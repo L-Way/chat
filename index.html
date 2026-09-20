@@ -141,6 +141,23 @@ section{position:absolute;inset:0}
 .row.snap .rico{transition:width .22s var(--spring),opacity .22s}
 @keyframes flashMsg{0%,100%{box-shadow:none}30%{box-shadow:0 0 0 3px var(--rose2)}}
 .b.flash{animation:flashMsg .9s ease}
+/* Nama pengirim di dalam bubble */
+.nm{display:block;max-width:100%;margin:0 0 2px;font-size:11.5px;font-weight:700;line-height:1.3;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;user-select:none;-webkit-user-select:none}
+.me .nm{color:rgba(255,255,255,.88)}
+.them .nm{color:var(--rose2)}
+.b.photo .nm{padding:3px 9px 4px}
+/* Tombol balas di samping bubble (area sentuh diperluas jadi ~44px lewat ::after) */
+.rbtn{position:absolute;top:50%;width:28px;height:28px;margin-top:-14px;border-radius:50%;display:grid;place-items:center;z-index:2;
+  color:var(--muted);background:rgba(255,255,255,.05);border:1px solid var(--line);opacity:.65;
+  transition:opacity .18s,transform .18s var(--spring),background .18s,color .18s}
+.rbtn::after{content:'';position:absolute;inset:-8px;border-radius:50%}
+.rbtn .ic{width:15px;height:15px;stroke-width:2.2}
+.me .rbtn{right:100%;margin-right:8px}
+.them .rbtn{left:100%;margin-left:8px}
+.rbtn:active{transform:scale(.86);background:rgba(255,92,138,.22);color:var(--rose);opacity:1}
+.rbtn:focus-visible{outline:2px solid var(--rose2);outline-offset:2px;opacity:1}
+.row.swiping .rbtn{opacity:0;pointer-events:none}
+@media (hover:hover) and (pointer:fine){.rbtn{opacity:0}.row:hover .rbtn{opacity:.9}.rbtn:hover{background:rgba(255,92,138,.18);color:var(--rose);opacity:1}}
 .qref{display:flex;gap:8px;align-items:flex-start;padding:6px 8px;margin-bottom:5px;border-radius:10px;background:rgba(0,0,0,.16);cursor:pointer}
 .qref .ql{width:3px;align-self:stretch;border-radius:3px;background:currentColor;flex:none;opacity:.85}
 .qref .qb{min-width:0;display:flex;flex-direction:column;gap:1px;overflow:hidden}
@@ -749,11 +766,12 @@ function tickIcon(m) {
   if (m.pending) return I.clock;
   return m.read_at ? I.checks.replace('class="ic ', 'class="ic rd ') : I.check;
 }
+const nameOf = m => m.sender === me ? USERS[me].own : partnerView().name;   // nama sendiri / nama lawan chat (sesuai tampilan masing-masing akun)
 function quoteHTML(m) {
   if (!m.reply_to) return '';
   const o = msgs.find(x => x.id === m.reply_to);
   if (!o) return `<div class="qref gone"><span class="ql"></span><div class="qb"><span class="qt">Pesan sudah tidak ada</span></div></div>`;
-  const name = o.sender === me ? 'Kamu' : partnerView().name;
+  const name = nameOf(o);
   const snip = o.kind === 'image' ? (o.photo_gone ? 'Foto sudah hilang' : '📷 Foto') : (o.body || '').slice(0, 80);
   return `<div class="qref" data-jump="${o.id}"><span class="ql"></span><div class="qb"><span class="qn">${esc(name)}</span><span class="qt">${esc(snip)}</span></div></div>`;
 }
@@ -771,8 +789,10 @@ function rowHTML(m, first, last, enter, delay) {
   const meta = `<span class="meta">${ttl}${fmtTime(m.created_at)}${mine ? tickIcon(m) : ''}</span>`;
   const rico = `<span class="rico">${I.reply}</span>`;
   const q = quoteHTML(m);
+  const nm = `<span class="nm">${esc(nameOf(m))}</span>`;
+  const rbtn = (m.pending || m.failed) ? '' : `<button type="button" class="rbtn" data-reply="${m.id}" aria-label="Balas pesan">${I.reply}</button>`;
   if (m.kind === 'text') {
-    return `<div class="${cls}" data-id="${m.id}"${st}>${rico}<div class="b${m.failed ? ' failed' : ''}">${q}${esc(m.body || '')}${meta}</div></div>`;
+    return `<div class="${cls}" data-id="${m.id}"${st}>${rico}<div class="b${m.failed ? ' failed' : ''}">${nm}${q}${esc(m.body || '')}${meta}${rbtn}</div></div>`;
   }
   // foto
   if (m.photo_gone) {
@@ -781,15 +801,26 @@ function rowHTML(m, first, last, enter, delay) {
   if (mine) {
     const seenIt = !!m.viewed_at;
     const label = m.pending ? 'Mengirim foto…' : (m.failed ? 'Gagal terkirim' : (seenIt ? 'Sudah dilihat' : 'Terkirim, belum dibuka'));
-    return `<div class="${cls}" data-id="${m.id}"${st}>${rico}<div class="b photo${m.failed ? ' failed' : ''}">${q}<div class="ph sent${seenIt ? ' seen' : ''}"><div class="lk">${m.pending ? I.clock : (seenIt ? I.eye : I.image)}</div><b>Foto</b><small>${label}</small></div>${meta}</div></div>`;
+    return `<div class="${cls}" data-id="${m.id}"${st}>${rico}<div class="b photo${m.failed ? ' failed' : ''}">${nm}${q}<div class="ph sent${seenIt ? ' seen' : ''}"><div class="lk">${m.pending ? I.clock : (seenIt ? I.eye : I.image)}</div><b>Foto</b><small>${label}</small></div>${meta}${rbtn}</div></div>`;
   }
   let hint;
   if (me !== 'er') hint = 'Hanya bisa dilihat sekali';
   else if (m.viewed_at) hint = `Tersisa ${Math.max(1, Math.ceil((+new Date(m.viewed_at) + ER_MS - now) / 60000))} menit`;
   else hint = `Bisa dilihat ${CONFIG.ER_PHOTO_MIN} menit setelah dibuka`;
-  return `<div class="${cls}" data-id="${m.id}"${st}>${rico}<div class="b photo">${q}<div class="ph lock" data-open="${m.id}"><div class="lk">${I.lock}</div><b>Ketuk untuk melihat foto</b><small>${hint}</small></div>${meta}</div></div>`;
+  return `<div class="${cls}" data-id="${m.id}"${st}>${rico}<div class="b photo">${nm}${q}<div class="ph lock" data-open="${m.id}"><div class="lk">${I.lock}</div><b>Ketuk untuk melihat foto</b><small>${hint}</small></div>${meta}${rbtn}</div></div>`;
 }
 function render(opts) {
+  try { renderInner(opts); }
+  catch (e) {
+    console.error('render gagal, membangun ulang daftar pesan', e);
+    try {
+      lastSig = '';
+      list.querySelectorAll(':scope > [data-key]').forEach(n => n.remove());
+      renderInner(Object.assign({}, opts, { force: true }));
+    } catch (e2) { console.error('render ulang juga gagal', e2); }
+  }
+}
+function renderInner(opts) {
   opts = opts || {};
   if (swipeLock) { // tunda render selagi ada geseran-balas aktif, supaya gestur tidak "putus"
     renderPending = { scroll: !!(renderPending && renderPending.scroll) || !!opts.scroll, smooth: !!(renderPending && renderPending.smooth) || !!opts.smooth, force: !!(renderPending && renderPending.force) || !!opts.force };
@@ -828,7 +859,7 @@ function render(opts) {
   // Hanya bangun ulang elemen DOM yang kontennya benar-benar berubah; sisanya dipakai ulang apa adanya
   const existing = new Map();
   for (const el of list.children) { if (el !== banner && el.dataset && el.dataset.key) existing.set(el.dataset.key, el); }
-  let cursor = banner.nextSibling;
+  let prev = banner;   // selalu anak yang sah dari #list, jadi tidak pernah basi
   for (const w of wanted) {
     const key = String(w.key);
     let el = existing.get(key);
@@ -839,10 +870,12 @@ function render(opts) {
       if (el.innerHTML !== wantHtml) el.innerHTML = wantHtml;
     } else if (!el || el.dataset.rsig !== w.rsig) {
       const tpl = document.createElement('div'); tpl.innerHTML = rowHTML(w.m, w.first, w.last, w.enter, w.delay);
-      el = tpl.firstElementChild; el.dataset.key = key; el.dataset.rsig = w.rsig;
+      const fresh = tpl.firstElementChild; fresh.dataset.key = key; fresh.dataset.rsig = w.rsig;
+      if (el) el.replaceWith(fresh); // ganti node lama secara utuh, jangan sampai node lamanya nyangkut dobel di DOM
+      el = fresh;
     }
-    if (cursor !== el) list.insertBefore(el, cursor);
-    cursor = el.nextSibling;
+    if (prev.nextSibling !== el) list.insertBefore(el, prev.nextSibling);
+    prev = el;
   }
   for (const el of existing.values()) el.remove(); // pesan yang sudah kedaluwarsa/terhapus / pembatas hari yang usang
 
@@ -1094,6 +1127,8 @@ async function pushPhoto(m) {
 /* ---------- Interaksi daftar pesan ---------- */
 list.addEventListener('click', e => {
   if (Date.now() - lastSwipeAt < 250) return; // abaikan klik yang terpicu setelah geser
+  const rb = e.target.closest('[data-reply]');
+  if (rb) { vib(8); startReply(rb.dataset.reply); return; }
   const jump = e.target.closest('[data-jump]');
   if (jump) {
     const row = list.querySelector(`.row[data-id="${jump.dataset.jump}"]`);
@@ -1114,7 +1149,7 @@ list.addEventListener('click', e => {
 let lp = null, lpXY = null;
 list.addEventListener('pointerdown', e => {
   if (decoy) return;
-  const b = e.target.closest('.row[data-id] .b'); if (!b) return;
+  const b = e.target.closest('.row[data-id] .b'); if (!b || e.target.closest('[data-reply]')) return;
   const id = b.closest('.row').dataset.id; lpXY = { x: e.clientX, y: e.clientY };
   lp = setTimeout(() => { lp = null; vib(15); msgMenu(id); }, 480);
 });
@@ -1124,8 +1159,9 @@ list.addEventListener('pointermove', e => { if (lp && lpXY && Math.hypot(e.clien
 /* ---------- Balas pesan: geser bubble untuk membalas ---------- */
 function startReply(id) {
   const m = msgs.find(x => x.id === id); if (!m || decoy) return;
+  if (m.pending || m.failed) { if (m.pending) toast('Tunggu pesannya terkirim dulu'); return; }   // pesan yang belum tersimpan di server belum bisa dikutip
   replyTo = id;
-  const name = m.sender === me ? 'Kamu' : partnerView().name;
+  const name = nameOf(m);
   const snip = m.kind === 'image' ? (m.photo_gone ? 'Foto sudah hilang' : '📷 Foto') : (m.body || '');
   $('rbName').textContent = 'Membalas ' + name;
   $('rbText').textContent = snip.length > 90 ? snip.slice(0, 90) + '…' : snip;
@@ -1140,7 +1176,7 @@ let sw = null;
 list.addEventListener('pointerdown', e => {
   if (decoy) return;
   const row = e.target.closest('.row[data-id]');
-  if (!row || e.target.closest('[data-open],[data-jump]')) return;
+  if (!row || e.target.closest('[data-open],[data-jump],[data-reply]')) return;
   const ic = row.querySelector('.rico'); if (!ic) return;
   sw = { row, ic, id: row.dataset.id, x0: e.clientX, y0: e.clientY, dx: 0, active: null, pid: e.pointerId };
 }, { passive: true });
