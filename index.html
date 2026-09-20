@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0c0911">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="robots" content="noindex,nofollow">
+<title>Ruang Kita</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff5c8a' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="application-name" content="Ruang Kita">
+<meta name="apple-mobile-web-app-title" content="Ruang Kita">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,500;1,9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c0911;--bg2:#140f1c;--surface:#1b1425;--surface2:#261c34;--line:rgba(255,255,255,.07);
+  --text:#f7eefa;--muted:#a394b1;--rose:#ff5c8a;--rose2:#ff8fab;--violet:#b86bff;--ok:#5be3a1;--danger:#ff6b81;
+  --ease:cubic-bezier(.22,1,.36,1);--spring:cubic-bezier(.34,1.56,.64,1);
+  --sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);
+  --font:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --serif:'Fraunces',Georgia,'Times New Roman',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font);
+  overscroll-behavior:none;touch-action:manipulation;-webkit-text-size-adjust:100%}
+body{position:fixed;inset:0;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea{-webkit-user-select:text;user-select:text;font-family:inherit}
+button{font-family:inherit;border:0;background:none;color:inherit;cursor:pointer}
+img,canvas{-webkit-user-drag:none;user-drag:none}
+svg{display:block}
+.ic{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ic.f{fill:currentColor;stroke:none}
+@media print{html,body{display:none!important}}
+
+/* ---------- App shell ---------- */
+#app{position:fixed;left:0;top:0;width:100%;height:100%;overflow:hidden;background:var(--bg)}
+section{position:absolute;inset:0}
+
+/* ---------- Shield (privasi) ---------- */
+#shield{position:fixed;inset:0;z-index:200;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--muted);
+  opacity:0;pointer-events:none;transition:opacity .12s}
+#shield.on{opacity:1;pointer-events:auto}
+#shield .ic{width:34px;height:34px;color:var(--rose)}
+#shield span{font-size:13px}
+
+/* ---------- Login ---------- */
+#login{display:flex;align-items:center;justify-content:center;padding:24px;overflow:hidden;
+  background:radial-gradient(90% 60% at 50% 0%,#2a1236 0%,transparent 70%),radial-gradient(80% 50% at 100% 100%,#3a1230 0%,transparent 70%),var(--bg);
+  transition:opacity .6s var(--ease),transform .7s var(--ease),filter .6s}
+#login.hide{opacity:0;transform:scale(1.12);filter:blur(8px);pointer-events:none;visibility:hidden;transition:opacity .6s var(--ease),transform .7s var(--ease),filter .6s,visibility 0s .7s}
+.hearts{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.hearts i{position:absolute;bottom:-40px;left:var(--x);width:var(--s);height:var(--s);background:var(--rose);opacity:0;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E") center/contain no-repeat;
+  animation:rise var(--d) linear var(--dl) infinite}
+@keyframes rise{0%{transform:translate3d(0,0,0) rotate(0);opacity:0}10%{opacity:.5}80%{opacity:.25}100%{transform:translate3d(var(--dx),-110vh,0) rotate(var(--r));opacity:0}}
+.lg{position:relative;width:100%;max-width:340px;text-align:center;animation:lgIn .9s var(--ease) both}
+@keyframes lgIn{from{opacity:0;transform:translateY(26px) scale(.96)}to{opacity:1;transform:none}}
+.orb{position:relative;width:104px;height:104px;margin:0 auto 26px;border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(circle at 30% 25%,#ff8fab,#e0459f 55%,#7a2fb0);box-shadow:0 14px 50px rgba(255,92,138,.45),inset 0 -6px 14px rgba(0,0,0,.25),inset 0 4px 10px rgba(255,255,255,.3);
+  animation:float 5s ease-in-out infinite}
+.orb::before,.orb::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid rgba(255,92,138,.5);animation:ping 3s var(--ease) infinite}
+.orb::after{animation-delay:1.5s}
+@keyframes ping{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.9);opacity:0}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.orb svg{width:46px;height:46px;overflow:visible;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.orb .sh{transform-origin:16px 11px;transition:transform .5s var(--spring)}
+.orb .body{fill:rgba(255,255,255,.18)}
+#login.unlocking .sh{transform:translateY(-4px) rotate(-28deg)}
+#login.unlocking .orb{animation:none;transform:scale(1.18);transition:transform .5s var(--spring);box-shadow:0 0 90px rgba(255,92,138,.9)}
+.lg h1{font-family:var(--serif);font-style:italic;font-weight:600;font-size:38px;letter-spacing:-.5px;line-height:1.05}
+.lg p.sub{margin:10px 0 26px;color:var(--muted);font-size:14px}
+.pwbox{position:relative;transition:transform .2s}
+.pwbox input{width:100%;height:56px;border-radius:18px;border:1.5px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);
+  font-size:16px;padding:0 54px 0 20px;outline:none;letter-spacing:.5px;text-align:center;transition:border-color .25s,box-shadow .25s,background .25s;backdrop-filter:blur(8px)}
+.pwbox input:focus{border-color:var(--rose);background:rgba(255,255,255,.08);box-shadow:0 0 0 4px rgba(255,92,138,.16)}
+.pwbox input::placeholder{color:#7d6f8b;letter-spacing:0}
+.pwbox .eye{position:absolute;right:6px;top:6px;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:var(--muted)}
+.pwbox.shake{animation:shake .5s}
+@keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(5px)}30%,50%,70%{transform:translateX(-9px)}40%,60%{transform:translateX(9px)}}
+#lgMsg{height:22px;margin:12px 0 4px;font-size:13px;color:var(--danger);opacity:0;transition:opacity .25s}
+#lgMsg.on{opacity:1}
+.cta{position:relative;overflow:hidden;width:100%;height:56px;border-radius:18px;font-weight:700;font-size:16px;color:#fff;
+  background:linear-gradient(135deg,#ff5c8a,#e0459f 55%,#b455e6);box-shadow:0 10px 30px rgba(255,92,138,.35);transition:transform .2s var(--spring),box-shadow .2s}
+.cta:active{transform:scale(.96);box-shadow:0 4px 14px rgba(255,92,138,.3)}
+.cta::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-20deg);animation:shine 3.4s ease-in-out infinite}
+@keyframes shine{0%,55%{left:-60%}100%{left:130%}}
+
+/* ---------- Chat ---------- */
+#chat{display:flex;flex-direction:column;opacity:0;pointer-events:none;visibility:hidden;transform:scale(.96);transition:opacity .6s var(--ease) .15s,transform .7s var(--ease) .15s,visibility 0s .8s;
+  background:var(--bg)}
+#chat.show{opacity:1;pointer-events:auto;visibility:visible;transform:none;transition:opacity .6s var(--ease) .15s,transform .7s var(--ease) .15s,visibility 0s}
+.aurora{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.aurora::before,.aurora::after{content:"";position:absolute;width:120vmax;height:120vmax;border-radius:50%;opacity:.5;will-change:transform}
+.aurora::before{left:-70vmax;top:-70vmax;background:radial-gradient(circle,rgba(184,107,255,.16),transparent 60%);animation:drift1 22s ease-in-out infinite alternate}
+.aurora::after{right:-80vmax;bottom:-80vmax;background:radial-gradient(circle,rgba(255,92,138,.14),transparent 60%);animation:drift2 26s ease-in-out infinite alternate}
+@keyframes drift1{to{transform:translate(28vmax,22vmax)}}
+@keyframes drift2{to{transform:translate(-24vmax,-26vmax)}}
+#hdr{position:relative;z-index:5;display:flex;align-items:center;gap:12px;padding:calc(var(--sat) + 10px) 10px 10px 14px;
+  background:rgba(20,15,28,.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+.av{position:relative;flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:18px;color:#fff;
+  background:linear-gradient(135deg,#ff8fab,#b86bff);box-shadow:0 4px 16px rgba(184,107,255,.35)}
+.av .dot{position:absolute;right:0;bottom:0;width:13px;height:13px;border-radius:50%;background:#6b5d78;border:2.5px solid #140f1c;transition:background .3s,box-shadow .3s}
+.av.on .dot{background:var(--ok);box-shadow:0 0 0 0 rgba(91,227,161,.6);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 7px rgba(91,227,161,0)}100%{box-shadow:0 0 0 0 rgba(91,227,161,0)}}
+.hm{flex:1;min-width:0}
+.hn{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16.5px;line-height:1.2}
+.hn span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip{flex:none;font-size:10.5px;font-weight:600;color:var(--ok);background:rgba(91,227,161,.12);padding:2px 8px;border-radius:99px;animation:pop .4s var(--spring)}
+.chip[hidden]{display:none}
+.hs{font-size:12.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .3s}
+.hs.love{font-family:var(--serif);font-style:italic;font-size:12.5px;color:var(--rose2)}
+.hs.typing{color:var(--rose2);font-style:normal;font-family:var(--font)}
+.ib{flex:none;width:42px;height:42px;border-radius:14px;display:grid;place-items:center;color:var(--muted);transition:transform .2s var(--spring),background .2s,color .2s}
+.ib:active{transform:scale(.88);background:rgba(255,255,255,.08);color:var(--text)}
+
+#scroller{position:relative;z-index:1;flex:1;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:10px 12px 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+#scroller::-webkit-scrollbar{display:none}
+.sys{width:max-content;max-width:92%;margin:6px auto 12px;display:flex;align-items:center;gap:7px;padding:7px 13px;border-radius:99px;
+  background:rgba(255,92,138,.09);border:1px solid rgba(255,92,138,.16);color:var(--rose2);font-size:12px;text-align:center}
+.sys .ic{width:13px;height:13px;flex:none}
+.day{display:flex;justify-content:center;margin:14px 0 8px}
+.day span{font-size:11.5px;color:var(--muted);background:rgba(255,255,255,.05);padding:4px 12px;border-radius:99px}
+.row{display:flex;margin-top:8px}
+.row.me{justify-content:flex-end}
+.row:not(.first){margin-top:2px}
+.b{position:relative;max-width:80%;padding:8px 13px 6px;font-size:15.5px;line-height:1.42;white-space:pre-wrap;overflow-wrap:anywhere;border-radius:20px}
+.me .b{background:linear-gradient(135deg,#ff5c8a,#e0459f 60%,#b455e6);color:#fff;box-shadow:0 4px 14px rgba(224,69,159,.22)}
+.them .b{background:var(--surface2);color:var(--text);border:1px solid var(--line)}
+.me:not(.first) .b{border-top-right-radius:7px}.me:not(.last) .b{border-bottom-right-radius:7px}.me.last .b{border-bottom-right-radius:5px}
+.them:not(.first) .b{border-top-left-radius:7px}.them:not(.last) .b{border-bottom-left-radius:7px}.them.last .b{border-bottom-left-radius:5px}
+.meta{float:right;display:inline-flex;align-items:center;gap:4px;margin:7px 0 -3px 12px;font-size:10.5px;opacity:.72;white-space:nowrap;user-select:none}
+.meta .ic{width:14px;height:14px;stroke-width:2.6}
+.meta .rd{opacity:1}
+.meta .ttl{color:#ffe08a}
+.b.failed{box-shadow:0 0 0 1.5px var(--danger)}
+.row.enter .b,.row.enter .ph{animation:popin .5s var(--spring) both;animation-delay:var(--dl,0s)}
+.row.me.enter .b,.row.me.enter .ph{transform-origin:100% 100%}
+.row.them.enter .b,.row.them.enter .ph{transform-origin:0 100%}
+@keyframes popin{from{opacity:0;transform:translateY(16px) scale(.6)}60%{opacity:1}to{opacity:1;transform:none}}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+.b.photo{padding:4px}
+.ph{position:relative;overflow:hidden;width:min(62vw,236px);height:min(70vw,270px);border-radius:17px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:14px}
+.ph.lock{cursor:pointer;background:radial-gradient(120% 90% at 15% 8%,#6b2f7e,transparent 60%),radial-gradient(100% 80% at 92% 92%,#a3305f,transparent 55%),#1c1327;transition:transform .2s var(--spring)}
+.ph.lock:active{transform:scale(.97)}
+.ph.lock::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.14) 50%,transparent 65%);transform:translateX(-100%);animation:sweep 3.2s ease-in-out infinite}
+@keyframes sweep{60%,100%{transform:translateX(100%)}}
+.ph .lk{position:relative;z-index:1;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.14);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.22);animation:breathe 2.4s ease-in-out infinite}
+.ph .lk .ic{width:28px;height:28px;color:#fff}
+@keyframes breathe{50%{transform:scale(1.09);box-shadow:0 0 0 12px rgba(255,255,255,.06)}}
+.ph b{position:relative;z-index:1;font-size:14.5px;color:#fff}
+.ph small{position:relative;z-index:1;font-size:12px;color:rgba(255,255,255,.72);line-height:1.35}
+.ph.sent{width:min(56vw,208px);height:auto;padding:16px 14px;background:rgba(0,0,0,.18);border:1px dashed rgba(255,255,255,.35)}
+.ph.sent .lk{width:46px;height:46px;animation:none;background:rgba(255,255,255,.18)}
+.ph.sent .lk .ic{width:22px;height:22px}
+.ph.seen .lk{background:rgba(255,255,255,.3)}
+.b.tomb{background:transparent!important;box-shadow:none!important;border:1px dashed rgba(255,255,255,.16)!important;color:var(--muted);font-size:13px;display:flex;align-items:center;gap:8px;padding:9px 14px}
+.b.tomb .ic{width:16px;height:16px}
+.b.tomb.in{animation:fadeup .5s var(--ease)}
+@keyframes fadeup{from{opacity:0;transform:translateY(6px)}}
+.dissolve{animation:dissolve .62s var(--ease) forwards!important}
+@keyframes dissolve{0%{opacity:1;filter:blur(0);transform:scale(1)}55%{opacity:.55;filter:blur(3px);transform:scale(.97)}100%{opacity:0;filter:blur(12px);transform:scale(.8)}}
+.pf{position:fixed;z-index:300;width:9px;height:9px;border-radius:50%;background:var(--c);pointer-events:none;animation:pf .75s var(--ease) forwards}
+@keyframes pf{from{transform:translate(0,0) scale(1);opacity:1}to{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}}
+.empty{margin:14vh auto 0;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;color:var(--muted);font-size:13.5px;max-width:240px}
+.empty b{color:var(--text);font-size:16px}
+.empty .hrt{width:64px;height:64px;color:var(--rose);animation:beat 1.6s ease-in-out infinite;filter:drop-shadow(0 6px 18px rgba(255,92,138,.5))}
+.empty .hrt svg{width:100%;height:100%}
+@keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.18)}30%{transform:scale(1)}45%{transform:scale(1.12)}}
+#typing{display:none;margin:6px 0 4px}
+#typing.on{display:flex}
+#typing .b{display:flex;gap:5px;align-items:center;padding:13px 15px;border-bottom-left-radius:5px;animation:popin .4s var(--spring);transform-origin:0 100%}
+#typing i{width:7px;height:7px;border-radius:50%;background:var(--rose2);animation:bounce 1.2s infinite}
+#typing i:nth-child(2){animation-delay:.15s}#typing i:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-6px);opacity:1}}
+#fab{position:absolute;z-index:6;right:14px;bottom:calc(var(--fabb,84px));width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--surface2);border:1px solid var(--line);
+  box-shadow:0 8px 24px rgba(0,0,0,.4);transform:scale(0);transition:transform .3s var(--spring)}
+#fab.on{transform:scale(1)}
+#fab:active{transform:scale(.9)}
+#fab .n{position:absolute;top:-6px;right:-4px;min-width:20px;height:20px;padding:0 5px;border-radius:99px;background:var(--rose);font-size:11px;font-weight:700;display:grid;place-items:center}
+#fab .n:empty{display:none}
+
+#cmp{position:relative;z-index:5;display:flex;align-items:flex-end;gap:8px;padding:8px 10px calc(var(--sab) + 10px);background:linear-gradient(to top,rgba(12,9,17,.96) 60%,rgba(12,9,17,0))}
+.tw{flex:1;min-width:0;background:var(--surface);border:1.5px solid var(--line);border-radius:24px;transition:border-color .25s,box-shadow .25s}
+.tw:focus-within{border-color:rgba(255,92,138,.55);box-shadow:0 0 0 4px rgba(255,92,138,.1)}
+#ta{display:block;width:100%;max-height:120px;min-height:44px;resize:none;border:0;outline:0;background:transparent;color:var(--text);font-size:16px;line-height:1.35;padding:11px 16px;overflow-y:auto}
+#ta::placeholder{color:#7d6f8b}
+#btnPhoto{width:46px;height:46px;border-radius:50%;background:var(--surface);border:1.5px solid var(--line);color:var(--rose2)}
+.sendb{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:#7d6f8b;background:var(--surface);border:1.5px solid var(--line);transition:transform .35s var(--spring),background .3s,color .3s,box-shadow .3s}
+.sendb .ic{transition:transform .4s var(--spring);width:20px;height:20px}
+.sendb.on{color:#fff;background:linear-gradient(135deg,#ff5c8a,#b455e6);border-color:transparent;box-shadow:0 6px 20px rgba(255,92,138,.45);transform:scale(1.06)}
+.sendb.on .ic{transform:translate(1px,-1px) rotate(0)}
+.sendb:active{transform:scale(.88)}
+.sendb.fly .ic{animation:fly .55s var(--ease)}
+@keyframes fly{0%{transform:none;opacity:1}45%{transform:translate(26px,-26px) scale(.6);opacity:0}46%{transform:translate(-26px,26px) scale(.6);opacity:0}100%{transform:none;opacity:1}}
+
+/* ---------- Tab obrolan (khusus Er) ---------- */
+#tabs{display:none;position:relative;z-index:4;margin:8px 12px 0;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:16px;grid-template-columns:1fr 1fr}
+#tabs.on{display:grid;animation:fadeup .5s var(--ease)}
+#tabs .sl{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:12px;background:linear-gradient(135deg,rgba(255,92,138,.32),rgba(184,107,255,.32));border:1px solid rgba(255,92,138,.35);transition:transform .45s var(--spring)}
+#tabs.r1 .sl{transform:translateX(100%)}
+.tab{position:relative;z-index:1;height:38px;font-weight:600;font-size:14px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:7px;transition:color .25s,transform .2s}
+.tab.on{color:var(--text)}
+.tab:active{transform:scale(.95)}
+.bd{min-width:19px;height:19px;padding:0 5px;border-radius:99px;background:var(--rose);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;animation:pop .4s var(--spring)}
+.bd:empty{display:none}
+#list.swap{animation:swapIn .45s var(--ease)}
+@keyframes swapIn{from{opacity:0;transform:translateY(12px)}}
+
+/* ---------- Sheet ---------- */
+#sheet{position:absolute;inset:0;z-index:120;pointer-events:none;background:rgba(0,0,0,0);transition:background .3s}
+#sheet.open{pointer-events:auto;background:rgba(0,0,0,.6)}
+.sh-card{position:absolute;left:0;right:0;bottom:0;padding:10px 16px calc(var(--sab) + 18px);background:var(--surface);border-radius:28px 28px 0 0;border-top:1px solid var(--line);
+  transform:translateY(105%);transition:transform .45s var(--ease)}
+#sheet.open .sh-card{transform:none}
+.sh-card::before{content:"";display:block;width:40px;height:4px;border-radius:9px;background:rgba(255,255,255,.18);margin:0 auto 14px}
+.who{display:flex;align-items:center;gap:12px;padding:6px 6px 14px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.who .av{width:44px;height:44px}
+.who b{display:block;font-size:15.5px}.who span{font-size:12.5px;color:var(--muted)}
+.it{display:flex;align-items:center;gap:14px;width:100%;padding:14px 8px;border-radius:14px;font-size:15px;font-weight:500;text-align:left;transition:background .2s,transform .2s}
+.it:active{background:rgba(255,255,255,.06);transform:scale(.98)}
+.it .ic{width:21px;height:21px;color:var(--rose2)}
+.it.dng,.it.dng .ic{color:var(--danger)}
+.it em{margin-left:auto;font-style:normal;font-size:12.5px;color:var(--muted)}
+.sh-t{font-weight:700;font-size:17px;margin:4px 6px 6px}.sh-p{font-size:13.5px;color:var(--muted);line-height:1.5;margin:0 6px 12px}
+.btn{height:50px;border-radius:16px;font-weight:700;font-size:15px;padding:0 20px;transition:transform .2s var(--spring)}
+.btn:active{transform:scale(.95)}
+.btn.ghost{background:rgba(255,255,255,.07)}
+.btn.danger{background:var(--danger);color:#fff}
+.btn.cta{width:auto;height:50px;border-radius:16px;font-size:15px}
+.acts{display:flex;gap:10px}.acts .btn{flex:1}
+.sh-card{max-height:100%;overflow-y:auto;overscroll-behavior:contain}
+.fld{display:block;width:100%;height:50px;border-radius:14px;border:1.5px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);font-size:16px;padding:0 16px;margin:0 0 10px;outline:none;transition:border-color .25s,box-shadow .25s}
+.fld:focus{border-color:var(--rose);box-shadow:0 0 0 4px rgba(255,92,138,.16)}
+.fld::placeholder{color:#7d6f8b}
+.sh-msg{min-height:20px;margin:-2px 6px 8px;font-size:13px;color:var(--danger)}
+.cta:disabled,.btn:disabled{opacity:.6;pointer-events:none}
+
+/* ---------- Preview foto ---------- */
+#pv{position:fixed;inset:0;z-index:130;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(6,4,10,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  opacity:0;pointer-events:none;transition:opacity .3s}
+#pv.open{opacity:1;pointer-events:auto}
+.pv-card{width:100%;max-width:380px;max-height:100%;display:flex;flex-direction:column;gap:14px;transform:scale(.9) translateY(20px);transition:transform .5s var(--spring)}
+#pv.open .pv-card{transform:none}
+.pv-card img{width:100%;max-height:55vh;object-fit:contain;border-radius:20px;background:#000;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.pv-card p{font-size:13px;color:var(--muted);text-align:center;line-height:1.5}
+
+/* ---------- Viewer foto ---------- */
+#viewer{position:fixed;inset:0;z-index:140;background:rgba(0,0,0,0);display:flex;flex-direction:column;pointer-events:none;visibility:hidden;transition:background .35s,visibility 0s .4s}
+#viewer.open{background:#000;pointer-events:auto;visibility:visible;transition:background .35s,visibility 0s}
+.vbar{position:relative;z-index:2;display:flex;align-items:center;gap:8px;padding:calc(var(--sat) + 10px) 10px 10px;opacity:0;transform:translateY(-12px);transition:.4s var(--ease) .1s}
+#viewer.open .vbar{opacity:1;transform:none}
+.vinfo{flex:1;min-width:0;text-align:center}
+.vinfo b{display:block;font-size:14px}.vinfo span{font-size:12px;color:var(--muted)}
+.vinfo span.warn{color:#ffb3c6}
+.vbar .ib{background:rgba(255,255,255,.1);color:#fff;border-radius:50%}
+.vstage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:0 8px calc(var(--sab) + 16px);opacity:0;transform:scale(.88);transition:opacity .4s var(--ease),transform .5s var(--spring);touch-action:none}
+#viewer.open .vstage{opacity:1;transform:none}
+.vstage.drag{transition:none}
+.vstage canvas,.vstage img{max-width:100%;max-height:100%;object-fit:contain;border-radius:14px;pointer-events:none}
+.vstage.er img{pointer-events:auto;-webkit-touch-callout:default;-webkit-user-select:auto;user-select:auto}
+.spin{width:36px;height:36px;border-radius:50%;border:3px solid rgba(255,255,255,.12);border-top-color:var(--rose);animation:rot .8s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* ---------- Tautan pasang (login) ---------- */
+.lnk{display:block;margin:14px auto 0;padding:8px 14px;border-radius:12px;color:var(--muted);font-size:13px;text-decoration:underline;text-underline-offset:3px;transition:color .2s,transform .2s var(--spring)}
+.lnk:active{color:var(--text);transform:scale(.96)}
+.lnk[hidden]{display:none}
+
+/* ---------- Puisi (tampilan sandi palsu) ---------- */
+#poems{display:flex;flex-direction:column;opacity:0;pointer-events:none;visibility:hidden;transform:scale(.96);transition:opacity .6s var(--ease) .15s,transform .7s var(--ease) .15s,visibility 0s .8s;background:var(--bg)}
+#poems.show{opacity:1;pointer-events:auto;visibility:visible;transform:none;transition:opacity .6s var(--ease) .15s,transform .7s var(--ease) .15s,visibility 0s}
+#pHdr{position:relative;z-index:5;display:flex;align-items:center;gap:8px;padding:calc(var(--sat) + 10px) 10px 12px 18px;background:rgba(20,15,28,.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+#pHdr .pt{flex:1;min-width:0}
+#pHdr h2{font-family:var(--serif);font-style:italic;font-weight:600;font-size:26px;letter-spacing:-.3px;line-height:1.1}
+#pCount{display:block;margin-top:2px;font-size:12.5px;color:var(--muted);min-height:16px}
+#pAdd{color:#fff;background:linear-gradient(135deg,#ff5c8a,#b455e6);box-shadow:0 6px 18px rgba(255,92,138,.35)}
+#pAdd:active{background:linear-gradient(135deg,#ff5c8a,#b455e6);color:#fff}
+#pScroll{position:relative;z-index:1;flex:1;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:14px 14px calc(var(--sab) + 24px);-webkit-overflow-scrolling:touch;scrollbar-width:none}
+#pScroll::-webkit-scrollbar{display:none}
+.pc{position:relative;overflow:hidden;padding:18px 18px 14px 22px;margin-bottom:12px;border-radius:22px;background:var(--surface);border:1px solid var(--line);cursor:pointer;transition:transform .25s var(--spring),background .2s}
+.pc::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:linear-gradient(var(--rose),var(--violet))}
+.pc:active{transform:scale(.98);background:var(--surface2)}
+#pList.anim .pc{animation:popin .55s var(--spring) both;animation-delay:calc(var(--i) * 60ms)}
+.pc h3{font-family:var(--serif);font-style:italic;font-weight:600;font-size:21px;line-height:1.2;margin-bottom:8px;overflow-wrap:anywhere}
+.pc p{font-size:14px;line-height:1.55;color:var(--muted);white-space:pre-line;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.pm{display:flex;justify-content:space-between;gap:10px;margin-top:12px;font-size:11.5px;color:#7d6f8b}
+.pm span:first-child{color:var(--rose2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pm span:last-child{flex:none}
+
+.pov{position:absolute;inset:0;z-index:110;display:flex;flex-direction:column;background:var(--bg);transform:translateY(100%);visibility:hidden;transition:transform .5s var(--ease),visibility 0s .5s}
+.pov.open{transform:none;visibility:visible;transition:transform .5s var(--ease),visibility 0s}
+#pEdit{z-index:115}
+.pbar{flex:none;display:flex;align-items:center;gap:6px;padding:calc(var(--sat) + 10px) 10px 10px;border-bottom:1px solid var(--line);background:rgba(20,15,28,.72)}
+.pbar .sp{flex:1}
+.pbar b{flex:1;text-align:center;font-size:15px}
+.pbar .btn.sm{height:40px;padding:0 18px;font-size:14px;border-radius:14px;margin-right:4px}
+.pbody{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:22px 20px calc(var(--sab) + 32px);-webkit-overflow-scrolling:touch}
+.rt{font-family:var(--serif);font-style:italic;font-weight:600;font-size:30px;line-height:1.15;text-align:center;letter-spacing:-.4px;overflow-wrap:anywhere}
+.rby{margin-top:8px;text-align:center;font-size:13px;color:var(--rose2)}
+.rx{margin:26px auto 0;max-width:460px;font-family:var(--serif);font-style:italic;font-weight:500;font-size:19px;line-height:1.85;text-align:center;white-space:pre-wrap;overflow-wrap:anywhere}
+.orn{width:22px;height:22px;margin:30px auto 8px;color:var(--rose);opacity:.85}
+.orn svg{width:100%;height:100%}
+.rdate{text-align:center;font-size:12px;color:#7d6f8b}
+.fld.tx{height:auto;min-height:280px;padding:14px 16px;line-height:1.6;resize:none;font-size:16px}
+
+/* ---------- Toast ---------- */
+#toast{position:fixed;left:50%;top:calc(var(--sat) + 14px);z-index:400;max-width:88%;padding:11px 18px;border-radius:99px;background:rgba(38,28,52,.96);border:1px solid var(--line);font-size:13.5px;text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,.5);transform:translate(-50%,calc(-100% - 40px));transition:transform .5s var(--spring);pointer-events:none}
+#toast.on{transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<!--
+  Urutan setup:
+  1) Supabase > Authentication > Users: buat 3 akun (saskia, selpia, er) sesuai CONFIG.ACCOUNTS.
+  2) Jalankan setup.sql di SQL Editor.
+  3) Ganti kunci enkripsi (CHAT_SECRET) di objek CONFIG di bawah sebelum dipakai.
+  4) Upload SEMUA file ke hosting HTTPS dalam satu folder: index.html, manifest.webmanifest,
+     sw.js, dan folder icons/. Tanpa HTTPS, enkripsi & pemasangan di layar utama tidak jalan.
+-->
+<div id="app">
+
+  <!-- LOGIN -->
+  <section id="login">
+    <div class="hearts" id="hearts"></div>
+    <div class="lg">
+      <div class="orb">
+        <svg viewBox="0 0 32 32"><rect class="body" x="6" y="14" width="20" height="14" rx="4"/><g class="sh"><path d="M11 14v-3.5a5 5 0 0 1 10 0V14"/></g><circle cx="16" cy="21" r="1.6" fill="#fff" stroke="none"/></svg>
+      </div>
+      <h1>Ruang Kita</h1>
+      <p class="sub">Masukkan sandi untuk masuk</p>
+      <div class="pwbox" id="pwbox">
+        <input id="pw" type="password" placeholder="Sandi" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-label="Sandi">
+        <button class="eye" id="eye" type="button" aria-label="Tampilkan sandi"></button>
+      </div>
+      <div id="lgMsg" role="alert"></div>
+      <button class="cta" id="lgBtn" type="button">Masuk</button>
+      <button class="lnk" id="btnInstall" type="button" hidden>Pasang di layar utama</button>
+    </div>
+  </section>
+
+  <!-- CHAT -->
+  <section id="chat">
+    <div class="aurora"></div>
+    <header id="hdr">
+      <div class="av" id="hAv"><span id="hIn"></span><i class="dot"></i></div>
+      <div class="hm">
+        <div class="hn"><span id="hName"></span><b class="chip" id="hChip" hidden>online</b></div>
+        <div class="hs" id="hSub"></div>
+      </div>
+      <button class="ib" id="btnLock" aria-label="Kunci"></button>
+      <button class="ib" id="btnMenu" aria-label="Menu"></button>
+    </header>
+    <div id="tabs" role="tablist"><i class="sl"></i>
+      <button class="tab" data-room="saskia">Saskia<b class="bd"></b></button>
+      <button class="tab" data-room="selpia">Selpia<b class="bd"></b></button>
+    </div>
+    <div id="scroller">
+      <div id="list"></div>
+      <div id="typing" class="row them"><div class="b"><i></i><i></i><i></i></div></div>
+    </div>
+    <button id="fab" aria-label="Ke pesan terbaru"><span class="n" id="fabN"></span></button>
+    <footer id="cmp">
+      <button class="ib" id="btnPhoto" aria-label="Kirim foto"></button>
+      <div class="tw"><textarea id="ta" rows="1" placeholder="Tulis pesan…" enterkeyhint="send" autocomplete="off" autocorrect="on" aria-label="Pesan"></textarea></div>
+      <button class="sendb" id="btnSend" aria-label="Kirim"></button>
+    </footer>
+    <input type="file" id="file" accept="image/*" hidden>
+  </section>
+
+  <!-- PUISI (tampilan sandi palsu) -->
+  <section id="poems">
+    <div class="aurora"></div>
+    <header id="pHdr">
+      <div class="pt"><h2>Puisi Cinta</h2><span id="pCount"></span></div>
+      <button class="ib" id="pAdd" aria-label="Tambah puisi"></button>
+      <button class="ib" id="pLock" aria-label="Kunci"></button>
+    </header>
+    <div id="pScroll"><div id="pList"></div></div>
+  </section>
+
+  <div class="pov" id="pRead" role="dialog" aria-modal="true" aria-label="Baca puisi">
+    <div class="pbar">
+      <button class="ib" id="rBack" aria-label="Kembali"></button>
+      <div class="sp"></div>
+      <button class="ib" id="rEdit" aria-label="Ubah"></button>
+      <button class="ib" id="rDel" aria-label="Hapus"></button>
+    </div>
+    <div class="pbody" id="rBody"></div>
+  </div>
+
+  <div class="pov" id="pEdit" role="dialog" aria-modal="true" aria-label="Tulis puisi">
+    <div class="pbar">
+      <button class="ib" id="eClose" aria-label="Tutup"></button>
+      <b id="eBar">Puisi baru</b>
+      <button class="btn cta sm" id="eSave" type="button">Simpan</button>
+    </div>
+    <div class="pbody">
+      <input class="fld" id="eTitle" type="text" maxlength="80" placeholder="Judul" autocomplete="off" autocapitalize="sentences">
+      <input class="fld" id="eBy" type="text" maxlength="60" placeholder="Penulis (boleh dikosongkan)" autocomplete="off" autocapitalize="words">
+      <textarea class="fld tx" id="eText" placeholder="Tulis puisimu di sini…" autocomplete="off"></textarea>
+      <div class="sh-msg" id="eMsg" role="alert"></div>
+    </div>
+  </div>
+
+  <div id="sheet"><div id="shCard"></div></div>
+
+  <div id="pv">
+    <div class="pv-card">
+      <img id="pvImg" alt="">
+      <p id="pvNote"></p>
+      <div class="acts"><button class="btn ghost" id="pvCancel">Batal</button><button class="btn cta" id="pvSend">Kirim foto</button></div>
+    </div>
+  </div>
+
+  <div id="viewer">
+    <div class="vbar">
+      <button class="ib" id="vClose" aria-label="Tutup"></button>
+      <div class="vinfo"><b id="vT"></b><span id="vS"></span></div>
+      <button class="ib" id="vDl" aria-label="Unduh" hidden></button>
+    </div>
+    <div class="vstage" id="vStage"></div>
+  </div>
+</div>
+<div id="shield"></div>
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+'use strict';
+/* =====================================================================
+   PENGATURAN — ubah sesuai kebutuhan
+   ===================================================================== */
+const CONFIG = {
+  SUPABASE_URL: 'https://zwsllgsjfnypwritsxfx.supabase.co',
+  SUPABASE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3c2xsZ3NqZm55cHdyaXRzeGZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk4NDcwMzIsImV4cCI6MjEwNTQyMzAzMn0.QckLgUtiw3peQt4x2cmi1w8hSzyxWdaixP-Bbp85-2w',
+
+  // Akun login (Supabase Auth). Email ini dibuat di Authentication > Users dan
+  // HARUS sama persis dengan yang ada di setup.sql. Boleh alamat karangan.
+  // Sandi ASLI tidak disimpan di file ini: ada di Supabase dan bisa diganti lewat menu.
+  ACCOUNTS: {
+    saskia: 'saskia@ruangkita.app',
+    selpia: 'selpia@ruangkita.app',
+    er:     'er@ruangkita.app'
+  },
+
+  // Kunci enkripsi pesan (harus SAMA di semua HP). GANTI dengan kalimat rahasia kalian.
+  CHAT_SECRET: 'ganti-kalimat-rahasia-kalian-ini-yang-panjang-2026',
+
+  // Sandi PALSU (membuka kumpulan puisi, tanpa terhubung ke server). Default:
+  //   Saskia palsu : saskia000  |  Selpia palsu : selpia000  |  Er palsu : er000000
+  // Untuk membuat hash baru: buka console browser lalu ketik  buatHash('sandibaru')
+  SALT: 'SKER::v1::',
+  DECOY_HASHES: {
+    'e5680ce0ae7dabd31656f3312ace4013ab7a8e99ca814ac4e9cda2fb9d4a4082': { user: 'saskia', mode: 'decoy' },
+    'e026ae6fed01278db72c1e2a1a5aa0c56828ee7a25947fc053f90fc716ef0b80': { user: 'er',     mode: 'decoy' },
+    '254d45b1549b09eed8c2d83df8099624e5d5fe57ee2333bbf4ff2d6ee655cc2d': { user: 'selpia', mode: 'decoy' }
+  },
+
+  // Kanal realtime privat (hanya anggota ruangnya yang bisa ikut).
+  // Jika indikator "online"/"mengetik" tidak jalan, ubah jadi false.
+  PRIVATE_CHANNELS: true,
+
+  MSG_TTL_H: 24,             // pesan hilang setelah (jam)
+  ER_PHOTO_MIN: 60,          // foto untuk Er bertahan (menit) setelah dibuka
+  LOCK_AFTER_MS: 120000      // otomatis terkunci jika ditinggal (ms)
+};
+
+const USERS = {
+  saskia: { own: 'Saskia Cantik', partner: 'er',
+            view: { name: 'Bang R Sayangku', sub: 'Hidup dan Matiku', initial: 'R' } },
+  selpia: { own: 'Selpia Manis', partner: 'er',
+            view: { name: 'Bang R Sayangku', sub: 'Hidup dan Matiku', initial: 'R' } },
+  er:     { own: 'Er Ganteng', partner: 'saskia',
+            views: { saskia: { name: 'Saskia Sayangku', sub: '', initial: 'S' },
+                     selpia: { name: 'Selpia Sayangku', sub: '', initial: 'S' } } }
+};
+
+/* =====================================================================
+   Util
+   ===================================================================== */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const iso = t => new Date(t === undefined ? Date.now() : t).toISOString();
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const vib = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };
+const ER_MS = CONFIG.ER_PHOTO_MIN * 60000;
+const TTL_MS = CONFIG.MSG_TTL_H * 3600000;
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() :
+  'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random()*16|0; return (c==='x'?r:(r&3|8)).toString(16); }));
+
+const P = (d, x='') => `<svg class="ic ${x}" viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
+const I = {
+  send:  P('<path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/>'),
+  image: P('<rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/>'),
+  lock:  P('<rect x="4" y="11" width="16" height="10" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'),
+  more:  P('<circle cx="12" cy="5" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="12" cy="19" r="1.4"/>'),
+  x:     P('<path d="M18 6 6 18M6 6l12 12"/>'),
+  dl:    P('<path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>'),
+  eye:   P('<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'),
+  eyeoff:P('<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M3 3l18 18"/>'),
+  down:  P('<path d="m6 9 6 6 6-6"/>'),
+  check: P('<path d="m5 12.5 4.5 4.5L19 7.5"/>'),
+  checks:P('<path d="m2 12.5 4.5 4.5L15 8"/><path d="m10 15.5 1.5 1.5L21 7.5"/>'),
+  clock: P('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+  trash: P('<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m6 6 1 14h10l1-14"/>'),
+  vol:   P('<path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/>'),
+  mute:  P('<path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 5 6M21 9l-5 6"/>'),
+  heart: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
+  warn:  P('<path d="M12 3 2 20h20z"/><path d="M12 10v5"/><path d="M12 18h.01"/>'),
+  key:   P('<circle cx="8" cy="15" r="4"/><path d="m11 12 9-9"/><path d="m16 7 3 3"/>'),
+  plus:  P('<path d="M12 5v14M5 12h14"/>'),
+  edit:  P('<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/>'),
+  back:  P('<path d="m15 18-6-6 6-6"/>')
+};
+
+/* ---------- SHA-256 (cadangan jika crypto.subtle tidak tersedia) ---------- */
+const te = new TextEncoder(), td = new TextDecoder();
+function sha256js(str) {
+  const bytes = te.encode(str), l = bytes.length;
+  const K = [], H = []; let pc = 0; const comp = {};
+  for (let c = 2; pc < 64; c++) {
+    if (!comp[c]) {
+      for (let i = c*c; i < 400; i += c) comp[i] = 1;
+      if (pc < 8) H[pc] = (Math.pow(c, .5) * 4294967296) | 0;
+      K[pc++] = (Math.pow(c, 1/3) * 4294967296) | 0;
+    }
+  }
+  const n = (((l + 8) >> 6) + 1) * 16, w = new Int32Array(n);
+  for (let i = 0; i < l; i++) w[i >> 2] |= bytes[i] << (24 - (i % 4) * 8);
+  w[l >> 2] |= 0x80 << (24 - (l % 4) * 8);
+  w[n - 1] = l * 8;
+  const rr = (x, k) => (x >>> k) | (x << (32 - k));
+  const W = new Int32Array(64); let h = H.slice();
+  for (let o = 0; o < n; o += 16) {
+    for (let i = 0; i < 64; i++) {
+      if (i < 16) W[i] = w[o + i];
+      else { const a = W[i-15], b = W[i-2];
+        W[i] = (W[i-16] + (rr(a,7)^rr(a,18)^(a>>>3)) + W[i-7] + (rr(b,17)^rr(b,19)^(b>>>10))) | 0; }
+    }
+    let [a,b,c,d,e,f,g,hh] = h;
+    for (let i = 0; i < 64; i++) {
+      const t1 = (hh + (rr(e,6)^rr(e,11)^rr(e,25)) + ((e&f)^(~e&g)) + K[i] + W[i]) | 0;
+      const t2 = ((rr(a,2)^rr(a,13)^rr(a,22)) + ((a&b)^(a&c)^(b&c))) | 0;
+      hh=g; g=f; f=e; e=(d+t1)|0; d=c; c=b; b=a; a=(t1+t2)|0;
+    }
+    h = [h[0]+a|0,h[1]+b|0,h[2]+c|0,h[3]+d|0,h[4]+e|0,h[5]+f|0,h[6]+g|0,h[7]+hh|0];
+  }
+  return h.map(x => (x >>> 0).toString(16).padStart(8, '0')).join('');
+}
+const hasSubtle = !!(window.crypto && crypto.subtle);
+async function sha256(s) {
+  if (!hasSubtle) return sha256js(s);
+  const buf = await crypto.subtle.digest('SHA-256', te.encode(s));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+window.buatHash = async pw => { const h = await sha256(CONFIG.SALT + pw); console.log(h); return h; };
+
+/* ---------- Enkripsi AES-GCM ---------- */
+let aesKey = null;
+async function getKey() {
+  if (aesKey) return aesKey;
+  const base = await crypto.subtle.importKey('raw', te.encode(CONFIG.CHAT_SECRET), 'PBKDF2', false, ['deriveKey']);
+  aesKey = await crypto.subtle.deriveKey({ name:'PBKDF2', salt: te.encode('sk-er::chat'), iterations: 120000, hash:'SHA-256' },
+    base, { name:'AES-GCM', length: 256 }, false, ['encrypt','decrypt']);
+  return aesKey;
+}
+function b64e(bytes) { let s = ''; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000)); return btoa(s); }
+function b64d(str) { const s = atob(str), a = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) a[i] = s.charCodeAt(i); return a; }
+async function enc(str) {
+  if (!hasSubtle) return 'p:' + b64e(te.encode(str));
+  const k = await getKey(), iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name:'AES-GCM', iv }, k, te.encode(str)));
+  const out = new Uint8Array(12 + ct.length); out.set(iv); out.set(ct, 12);
+  return 'e:' + b64e(out);
+}
+async function dec(s) {
+  if (!s) return '';
+  const t = s.slice(0, 2), d = s.slice(2);
+  if (t === 'p:') return td.decode(b64d(d));
+  const k = await getKey(), raw = b64d(d);
+  return td.decode(await crypto.subtle.decrypt({ name:'AES-GCM', iv: raw.slice(0, 12) }, k, raw.slice(12)));
+}
+
+/* ---------- Suara ---------- */
+let soundOn = localStorage.getItem('sk_snd') !== '0', ac = null;
+function tone(freqs) {
+  if (!soundOn) return;
+  try {
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    if (ac.state === 'suspended') ac.resume();
+    const t = ac.currentTime;
+    freqs.forEach((f, i) => {
+      const o = ac.createOscillator(), g = ac.createGain(), s = t + i * .09;
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0, s); g.gain.linearRampToValueAtTime(.05, s + .012); g.gain.exponentialRampToValueAtTime(.0001, s + .26);
+      o.connect(g); g.connect(ac.destination); o.start(s); o.stop(s + .3);
+    });
+  } catch (e) {}
+}
+
+/* =====================================================================
+   State
+   ===================================================================== */
+let me = null, partner = null, room = null, badge = { saskia: 0, selpia: 0 }, decoy = false, sb = null, chan = null, rtOk = false;
+let msgs = [], seen = new Set(), textCache = new Map();
+let partnerOnline = false, typingUntil = 0, lastTypeSent = 0;
+let stick = true, unread = 0, lastSig = '', firstRender = true, firstSync = true;
+let shieldOff = false, hiddenAt = 0, V = null, syncing = false, syncQueued = false, syncTimer = null;
+let pollT = null, tickT = null, lastClean = 0, lgFails = 0, lgLock = 0, pendingPhoto = null;
+let killing = Promise.resolve(), loginBusy = false;
+const AUTH_KEY = 'sk_auth';
+
+const scroller = $('scroller'), list = $('list'), ta = $('ta');
+
+/* =====================================================================
+   UI kecil: toast, burst, sheet
+   ===================================================================== */
+let toastT;
+function toast(t) { const el = $('toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('on'), 2600); }
+function burst(x, y, colors) {
+  colors = colors || ['#ff5c8a', '#ff8fab', '#b86bff', '#ffd1dc'];
+  for (let i = 0; i < 16; i++) {
+    const p = document.createElement('i'); p.className = 'pf';
+    const a = Math.random() * Math.PI * 2, d = 40 + Math.random() * 70;
+    p.style.cssText = `left:${x}px;top:${y}px;--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d}px;--c:${colors[i % colors.length]};width:${5+Math.random()*7}px;height:${5+Math.random()*7}px`;
+    document.body.appendChild(p); setTimeout(() => p.remove(), 800);
+  }
+}
+function openSheet(html) { $('shCard').className = 'sh-card'; $('shCard').innerHTML = html; requestAnimationFrame(() => $('sheet').classList.add('open')); }
+function closeSheet() { $('sheet').classList.remove('open'); }
+$('sheet').addEventListener('click', e => { if (e.target === $('sheet')) closeSheet(); });
+
+/* =====================================================================
+   Format waktu
+   ===================================================================== */
+const fmtTime = t => new Date(t).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false }).replace('.', ':');
+function dayLabel(t) {
+  const d = new Date(t), n = new Date();
+  const k = x => x.getFullYear() * 400 + x.getMonth() * 31 + x.getDate();
+  const y = new Date(n); y.setDate(n.getDate() - 1);
+  if (k(d) === k(n)) return 'Hari ini';
+  if (k(d) === k(y)) return 'Kemarin';
+  return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long' });
+}
+
+/* =====================================================================
+   Render pesan
+   ===================================================================== */
+function tickIcon(m) {
+  if (m.failed) return I.warn;
+  if (m.pending) return I.clock;
+  return m.read_at ? I.checks.replace('class="ic ', 'class="ic rd ') : I.check;
+}
+function rowHTML(m, first, last, enter, delay) {
+  const mine = m.sender === me, now = Date.now();
+  const cls = `row ${mine ? 'me' : 'them'}${first ? ' first' : ''}${last ? ' last' : ''}${enter ? ' enter' : ''}`;
+  const st = delay ? ` style="--dl:${delay}s"` : '';
+  const left = new Date(m.expires_at) - now;
+  const ttl = (!decoy && left < 3600000 && left > 0) ? `<span class="ttl">${Math.max(1, Math.ceil(left / 60000))}m</span>` : '';
+  const meta = `<span class="meta">${ttl}${fmtTime(m.created_at)}${mine ? tickIcon(m) : ''}</span>`;
+  if (m.kind === 'text') {
+    return `<div class="${cls}" data-id="${m.id}"${st}><div class="b${m.failed ? ' failed' : ''}">${esc(m.body || '')}${meta}</div></div>`;
+  }
+  // foto
+  if (m.photo_gone) {
+    return `<div class="${cls}" data-id="${m.id}"><div class="b tomb${m._fresh ? ' in' : ''}">${I.eyeoff}<span>Foto sudah hilang</span><span class="meta" style="margin:0 0 0 4px">${fmtTime(m.created_at)}</span></div></div>`;
+  }
+  if (mine) {
+    const seenIt = !!m.viewed_at;
+    const label = m.pending ? 'Mengirim foto…' : (m.failed ? 'Gagal terkirim' : (seenIt ? 'Sudah dilihat' : 'Terkirim, belum dibuka'));
+    return `<div class="${cls}" data-id="${m.id}"${st}><div class="b photo${m.failed ? ' failed' : ''}"><div class="ph sent${seenIt ? ' seen' : ''}"><div class="lk">${m.pending ? I.clock : (seenIt ? I.eye : I.image)}</div><b>Foto</b><small>${label}</small></div>${meta}</div></div>`;
+  }
+  let hint;
+  if (me !== 'er') hint = 'Hanya bisa dilihat sekali';
+  else if (m.viewed_at) hint = `Tersisa ${Math.max(1, Math.ceil((+new Date(m.viewed_at) + ER_MS - now) / 60000))} menit`;
+  else hint = `Bisa dilihat ${CONFIG.ER_PHOTO_MIN} menit setelah dibuka`;
+  return `<div class="${cls}" data-id="${m.id}"${st}><div class="b photo"><div class="ph lock" data-open="${m.id}"><div class="lk">${I.lock}</div><b>Ketuk untuk melihat foto</b><small>${hint}</small></div>${meta}</div></div>`;
+}
+function render(opts) {
+  opts = opts || {};
+  const now = Date.now();
+  const timeSens = msgs.some(m => new Date(m.expires_at) - now < 3600000 || (m.kind === 'image' && m.viewed_at && !m.photo_gone));
+  const sig = msgs.map(m => [m.id, m.read_at ? 1 : 0, m.viewed_at ? 1 : 0, m.photo_gone ? 1 : 0, m.pending ? 1 : 0, m.failed ? 1 : 0, (m.body || '').length].join('.')).join('|') + (timeSens ? '@' + Math.floor(now / 60000) : '');
+  if (sig === lastSig && !opts.force) return;
+  lastSig = sig;
+  const wasStick = stick;
+  let html = decoy ? '' : `<div class="sys">${I.lock}<span>Pesan hilang otomatis setelah ${CONFIG.MSG_TTL_H} jam</span></div>`;
+  if (!msgs.length) html += `<div class="empty"><div class="hrt">${I.heart}</div><b>Belum ada pesan</b><span>Kirim sapaan pertama untuk hari ini.</span></div>`;
+  let lastDay = '', idx = 0;
+  const startAt = Math.max(0, msgs.length - 10);
+  msgs.forEach((m, i) => {
+    const d = dayLabel(m.created_at);
+    if (d !== lastDay) { html += `<div class="day"><span>${d}</span></div>`; lastDay = d; }
+    const pv = msgs[i - 1], nx = msgs[i + 1];
+    const gap = (a, b) => Math.abs(new Date(b.created_at) - new Date(a.created_at));
+    const first = !pv || pv.sender !== m.sender || dayLabel(pv.created_at) !== d || gap(pv, m) > 180000;
+    const last = !nx || nx.sender !== m.sender || dayLabel(nx.created_at) !== d || gap(m, nx) > 180000;
+    let enter = false, delay = 0;
+    if (!seen.has(m.id)) { seen.add(m.id); enter = true; if (firstRender && i >= startAt) delay = (idx++) * .045; }
+    html += rowHTML(m, first, last, enter, delay);
+  });
+  list.innerHTML = html;
+  firstRender = false;
+  msgs.forEach(m => { delete m._fresh; });
+  if (wasStick || opts.scroll) scrollBottom(!!opts.smooth);
+}
+function scrollBottom(smooth) {
+  scroller.scrollTo({ top: scroller.scrollHeight + 999, behavior: smooth ? 'smooth' : 'auto' });
+  unread = 0; updateFab();
+}
+function updateFab() {
+  $('fab').classList.toggle('on', !stick);
+  $('fabN').textContent = unread > 0 ? unread : '';
+}
+scroller.addEventListener('scroll', () => {
+  stick = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 90;
+  if (stick) unread = 0;
+  updateFab();
+}, { passive: true });
+$('fab').addEventListener('click', () => scrollBottom(true));
+
+/* =====================================================================
+   Header & status
+   ===================================================================== */
+function partnerView() { return me === 'er' ? USERS.er.views[room] : USERS[me].view; }
+function updateHeader() {
+  const v = partnerView();
+  $('hName').textContent = v.name;
+  $('hIn').textContent = v.initial;
+  const typing = Date.now() < typingUntil;
+  const hs = $('hSub');
+  $('hAv').classList.toggle('on', !decoy && partnerOnline);
+  $('hChip').hidden = !(!decoy && partnerOnline && v.sub && !typing);
+  if (typing) { hs.className = 'hs typing'; hs.textContent = 'sedang mengetik…'; }
+  else if (v.sub) { hs.className = 'hs love'; hs.textContent = v.sub; }
+  else { hs.className = 'hs'; hs.textContent = partnerOnline ? 'online' : 'offline'; }
+  const showT = typing && !decoy ? true : typing;
+  $('typing').classList.toggle('on', showT);
+  if (showT && stick) scrollBottom(false);
+}
+
+/* =====================================================================
+   Supabase: sinkronisasi
+   ===================================================================== */
+function ensureClient(quiet) {
+  if (sb) return sb;
+  if (!window.supabase) { if (!quiet) toast('Tidak bisa memuat pustaka. Periksa internet.'); return null; }
+  const c = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: AUTH_KEY },
+    realtime: { params: { eventsPerSecond: 10 } }
+  });
+  sb = c;
+  // sesi dicabut/kedaluwarsa dari sisi server -> kunci aplikasi
+  c.auth.onAuthStateChange(ev => {
+    if (ev !== 'SIGNED_OUT' || c !== sb) return;
+    setTimeout(() => { if (me && !decoy && c === sb) { toast('Sesi berakhir. Masuk lagi.'); lockApp(); } }, 0);
+  });
+  return sb;
+}
+function scheduleSync(ms) { clearTimeout(syncTimer); syncTimer = setTimeout(sync, ms || 250); }
+let errShown = false;
+async function sync() {
+  if (decoy || !me || !ensureClient()) return;
+  if (syncing) { syncQueued = true; return; }
+  syncing = true;
+  const myRoom = room;
+  try {
+    const nowI = iso();
+    const cols = 'id,room,sender,kind,created_at,expires_at,read_at,viewed_at,photo_gone';
+    const [t, i] = await Promise.all([
+      sb.from('messages').select(cols + ',body').eq('room', myRoom).eq('kind', 'text').gt('expires_at', nowI).order('created_at', { ascending: true }).limit(600),
+      sb.from('messages').select(cols).eq('room', myRoom).eq('kind', 'image').gt('expires_at', nowI).order('created_at', { ascending: true }).limit(200)
+    ]);
+    if (myRoom !== room) return;
+    if (t.error) throw t.error; if (i.error) throw i.error;
+    errShown = false;
+    const rows = t.data.concat(i.data), ids = new Set(rows.map(r => r.id));
+    const prevIds = new Set(msgs.map(m => m.id)), byId = new Map(msgs.map(m => [m.id, m]));
+    const out = [];
+    for (const r of rows) {
+      let body = null;
+      if (r.kind === 'text') {
+        body = textCache.get(r.id);
+        if (body === undefined) { try { body = await dec(r.body); } catch (e) { body = 'Pesan tidak bisa dibuka'; } textCache.set(r.id, body); }
+      }
+      const old = byId.get(r.id), m = Object.assign({}, r, { body, pending: false, failed: false, localAt: old ? old.localAt : 0 });
+      if (old) { if (old.viewed_at && !m.viewed_at) m.viewed_at = old.viewed_at; if (old.photo_gone) m.photo_gone = true; }
+      out.push(m);
+    }
+    for (const m of msgs) if (!ids.has(m.id) && (m.pending || m.failed || Date.now() - (m.localAt || 0) < 8000)) out.push(m);
+    out.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    const fresh = out.filter(m => !prevIds.has(m.id) && m.sender === partner);
+    msgs = out;
+    if (!firstSync && fresh.length) { tone([880, 1175]); vib(12); if (!stick) { unread += fresh.length; updateFab(); } }
+    firstSync = false;
+    render();
+    maintain();
+    if (me === 'er') checkOther();
+  } catch (e) {
+    if (/PGRST30\d|JWT/.test(JSON.stringify(e))) { toast('Sesi berakhir. Masuk lagi.'); lockApp(); return; }
+    if (!errShown) { errShown = true; toast(/relation|PGRST205|42P01/.test(JSON.stringify(e)) ? 'Tabel belum dibuat. Jalankan setup.sql di Supabase.' : 'Koneksi bermasalah, mencoba lagi…'); }
+  } finally {
+    syncing = false;
+    if (syncQueued) { syncQueued = false; scheduleSync(100); }
+  }
+}
+async function maintain() {
+  if (decoy || !sb) return;
+  const now = Date.now();
+  // hapus foto sesuai aturan
+  for (const m of msgs) {
+    if (m.kind !== 'image' || m.photo_gone || m.pending || !m.viewed_at) continue;
+    const rcv = m.sender === 'er' ? m.room : 'er', va = +new Date(m.viewed_at);
+    const inViewer = V && V.id === m.id;
+    if (inViewer) continue;
+    if ((rcv === 'er' && now > va + ER_MS) || (rcv !== 'er' && now > va + 600000)) wipe(m.id);
+  }
+  // tandai dibaca
+  if (!document.hidden && !shieldOff) {
+    const ids = msgs.filter(m => m.sender === partner && m.kind === 'text' && !m.read_at).map(m => m.id);
+    if (ids.length) { const t = iso(); msgs.forEach(m => { if (ids.includes(m.id)) m.read_at = t; }); sb.from('messages').update({ read_at: t }).in('id', ids).then(() => {}); }
+  }
+  // buang kadaluarsa
+  if (now - lastClean > 120000) { lastClean = now; sb.from('messages').delete().lt('expires_at', iso()).then(() => {}); }
+  // antrean hapus foto yang tertunda
+  try {
+    const q = JSON.parse(localStorage.getItem('sk_burn') || '[]');
+    if (q.length) { localStorage.removeItem('sk_burn'); q.forEach(id => wipe(id)); }
+  } catch (e) {}
+}
+async function wipe(id) {
+  const m = msgs.find(x => x.id === id);
+  if (m) { m.photo_gone = true; m._fresh = true; }
+  render();
+  try {
+    const { error } = await sb.from('messages').update({ body: null, photo_gone: true }).eq('id', id);
+    if (error) throw error;
+  } catch (e) {
+    try { const q = JSON.parse(localStorage.getItem('sk_burn') || '[]'); if (!q.includes(id)) q.push(id); localStorage.setItem('sk_burn', JSON.stringify(q)); } catch (x) {}
+  }
+}
+
+function connectRealtime() {
+  if (decoy || !ensureClient()) return;
+  chan = sb.channel('ruang-' + room, { config: { private: !!CONFIG.PRIVATE_CHANNELS, presence: { key: me }, broadcast: { self: false } } });
+  chan.on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => scheduleSync(200))
+      .on('presence', { event: 'sync' }, () => { partnerOnline = !!chan.presenceState()[partner]; updateHeader(); })
+      .on('broadcast', { event: 'typing' }, ({ payload }) => {
+        if (payload && payload.u === partner) { typingUntil = Date.now() + 3500; updateHeader(); setTimeout(updateHeader, 3600); }
+      })
+      .subscribe(status => {
+        rtOk = status === 'SUBSCRIBED';
+        if (rtOk && !document.hidden) chan.track({ t: Date.now() });
+        if (status === 'CHANNEL_ERROR') console.warn('Realtime gagal, memakai polling 5 detik. Jika kanal privat bermasalah, set CONFIG.PRIVATE_CHANNELS = false.');
+      });
+}
+
+/* =====================================================================
+   Kirim pesan
+   ===================================================================== */
+function autosize() { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 120) + 'px'; }
+function updateSendBtn() { $('btnSend').classList.toggle('on', !!ta.value.trim()); }
+ta.addEventListener('input', () => {
+  autosize(); updateSendBtn();
+  if (!decoy && rtOk && chan && Date.now() - lastTypeSent > 2000) { lastTypeSent = Date.now(); chan.send({ type: 'broadcast', event: 'typing', payload: { u: me } }); }
+  if (stick) scrollBottom(false);
+});
+ta.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey && matchMedia('(pointer:fine)').matches) { e.preventDefault(); sendText(); }
+});
+$('btnSend').addEventListener('pointerdown', e => e.preventDefault()); // jaga keyboard tetap terbuka
+$('btnSend').addEventListener('click', sendText);
+
+async function sendText() {
+  const v = ta.value.trim(); if (!v) return;
+  ta.value = ''; autosize(); updateSendBtn();
+  const b = $('btnSend'); b.classList.remove('fly'); void b.offsetWidth; b.classList.add('fly');
+  vib(8); tone([660, 880]);
+  const now = Date.now();
+  const m = { id: uid(), room, sender: me, kind: 'text', body: v, created_at: iso(now), expires_at: iso(now + TTL_MS), read_at: null, viewed_at: null, photo_gone: false, pending: true, localAt: now };
+  msgs.push(m); textCache.set(m.id, v); render({ scroll: true, smooth: true });
+  await pushText(m);
+}
+async function pushText(m) {
+  if (!ensureClient()) { m.pending = false; m.failed = true; render({ force: true }); return; }
+  m.pending = true; m.failed = false; render({ force: true });
+  try {
+    const body = await enc(m.body);
+    const { data, error } = await sb.from('messages').insert({ id: m.id, room: m.room, sender: me, kind: 'text', body }).select('created_at,expires_at').single();
+    if (error) throw error;
+    m.created_at = data.created_at; m.expires_at = data.expires_at; m.pending = false; m.localAt = Date.now();
+    render({ force: true });
+  } catch (e) { m.pending = false; m.failed = true; render({ force: true }); toast('Pesan gagal terkirim. Ketuk pesan untuk coba lagi.'); }
+}
+
+/* ---------- Foto: pilih, kompres, kirim ---------- */
+$('btnPhoto').addEventListener('click', () => {
+  $('file').value = ''; $('file').click();
+});
+async function compress(file) {
+  let src;
+  try { src = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+  catch (e) { src = await new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = URL.createObjectURL(file); }); }
+  const w0 = src.width || src.naturalWidth, h0 = src.height || src.naturalHeight, sc = Math.min(1, 1280 / Math.max(w0, h0));
+  const c = document.createElement('canvas'); c.width = Math.round(w0 * sc); c.height = Math.round(h0 * sc);
+  const g = c.getContext('2d'); g.fillStyle = '#000'; g.fillRect(0, 0, c.width, c.height); g.drawImage(src, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', .74);
+}
+$('file').addEventListener('change', async () => {
+  const f = $('file').files[0]; if (!f) return;
+  try {
+    pendingPhoto = await compress(f);
+    $('pvImg').src = pendingPhoto;
+    $('pvNote').textContent = partner !== 'er'
+      ? 'Dia hanya bisa melihat foto ini satu kali, lalu foto otomatis terhapus.'
+      : `Foto ini hilang ${CONFIG.ER_PHOTO_MIN} menit setelah dibuka.`;
+    $('pv').classList.add('open');
+  } catch (e) { toast('Foto tidak bisa dibaca'); }
+});
+$('pvCancel').addEventListener('click', () => { $('pv').classList.remove('open'); pendingPhoto = null; });
+$('pvSend').addEventListener('click', async () => {
+  const data = pendingPhoto; if (!data) return;
+  pendingPhoto = null; $('pv').classList.remove('open');
+  const now = Date.now();
+  const m = { id: uid(), room, sender: me, kind: 'image', body: null, created_at: iso(now), expires_at: iso(now + TTL_MS), read_at: null, viewed_at: null, photo_gone: false, pending: true, localAt: now, _data: data };
+  msgs.push(m); render({ scroll: true, smooth: true }); vib(10); tone([660, 880]);
+  await pushPhoto(m);
+});
+async function pushPhoto(m) {
+  if (!ensureClient()) { m.pending = false; m.failed = true; render({ force: true }); return; }
+  m.pending = true; m.failed = false; render({ force: true });
+  try {
+    const body = await enc(m._data);
+    const { data, error } = await sb.from('messages').insert({ id: m.id, room: m.room, sender: me, kind: 'image', body }).select('created_at,expires_at').single();
+    if (error) throw error;
+    m.created_at = data.created_at; m.expires_at = data.expires_at; m.pending = false; m.localAt = Date.now(); delete m._data;
+    render({ force: true });
+  } catch (e) { m.pending = false; m.failed = true; render({ force: true }); toast('Foto gagal terkirim. Ketuk foto untuk coba lagi.'); }
+}
+
+/* ---------- Interaksi daftar pesan ---------- */
+list.addEventListener('click', e => {
+  const open = e.target.closest('[data-open]');
+  if (open) { openPhoto(open.dataset.open); return; }
+  const row = e.target.closest('.row[data-id]');
+  if (row) {
+    const m = msgs.find(x => x.id === row.dataset.id);
+    if (m && m.failed) { m.kind === 'text' ? pushText(m) : pushPhoto(m); }
+  }
+});
+let lp = null, lpXY = null;
+list.addEventListener('pointerdown', e => {
+  if (decoy) return;
+  const b = e.target.closest('.row.me .b'); if (!b) return;
+  const id = b.closest('.row').dataset.id; lpXY = { x: e.clientX, y: e.clientY };
+  lp = setTimeout(() => { lp = null; vib(15); msgMenu(id); }, 480);
+});
+list.addEventListener('pointermove', e => { if (lp && lpXY && Math.hypot(e.clientX - lpXY.x, e.clientY - lpXY.y) > 9) { clearTimeout(lp); lp = null; } });
+['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => list.addEventListener(ev, () => { clearTimeout(lp); lp = null; }));
+function msgMenu(id) {
+  openSheet(`<button class="it dng" data-act="del" data-id="${id}">${I.trash}<span>Hapus pesan untuk semua</span></button>`);
+}
+async function deleteMsg(id) {
+  closeSheet();
+  const row = list.querySelector(`.row[data-id="${id}"] .b`);
+  if (row) { const r = row.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2); row.classList.add('dissolve'); }
+  vib(12); await wait(520);
+  msgs = msgs.filter(m => m.id !== id); render({ force: true });
+  try { await sb.from('messages').delete().eq('id', id); } catch (e) {}
+}
+
+/* =====================================================================
+   Viewer foto
+   ===================================================================== */
+async function openPhoto(id) {
+  const m = msgs.find(x => x.id === id);
+  if (!m || m.photo_gone || m.sender === me || decoy || V) return;
+  const isEr = me === 'er';
+  if (isEr && m.viewed_at && Date.now() > +new Date(m.viewed_at) + ER_MS) { wipe(id); toast('Foto sudah hilang'); return; }
+  vib(10);
+  V = { id, isEr, loaded: false, url: null, timer: null };
+  const token = V;
+  $('vStage').className = 'vstage' + (isEr ? ' er' : ''); $('vStage').style.transform = ''; $('vStage').innerHTML = '<div class="spin"></div>';
+  $('vT').textContent = partnerView().name; $('vS').textContent = 'Membuka…'; $('vS').className = '';
+  $('vDl').hidden = true;
+  $('viewer').classList.add('open');
+  if (isEr) shieldOff = true; // Er boleh screenshot
+  try {
+    const { data, error } = await sb.from('messages').select('body,photo_gone').eq('id', id).single();
+    if (V !== token) return;
+    if (error) throw error;
+    if (data.photo_gone || !data.body) { closeViewer(true); m.photo_gone = true; m._fresh = true; render(); toast('Foto sudah hilang'); return; }
+    const url = await dec(data.body);
+    if (V !== token) return;
+    if (!m.viewed_at) { const va = iso(); m.viewed_at = va; sb.from('messages').update({ viewed_at: va }).eq('id', id).is('viewed_at', null).then(() => {}); }
+    token.loaded = true; token.url = url;
+    await showInViewer(m, url, isEr);
+  } catch (e) { if (V === token) { closeViewer(true); toast('Foto gagal dibuka. Coba lagi.'); } }
+}
+function showInViewer(m, url, isEr) {
+  return new Promise(res => {
+    const img = new Image();
+    img.onload = () => {
+      if (!V) return res();
+      const st = $('vStage'); st.innerHTML = '';
+      if (isEr) {
+        img.draggable = false; img.alt = 'Foto'; st.appendChild(img);
+        $('vDl').hidden = false;
+        const dl = () => { const left = +new Date(m.viewed_at) + ER_MS - Date.now(); $('vS').textContent = 'Hilang dalam ' + fmtCount(left); $('vS').className = left < 300000 ? 'warn' : ''; if (left <= 0) { closeViewer(true); wipe(m.id); toast('Waktu foto habis'); } };
+        dl(); V.timer = setInterval(dl, 1000);
+      } else {
+        const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight;
+        const g = c.getContext('2d'); g.drawImage(img, 0, 0);
+        g.save(); g.globalAlpha = .07; g.fillStyle = '#fff'; g.font = `600 ${Math.round(c.width / 22)}px sans-serif`; g.rotate(-.5);
+        for (let y = -c.height; y < c.height * 2; y += c.width / 5) for (let x = -c.width; x < c.width * 2; x += c.width / 2.2) g.fillText(USERS[me].own.split(' ')[0], x, y);
+        g.restore();
+        st.appendChild(c);
+        $('vS').textContent = 'Foto akan terhapus setelah ditutup'; $('vS').className = 'warn';
+      }
+      res();
+    };
+    img.onerror = () => { closeViewer(true); toast('Foto rusak'); res(); };
+    img.src = url;
+  });
+}
+function fmtCount(ms) { ms = Math.max(0, ms); const s = Math.floor(ms / 1000), m = Math.floor(s / 60); return String(m).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); }
+function closeViewer(silent) {
+  if (!V) return;
+  const v = V; V = null; clearInterval(v.timer); shieldOff = false;
+  $('viewer').classList.remove('open');
+  setTimeout(() => { if (!V) $('vStage').innerHTML = ''; }, 450);
+  if (!silent && v.loaded && !v.isEr) burnPhoto(v.id);
+}
+async function burnPhoto(id) {
+  const el = list.querySelector(`.row[data-id="${id}"] .b`);
+  if (el) { const r = el.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2); el.classList.add('dissolve'); vib([10, 30, 10]); await wait(560); }
+  await wipe(id);
+}
+$('vClose').addEventListener('click', () => closeViewer(false));
+$('vDl').addEventListener('click', () => {
+  if (!V || !V.url) return;
+  const a = document.createElement('a'); a.href = V.url; a.download = 'foto-' + Date.now() + '.jpg';
+  document.body.appendChild(a); a.click(); a.remove(); toast('Foto disimpan'); vib(10);
+});
+(function swipeClose() {
+  const st = $('vStage'); let y0 = null, dy = 0;
+  st.addEventListener('touchstart', e => { y0 = e.touches[0].clientY; dy = 0; st.classList.add('drag'); }, { passive: true });
+  st.addEventListener('touchmove', e => { if (y0 === null) return; dy = e.touches[0].clientY - y0; if (dy > 0) { st.style.transform = `translateY(${dy}px) scale(${1 - dy / 1600})`; $('viewer').style.background = `rgba(0,0,0,${Math.max(.2, 1 - dy / 500)})`; } }, { passive: true });
+  st.addEventListener('touchend', () => {
+    st.classList.remove('drag'); $('viewer').style.background = '';
+    if (dy > 110) { st.style.transform = ''; closeViewer(false); } else st.style.transform = '';
+    y0 = null;
+  });
+})();
+
+/* =====================================================================
+   Tab obrolan (Er): Saskia / Selpia
+   ===================================================================== */
+function updateTabs() {
+  const t = $('tabs'); if (!t) return;
+  t.classList.toggle('on', !decoy && me === 'er');
+  t.classList.toggle('r1', room === 'selpia');
+  t.querySelectorAll('.tab').forEach(b => {
+    const r = b.dataset.room; b.classList.toggle('on', r === room);
+    b.querySelector('.bd').textContent = (r !== room && badge[r]) ? badge[r] : '';
+  });
+}
+async function checkOther() {
+  if (decoy || me !== 'er' || !sb) return;
+  const other = room === 'saskia' ? 'selpia' : 'saskia', myRoom = room;
+  try {
+    const { data, error } = await sb.from('messages').select('id,kind,read_at,viewed_at,photo_gone').eq('room', other).eq('sender', other).gt('expires_at', iso());
+    if (error || myRoom !== room) return;
+    const n = data.filter(m => m.kind === 'text' ? !m.read_at : (!m.viewed_at && !m.photo_gone)).length;
+    if (n > badge[other]) { tone([880, 1175]); vib(12); toast('Pesan baru dari ' + USERS.er.views[other].name); }
+    badge[other] = n; updateTabs();
+  } catch (e) {}
+}
+function switchRoom(r) {
+  if (me !== 'er' || decoy || r === room || (r !== 'saskia' && r !== 'selpia')) return;
+  vib(8); tone([740]);
+  room = r; partner = r; badge[r] = 0; localStorage.setItem('sk_room', r);
+  if (chan && sb) { try { sb.removeChannel(chan); } catch (e) {} }
+  chan = null; rtOk = false;
+  msgs = []; seen = new Set(); lastSig = ''; firstRender = true; firstSync = true; stick = true; unread = 0;
+  partnerOnline = false; typingUntil = 0; ta.value = ''; autosize(); updateSendBtn();
+  updateHeader(); updateTabs(); render({ force: true });
+  list.classList.remove('swap'); void list.offsetWidth; list.classList.add('swap');
+  connectRealtime(); sync();
+}
+$('tabs').addEventListener('click', e => { const b = e.target.closest('.tab'); if (b) switchRoom(b.dataset.room); });
+
+/* =====================================================================
+   Menu
+   ===================================================================== */
+function authKind(e) {
+  const st = e && e.status, code = (e && e.code) || '';
+  if (st === 429 || /rate_limit/.test(code)) return 'rate';
+  if ((e && e.name === 'AuthRetryableFetchError') || !st || st >= 500) return 'net';
+  return 'bad';
+}
+function pwForm() {
+  const f = (id, ph, ac) => `<input class="fld" id="${id}" type="password" placeholder="${ph}" autocomplete="${ac}" autocapitalize="off" autocorrect="off" spellcheck="false">`;
+  openSheet(`<div class="sh-t">Ganti sandi</div><p class="sh-p">Sandi baru minimal 8 karakter. Pakai sandi yang belum pernah dipakai di tempat lain.</p>
+    ${f('pwCur', 'Sandi saat ini', 'current-password')}${f('pwNew', 'Sandi baru', 'new-password')}${f('pwNew2', 'Ulangi sandi baru', 'new-password')}
+    <div class="sh-msg" id="pwMsg" role="alert"></div>
+    <div class="acts"><button class="btn ghost" data-act="close">Batal</button><button class="btn cta" id="pwSave" data-act="pwsave">Simpan</button></div>`);
+}
+async function savePw() {
+  const msg = t => { $('pwMsg').textContent = t || ''; };
+  const cur = $('pwCur').value, nw = $('pwNew').value, nw2 = $('pwNew2').value, btn = $('pwSave');
+  if (!cur || !nw || !nw2) return msg('Isi semua kolom.');
+  if (nw.length < 8) return msg('Sandi baru minimal 8 karakter.');
+  if (nw !== nw2) return msg('Konfirmasi sandi tidak sama.');
+  if (nw === cur) return msg('Sandi baru harus berbeda dari yang lama.');
+  if (CONFIG.DECOY_HASHES[await sha256(CONFIG.SALT + nw)]) return msg('Sandi ini tidak bisa dipakai. Pilih yang lain.');
+  const c = ensureClient(); if (!c || decoy || !me) return;
+  const fail = (e, bad) => { const k = authKind(e); return msg(k === 'rate' ? 'Terlalu banyak percobaan. Tunggu beberapa menit.' : k === 'net' ? 'Tidak bisa terhubung. Periksa internet.' : bad); };
+  btn.disabled = true; msg('');
+  try {
+    // verifikasi sandi lama sekaligus memperbarui sesi
+    const r1 = await c.auth.signInWithPassword({ email: CONFIG.ACCOUNTS[me], password: cur });
+    if (r1.error) return fail(r1.error, 'Sandi saat ini salah.');
+    const r2 = await c.auth.updateUser({ password: nw });
+    if (r2.error) {
+      const code = r2.error.code || '';
+      return fail(r2.error, code === 'same_password' ? 'Sandi baru harus berbeda dari yang lama.' : code === 'weak_password' ? 'Sandi terlalu lemah. Tambahkan huruf, angka, atau simbol.' : 'Gagal mengganti sandi.');
+    }
+    closeSheet(); toast('Sandi berhasil diganti'); vib(15);
+  } catch (e) { msg('Koneksi bermasalah. Coba lagi.'); }
+  finally { btn.disabled = false; }
+}
+$('btnMenu').addEventListener('click', () => {
+  const u = USERS[me];
+  openSheet(`
+    <div class="who"><div class="av"><span>${esc(u.own[0])}</span></div><div><b>${esc(u.own)}</b><span>${decoy ? 'Terhubung' : 'Masuk dengan aman'}</span></div></div>
+    <button class="it" data-act="lock">${I.lock}<span>Kunci sekarang</span></button>
+    <button class="it" data-act="snd">${soundOn ? I.vol : I.mute}<span>Suara pesan</span><em>${soundOn ? 'Nyala' : 'Mati'}</em></button>
+    ${decoy ? '' : `<button class="it" data-act="pw">${I.key}<span>Ganti sandi</span></button>`}
+    <button class="it dng" data-act="wipeask">${I.trash}<span>Hapus semua obrolan</span></button>`);
+});
+$('shCard').addEventListener('click', async e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const a = b.dataset.act;
+  if (a === 'lock') { closeSheet(); await wait(200); lockApp(); }
+  else if (a === 'snd') { soundOn = !soundOn; localStorage.setItem('sk_snd', soundOn ? '1' : '0'); closeSheet(); toast(soundOn ? 'Suara dinyalakan' : 'Suara dimatikan'); if (soundOn) tone([880]); }
+  else if (a === 'pw') pwForm();
+  else if (a === 'pwsave') savePw();
+  else if (a === 'pdel') delPoem(b.dataset.id);
+  else if (a === 'discard') { closeSheet(); closeEditor(); }
+  else if (a === 'del') deleteMsg(b.dataset.id);
+  else if (a === 'wipeask') {
+    $('shCard').innerHTML = `<div class="sh-t">Hapus semua obrolan?</div><p class="sh-p">Semua pesan dan foto di obrolan ini akan terhapus untuk kamu dan pasanganmu. Tindakan ini tidak bisa dibatalkan.</p><div class="acts"><button class="btn ghost" data-act="close">Batal</button><button class="btn danger" data-act="wipe">Hapus semua</button></div>`;
+  }
+  else if (a === 'close') closeSheet();
+  else if (a === 'wipe') {
+    closeSheet();
+    if (!decoy) { try { await sb.from('messages').delete().eq('room', room); } catch (er) {} }
+    msgs = []; textCache.clear(); render({ force: true }); toast('Obrolan dihapus');
+  }
+});
+$('btnLock').addEventListener('click', () => { vib(10); lockApp(); });
+
+/* =====================================================================
+   Puisi (tampilan untuk sandi palsu) — disimpan di localStorage perangkat
+   ===================================================================== */
+const POEM_KEY = 'sk_poems', POEM_SEEDED = 'sk_poems_seeded';
+const SEED_POEMS = [
+  { title: 'Rumah Bernama Kamu', body: [
+    'Aku pernah mencari rumah',
+    'di peta, di pelabuhan, di kota-kota yang jauh,',
+    'tetapi pintunya selalu terkunci',
+    'sampai kamu tersenyum.',
+    '',
+    'Kini pulang bukan lagi sebuah tempat,',
+    'melainkan namamu',
+    'yang kusebut pelan-pelan',
+    'setiap kali dunia terasa asing.'].join('\n') },
+  { title: 'Hujan dan Kamu', body: [
+    'Hujan turun di jendela malam ini,',
+    'dan aku teringat caramu tertawa:',
+    'pelan, lalu tiba-tiba,',
+    'seperti matahari menyelinap di sela awan.',
+    '',
+    'Jika rindu punya suara,',
+    'ia adalah rintik pertama',
+    'yang jatuh di atap hatiku,',
+    'menyebut namamu berulang kali.'].join('\n') },
+  { title: 'Sederhana', body: [
+    'Aku tidak meminta bintang,',
+    'tidak pula bulan di telapak tangan.',
+    'Cukup kamu di sampingku',
+    'saat teh mulai dingin dan senja menua.',
+    '',
+    'Sebab bahagia, ternyata,',
+    'hanyalah dua cangkir',
+    'dan satu cerita',
+    'yang tak pernah habis kita bagi.'].join('\n') },
+  { title: 'Jarak', body: [
+    'Jarak hanyalah angka',
+    'yang tak tahu cara menghitung rindu.',
+    'Sejauh apa pun kau berada,',
+    'namamu tetap dekat di ujung doaku.',
+    '',
+    'Jika malam terlalu panjang,',
+    'kupandangi langit yang sama denganmu;',
+    'di sana kita bertemu',
+    'tanpa perlu satu langkah pun.'].join('\n') },
+  { title: 'Janji Kecil', body: [
+    'Aku berjanji dengan hal-hal kecil:',
+    'menggenggam tanganmu saat ramai,',
+    'mendengarkan ceritamu sampai ujungnya,',
+    'dan tetap tinggal ketika hari sedang buruk.',
+    '',
+    'Janji besar mudah diucapkan,',
+    'tetapi cinta, kurasa,',
+    'lahir dari sabar yang diulang setiap hari.'].join('\n') }
+];
+let poems = [], editId = null, readId = null, editSnap = '';
+
+const fmtDate = t => new Date(t).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+const cleanPoem = p => ({ id: String(p.id), title: String(p.title || ''), by: String(p.by || ''), body: String(p.body), at: Number(p.at) || Date.now() });
+
+function poemsPersist() {
+  try { localStorage.setItem(POEM_KEY, JSON.stringify(poems)); return true; }
+  catch (e) { toast('Puisi tidak bisa disimpan di perangkat ini.'); return false; }
+}
+function poemsLoad() {
+  let arr = null;
+  try {
+    const raw = localStorage.getItem(POEM_KEY);
+    if (raw !== null) { const a = JSON.parse(raw); if (Array.isArray(a)) arr = a.filter(p => p && p.id && typeof p.body === 'string').map(cleanPoem); }
+  } catch (e) { arr = null; }
+  if (arr === null) {
+    let seeded = false; try { seeded = !!localStorage.getItem(POEM_SEEDED); } catch (e) {}
+    if (seeded) arr = [];
+    else {
+      const t = Date.now();
+      arr = SEED_POEMS.map((p, i) => ({ id: uid(), title: p.title, by: '', body: p.body, at: t - i * 1000 }));
+      poems = arr; poemsPersist();
+      try { localStorage.setItem(POEM_SEEDED, '1'); } catch (e) {}
+    }
+  }
+  poems = arr;
+}
+function poemsRender(anim) {
+  const list = poems.slice().sort((a, b) => b.at - a.at);
+  $('pCount').textContent = list.length ? list.length + ' puisi' : '';
+  const pl = $('pList');
+  pl.classList.toggle('anim', !!anim);
+  pl.innerHTML = list.length ? list.map((p, i) => {
+    const prev = p.body.split('\n').filter(l => l.trim()).slice(0, 3).join('\n');
+    return `<article class="pc" data-id="${esc(p.id)}" style="--i:${Math.min(i, 8)}"><h3>${esc(p.title || 'Tanpa judul')}</h3><p>${esc(prev)}</p><div class="pm"><span>${p.by ? 'oleh ' + esc(p.by) : ''}</span><span>${fmtDate(p.at)}</span></div></article>`;
+  }).join('') : `<div class="empty"><div class="hrt">${I.heart}</div><b>Belum ada puisi</b><span>Ketuk tombol + untuk menulis puisi pertamamu.</span></div>`;
+}
+function poemsReset() {
+  poems = []; editId = null; readId = null; editSnap = '';
+  $('pList').innerHTML = ''; $('rBody').innerHTML = '';
+  $('eTitle').value = ''; $('eBy').value = ''; $('eText').value = ''; $('eMsg').textContent = '';
+  $('pRead').classList.remove('open'); $('pEdit').classList.remove('open');
+}
+function enterPoems() {
+  poemsLoad(); poemsRender(true);
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+}
+
+/* ---------- Baca ---------- */
+function openReader(id) {
+  const p = poems.find(x => x.id === id); if (!p) return;
+  readId = id;
+  $('rBody').innerHTML = `<h3 class="rt">${esc(p.title || 'Tanpa judul')}</h3>${p.by ? `<div class="rby">oleh ${esc(p.by)}</div>` : ''}<div class="rx">${esc(p.body)}</div><div class="orn">${I.heart}</div><div class="rdate">${fmtDate(p.at)}</div>`;
+  $('rBody').scrollTop = 0;
+  $('pRead').classList.add('open');
+}
+function closeReader() { $('pRead').classList.remove('open'); readId = null; }
+
+/* ---------- Tulis / ubah ---------- */
+const editVals = () => JSON.stringify([$('eTitle').value.trim(), $('eBy').value.trim(), $('eText').value.trim()]);
+function openEditor(id) {
+  const p = id ? poems.find(x => x.id === id) : null;
+  editId = p ? p.id : null;
+  $('eBar').textContent = p ? 'Ubah puisi' : 'Puisi baru';
+  $('eTitle').value = p ? p.title : ''; $('eBy').value = p ? p.by : ''; $('eText').value = p ? p.body : '';
+  $('eMsg').textContent = ''; editSnap = editVals();
+  $('pEdit').classList.add('open');
+  $('pEdit').querySelector('.pbody').scrollTop = 0;
+}
+function closeEditor() {
+  $('pEdit').classList.remove('open'); editId = null;
+  try { document.activeElement && document.activeElement.blur && document.activeElement.blur(); } catch (e) {}
+}
+function tryCloseEditor() {
+  if (editVals() === editSnap) { closeEditor(); return; }
+  openSheet(`<div class="sh-t">Buang perubahan?</div><p class="sh-p">Puisi yang belum disimpan akan hilang.</p><div class="acts"><button class="btn ghost" data-act="close">Lanjut menulis</button><button class="btn danger" data-act="discard">Buang</button></div>`);
+}
+function savePoem() {
+  const title = $('eTitle').value.trim(), by = $('eBy').value.trim(), body = $('eText').value.replace(/^\s*\n/, '').replace(/\s+$/, '');
+  if (!body.trim()) { $('eMsg').textContent = 'Isi puisi belum ditulis.'; return; }
+  if (editId) { const p = poems.find(x => x.id === editId); if (p) { p.title = title; p.by = by; p.body = body; } }
+  else poems.push({ id: uid(), title, by, body, at: Date.now() });
+  const ok = poemsPersist();
+  closeEditor(); poemsRender(false);
+  if (readId) openReader(readId);
+  if (ok) { toast('Puisi disimpan'); vib(10); }
+}
+
+/* ---------- Hapus ---------- */
+function askDeletePoem(id) {
+  openSheet(`<div class="sh-t">Hapus puisi ini?</div><p class="sh-p">Puisi akan dihapus dari perangkat ini dan tidak bisa dikembalikan.</p><div class="acts"><button class="btn ghost" data-act="close">Batal</button><button class="btn danger" data-act="pdel" data-id="${esc(id)}">Hapus</button></div>`);
+}
+function delPoem(id) {
+  poems = poems.filter(p => p.id !== id);
+  poemsPersist(); closeSheet(); closeReader(); poemsRender(false); toast('Puisi dihapus'); vib(12);
+}
+
+$('pList').addEventListener('click', e => { const c = e.target.closest('.pc'); if (c) openReader(c.dataset.id); });
+$('pAdd').addEventListener('click', () => openEditor(null));
+$('pLock').addEventListener('click', () => { vib(10); lockApp(); });
+$('rBack').addEventListener('click', closeReader);
+$('rEdit').addEventListener('click', () => { if (readId) openEditor(readId); });
+$('rDel').addEventListener('click', () => { if (readId) askDeletePoem(readId); });
+$('eClose').addEventListener('click', tryCloseEditor);
+$('eSave').addEventListener('click', savePoem);
+$('eText').addEventListener('input', () => { $('eMsg').textContent = ''; });
+
+/* =====================================================================
+   Sesi: login, kunci
+   ===================================================================== */
+/* ---------- Supabase Auth: masuk & keluar ---------- */
+function killSession(delay) {
+  killing = (async () => {
+    if (delay) await wait(delay);
+    const c = sb; sb = null;
+    if (c) {
+      try { c.auth.stopAutoRefresh(); } catch (e) {}
+      try { await Promise.race([c.auth.signOut({ scope: 'local' }), wait(4000)]); } catch (e) {}
+    }
+    try { localStorage.removeItem(AUTH_KEY); } catch (e) {}
+  })();
+}
+function loginOrder() {
+  const all = Object.keys(CONFIG.ACCOUNTS); let w = null;
+  try { w = localStorage.getItem('sk_who'); } catch (e) {}
+  return w && all.includes(w) ? [w].concat(all.filter(u => u !== w)) : all;
+}
+// Satu kolom sandi saja: coba tiap akun (akun terakhir di HP ini dicoba lebih dulu).
+async function authLogin(pw) {
+  const c = ensureClient(true); if (!c) return { err: 'net' };
+  let kind = 'bad';
+  for (const u of loginOrder()) {
+    let res;
+    try { res = await c.auth.signInWithPassword({ email: CONFIG.ACCOUNTS[u], password: pw }); }
+    catch (e) { kind = 'net'; break; }
+    if (!res.error && res.data && res.data.session) {
+      const w = await c.rpc('app_user');           // profil di server = sumber kebenaran
+      if (!w.error && w.data === u) return { user: u };
+      killSession(0); await killing;
+      return { err: 'noprofile' };
+    }
+    const k = res.error ? authKind(res.error) : 'bad';
+    if (k === 'rate' || k === 'net') { kind = k; break; }
+  }
+  return { err: kind };
+}
+
+function enterChat() {
+  if (decoy) { enterPoems(); tickT = setInterval(() => { if (me) touch(); }, 15000); return; }   // sandi palsu: tampilan puisi
+  msgs = []; seen = new Set(); textCache = new Map(); lastSig = ''; firstRender = true; firstSync = true; stick = true; unread = 0; errShown = false;
+  partnerOnline = false; typingUntil = 0; ta.value = ''; autosize(); updateSendBtn();
+  updateHeader(); updateTabs(); render({ force: true });
+  sync(); connectRealtime(); pollT = setInterval(() => { if (!document.hidden) sync(); }, 5000);
+  tickT = setInterval(() => {
+    if (!me) return; touch();
+    const now = Date.now(), before = msgs.length;
+    msgs = msgs.filter(m => new Date(m.expires_at) > now || m.pending);
+    render({ force: msgs.length !== before });
+    if (!decoy) maintain();
+  }, 15000);
+}
+function teardown() {
+  clearInterval(pollT); clearInterval(tickT); clearTimeout(syncTimer);
+  if (chan && sb) { try { sb.removeChannel(chan); } catch (e) {} }
+  chan = null; rtOk = false;
+}
+function startSession(acc, animated) {
+  me = acc.user; decoy = acc.mode === 'decoy';
+  const sr = localStorage.getItem('sk_room');
+  room = me === 'er' ? (sr === 'selpia' ? 'selpia' : 'saskia') : me;
+  partner = me === 'er' ? room : 'er'; badge = { saskia: 0, selpia: 0 };
+  localStorage.setItem('sk_sess', JSON.stringify({ user: me, mode: acc.mode })); touch();
+  if (!decoy) { try { localStorage.setItem('sk_who', me); } catch (e) {} }
+  const go = () => { $('login').classList.add('hide'); $(decoy ? 'poems' : 'chat').classList.add('show'); };
+  enterChat();
+  if (animated) { $('login').classList.add('unlocking'); setTimeout(go, 700); } else go();
+  vvUpdate();
+}
+function lockApp() {
+  if (!me && !$('chat').classList.contains('show') && !$('poems').classList.contains('show')) return;
+  const burning = !!(V && V.loaded && !V.isEr);
+  closeViewer(false); closeSheet(); $('pv').classList.remove('open'); pendingPhoto = null;
+  teardown(); localStorage.removeItem('sk_sess');
+  killSession(burning ? 1500 : 0); // beri waktu foto sekali-lihat terhapus dulu
+  me = null; partner = null; room = null; msgs = []; list.innerHTML = ''; updateTabs(); shieldOff = false;
+  $('chat').classList.remove('show'); $('poems').classList.remove('show'); poemsReset();
+  const lg = $('login'); lg.classList.remove('hide', 'unlocking'); $('pw').value = ''; $('pw').type = 'password'; $('eye').innerHTML = I.eye;
+  const box = lg.querySelector('.lg'); box.style.animation = 'none'; void box.offsetWidth; box.style.animation = '';
+  setMsg('');
+}
+const touch = () => { try { localStorage.setItem('sk_last', String(Date.now())); } catch (e) {} };
+
+function setMsg(t) { const m = $('lgMsg'); m.textContent = t || ''; m.classList.toggle('on', !!t); }
+async function tryLogin() {
+  if (loginBusy) return;
+  if (Date.now() < lgLock) { shake(); setMsg('Terlalu banyak percobaan. Tunggu sebentar.'); return; }
+  const pw = $('pw').value; if (!pw) { shake(); return; }
+  loginBusy = true; $('lgBtn').disabled = true;
+  try {
+    let acc = CONFIG.DECOY_HASHES[await sha256(CONFIG.SALT + pw)];
+    if (!acc) {
+      await killing;
+      const r = await authLogin(pw);
+      if (r.user) acc = { user: r.user, mode: 'real' };
+      else {
+        if (r.err === 'net') { shake(); setMsg('Tidak bisa terhubung. Periksa internet.'); return; }
+        if (r.err === 'rate') { shake(); setMsg('Terlalu banyak percobaan. Tunggu beberapa menit.'); return; }
+        if (r.err === 'noprofile') { shake(); setMsg('Akun belum siap. Jalankan setup.sql.'); return; }
+        lgFails++; vib([30, 40, 30]); shake(); $('pw').value = '';
+        if (lgFails >= 5) { lgFails = 0; lgLock = Date.now() + 30000; setMsg('Terlalu banyak percobaan. Tunggu 30 detik.'); }
+        else setMsg('Sandi salah');
+        return;
+      }
+    }
+    lgFails = 0; setMsg(''); $('pw').blur(); vib(20); tone([523, 659, 784]);
+    startSession(acc, true);
+  } finally { loginBusy = false; $('lgBtn').disabled = false; }
+}
+function shake() { const b = $('pwbox'); b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); }
+$('lgBtn').addEventListener('click', tryLogin);
+$('pw').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+$('pw').addEventListener('input', () => setMsg(''));
+$('eye').addEventListener('click', () => { const p = $('pw'); const show = p.type === 'password'; p.type = show ? 'text' : 'password'; $('eye').innerHTML = show ? I.eyeoff : I.eye; });
+
+/* =====================================================================
+   Perlindungan tampilan (screenshot & privasi)
+   ===================================================================== */
+const shield = $('shield');
+shield.innerHTML = I.lock + '<span>Terkunci sementara — ketuk untuk kembali</span>';
+const shieldUp = () => { if (me && !decoy && !shieldOff) shield.classList.add('on'); };
+const shieldDown = () => shield.classList.remove('on');
+shield.addEventListener('pointerdown', shieldDown);
+window.addEventListener('blur', shieldUp);
+window.addEventListener('focus', shieldDown);
+window.addEventListener('pagehide', shieldUp);
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    hiddenAt = Date.now(); touch(); shieldUp();
+    if (V && !V.isEr) closeViewer(false);
+    if (chan) { try { chan.untrack(); } catch (e) {} }
+  } else {
+    shieldDown();
+    if (me && Date.now() - hiddenAt > CONFIG.LOCK_AFTER_MS) lockApp();
+    else if (me) { sync(); if (chan && rtOk) { try { chan.track({ t: Date.now() }); } catch (e) {} } vvUpdate(); }
+  }
+});
+document.addEventListener('keyup', e => {
+  if (e.key === 'PrintScreen') { try { navigator.clipboard.writeText(' '); } catch (x) {} if (me && !decoy && !shieldOff) { shield.classList.add('on'); setTimeout(shieldDown, 1500); } }
+});
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && ['p', 's'].includes(e.key.toLowerCase())) e.preventDefault();
+  if (e.metaKey && e.shiftKey && ['3', '4', '5'].includes(e.key)) shieldUp();
+});
+document.addEventListener('contextmenu', e => { if (!(V && V.isEr)) e.preventDefault(); });
+document.addEventListener('dragstart', e => e.preventDefault());
+document.addEventListener('copy', e => { if (!e.target.closest || !e.target.closest('input,textarea')) e.preventDefault(); });
+
+/* =====================================================================
+   Viewport (keyboard HP) & init
+   ===================================================================== */
+function vvUpdate() {
+  const v = window.visualViewport, app = $('app'), h = v ? v.height : innerHeight;
+  app.style.height = h + 'px';
+  app.style.transform = v && v.offsetTop ? `translateY(${v.offsetTop}px)` : '';
+  $('fab').style.setProperty('--fabb', ($('cmp').offsetHeight + 12) + 'px');
+  if (stick && me) scrollBottom(false);
+}
+if (window.visualViewport) { visualViewport.addEventListener('resize', vvUpdate); visualViewport.addEventListener('scroll', vvUpdate); }
+window.addEventListener('resize', vvUpdate);
+window.addEventListener('scroll', () => window.scrollTo(0, 0));
+
+// ikon statis
+$('btnLock').innerHTML = I.lock; $('btnMenu').innerHTML = I.more; $('btnPhoto').innerHTML = I.image;
+$('btnSend').innerHTML = I.send; $('vClose').innerHTML = I.x; $('vDl').innerHTML = I.dl; $('fab').insertAdjacentHTML('afterbegin', I.down); $('eye').innerHTML = I.eye;
+
+$('pAdd').innerHTML = I.plus; $('pLock').innerHTML = I.lock; $('rBack').innerHTML = I.back; $('rEdit').innerHTML = I.edit; $('rDel').innerHTML = I.trash; $('eClose').innerHTML = I.x;
+
+// hati melayang di halaman login
+(function hearts() {
+  const box = $('hearts'); let h = '';
+  for (let i = 0; i < 16; i++) {
+    const s = 10 + Math.random() * 22, x = Math.random() * 100, dx = (Math.random() - .5) * 90, d = 9 + Math.random() * 9, dl = -Math.random() * 16, r = (Math.random() - .5) * 60;
+    h += `<i style="--x:${x}%;--s:${s}px;--dx:${dx}px;--d:${d}s;--dl:${dl}s;--r:${r}deg"></i>`;
+  }
+  box.innerHTML = h;
+})();
+
+/* =====================================================================
+   PWA: pasang di layar utama + service worker
+   ===================================================================== */
+let deferredInstall = null;
+const isStandalone = () => { try { return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; } catch (e) { return false; } };
+const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const updateInstall = () => { $('btnInstall').hidden = isStandalone(); };
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; updateInstall(); });
+window.addEventListener('appinstalled', () => { deferredInstall = null; updateInstall(); toast('Terpasang di layar utama'); });
+$('btnInstall').addEventListener('click', async () => {
+  if (deferredInstall) { const d = deferredInstall; deferredInstall = null; try { await d.prompt(); await d.userChoice; } catch (e) {} return; }
+  const how = isIOS()
+    ? '1. Buka halaman ini di Safari.<br>2. Ketuk tombol Bagikan (kotak dengan panah ke atas).<br>3. Pilih “Tambahkan ke Layar Utama”, lalu ketuk Tambah.'
+    : 'Buka menu browser (titik tiga di pojok kanan atas), lalu pilih “Instal aplikasi” atau “Tambahkan ke layar utama”.';
+  openSheet(`<div class="sh-t">Pasang di layar utama</div><p class="sh-p">${how}</p><div class="acts"><button class="btn ghost" data-act="close">Tutup</button></div>`);
+});
+updateInstall();
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+}
+
+vvUpdate();
+(async function restore() {
+  try {
+    const s = JSON.parse(localStorage.getItem('sk_sess') || 'null'), last = +localStorage.getItem('sk_last') || 0;
+    const fresh = !!(s && USERS[s.user] && Date.now() - last < CONFIG.LOCK_AFTER_MS);
+    if (fresh && s.mode === 'decoy') startSession({ user: s.user, mode: 'decoy' }, false);
+    else if (fresh && ensureClient(true)) {
+      let who = null;
+      const g = await sb.auth.getSession();
+      if (g.data && g.data.session) { const r = await sb.rpc('app_user'); if (!r.error) who = r.data; }
+      if (who && USERS[who]) startSession({ user: who, mode: 'real' }, false);
+      else { localStorage.removeItem('sk_sess'); killSession(0); }
+    } else {
+      localStorage.removeItem('sk_sess');
+      if (localStorage.getItem(AUTH_KEY)) { ensureClient(true); killSession(0); }
+    }
+  } catch (e) {}
+  if (!me) setTimeout(() => { try { if (!me && !matchMedia('(pointer:coarse)').matches) $('pw').focus(); } catch (e) {} }, 900);
+})();
+</script>
+</body>
+</html>
