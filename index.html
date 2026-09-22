@@ -62,31 +62,31 @@ section{position:absolute;inset:0}
 @keyframes rise{0%{transform:translate3d(0,0,0) rotate(0);opacity:0}10%{opacity:.5}80%{opacity:.25}100%{transform:translate3d(var(--dx),-110vh,0) rotate(var(--r));opacity:0}}
 .lg{position:relative;width:100%;max-width:340px;text-align:center;animation:lgIn .9s var(--ease) both}
 @keyframes lgIn{from{opacity:0;transform:translateY(26px) scale(.96)}to{opacity:1;transform:none}}
-.orb{position:relative;width:104px;height:104px;margin:0 auto 26px;border-radius:50%;display:grid;place-items:center;
+.orb{position:relative;width:82px;height:82px;margin:0 auto 20px;border-radius:50%;display:grid;place-items:center;
   background:radial-gradient(circle at 30% 25%,#ff8fab,#e0459f 55%,#7a2fb0);box-shadow:0 14px 50px rgba(255,92,138,.45),inset 0 -6px 14px rgba(0,0,0,.25),inset 0 4px 10px rgba(255,255,255,.3);
   animation:float 5s ease-in-out infinite}
 .orb::before,.orb::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid rgba(255,92,138,.5);animation:ping 3s var(--ease) infinite}
 .orb::after{animation-delay:1.5s}
 @keyframes ping{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.9);opacity:0}}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-.orb svg{width:46px;height:46px;overflow:visible;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.orb svg{width:36px;height:36px;overflow:visible;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .orb .sh{transform-origin:16px 11px;transition:transform .5s var(--spring)}
 .orb .body{fill:rgba(255,255,255,.18)}
 #login.unlocking .sh{transform:translateY(-4px) rotate(-28deg)}
 #login.unlocking .orb{animation:none;transform:scale(1.18);transition:transform .5s var(--spring);box-shadow:0 0 90px rgba(255,92,138,.9)}
-.lg h1{font-family:var(--serif);font-style:italic;font-weight:600;font-size:38px;letter-spacing:-.5px;line-height:1.05}
-.lg p.sub{margin:10px 0 26px;color:var(--muted);font-size:14px}
+.lg h1{font-family:var(--serif);font-style:italic;font-weight:600;font-size:30px;letter-spacing:-.5px;line-height:1.05}
+.lg p.sub{margin:8px 0 22px;color:var(--muted);font-size:13px}
 .pwbox{position:relative;transition:transform .2s}
-.pwbox input{width:100%;height:56px;border-radius:18px;border:1.5px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);
-  font-size:16px;padding:0 54px 0 20px;outline:none;letter-spacing:.5px;text-align:center;transition:border-color .25s,box-shadow .25s,background .25s;backdrop-filter:blur(8px)}
+.pwbox input{width:100%;height:48px;border-radius:16px;border:1.5px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);
+  font-size:16px;padding:0 50px 0 18px;outline:none;letter-spacing:.5px;text-align:center;transition:border-color .25s,box-shadow .25s,background .25s;backdrop-filter:blur(8px)}
 .pwbox input:focus{border-color:var(--rose);background:rgba(255,255,255,.08);box-shadow:0 0 0 4px rgba(255,92,138,.16)}
 .pwbox input::placeholder{color:#7d6f8b;letter-spacing:0}
-.pwbox .eye{position:absolute;right:6px;top:6px;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:var(--muted)}
+.pwbox .eye{position:absolute;right:4px;top:4px;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:var(--muted)}
 .pwbox.shake{animation:shake .5s}
 @keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(5px)}30%,50%,70%{transform:translateX(-9px)}40%,60%{transform:translateX(9px)}}
-#lgMsg{height:22px;margin:12px 0 4px;font-size:13px;color:var(--danger);opacity:0;transition:opacity .25s}
+#lgMsg{height:20px;margin:10px 0 4px;font-size:12.5px;color:var(--danger);opacity:0;transition:opacity .25s}
 #lgMsg.on{opacity:1}
-.cta{position:relative;overflow:hidden;width:100%;height:56px;border-radius:18px;font-weight:700;font-size:16px;color:#fff;
+.cta{position:relative;overflow:hidden;width:100%;height:48px;border-radius:16px;font-weight:700;font-size:15px;color:#fff;
   background:linear-gradient(135deg,#ff5c8a,#e0459f 55%,#b455e6);box-shadow:0 10px 30px rgba(255,92,138,.35);transition:transform .2s var(--spring),box-shadow .2s}
 .cta:active{transform:scale(.96);box-shadow:0 4px 14px rgba(255,92,138,.3)}
 .cta::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-20deg);animation:shine 3.4s ease-in-out infinite}
@@ -102,23 +102,25 @@ section{position:absolute;inset:0}
 .aurora::after{right:-80vmax;bottom:-80vmax;background:radial-gradient(circle,rgba(255,92,138,.14),transparent 60%);animation:drift2 26s ease-in-out infinite alternate}
 @keyframes drift1{to{transform:translate(28vmax,22vmax)}}
 @keyframes drift2{to{transform:translate(-24vmax,-26vmax)}}
-#hdr{position:relative;z-index:5;display:flex;align-items:center;gap:12px;padding:calc(var(--sat) + 10px) 10px 10px 14px;
+#hdr{position:relative;z-index:5;display:flex;align-items:center;gap:9px;padding:calc(var(--sat) + 7px) 7px 7px 12px;
   background:rgba(20,15,28,.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
-.av{position:relative;flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:18px;color:#fff;
+.av{position:relative;flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:14.5px;color:#fff;
   background:linear-gradient(135deg,#ff8fab,#b86bff);box-shadow:0 4px 16px rgba(184,107,255,.35)}
-.av .dot{position:absolute;right:0;bottom:0;width:13px;height:13px;border-radius:50%;background:#6b5d78;border:2.5px solid #140f1c;transition:background .3s,box-shadow .3s}
+.av .dot{position:absolute;right:0;bottom:0;width:10px;height:10px;border-radius:50%;background:#6b5d78;border:2px solid #140f1c;transition:background .3s,box-shadow .3s}
 .av.on .dot{background:var(--ok);box-shadow:0 0 0 0 rgba(91,227,161,.6);animation:pulse 2s infinite}
 @keyframes pulse{70%{box-shadow:0 0 0 7px rgba(91,227,161,0)}100%{box-shadow:0 0 0 0 rgba(91,227,161,0)}}
 .hm{flex:1;min-width:0}
-.hn{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16.5px;line-height:1.2}
+.hn{display:flex;align-items:center;gap:7px;font-weight:700;font-size:14.5px;line-height:1.2}
 .hn span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.chip{flex:none;font-size:10.5px;font-weight:600;color:var(--ok);background:rgba(91,227,161,.12);padding:2px 8px;border-radius:99px;animation:pop .4s var(--spring)}
+.chip{flex:none;font-size:9.5px;font-weight:600;color:var(--ok);background:rgba(91,227,161,.12);padding:2px 7px;border-radius:99px;animation:pop .4s var(--spring)}
 .chip[hidden]{display:none}
-.hs{font-size:12.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .3s}
-.hs.love{font-family:var(--serif);font-style:italic;font-size:12.5px;color:var(--rose2)}
+.hs{font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .3s}
+.hs.love{font-family:var(--serif);font-style:italic;font-size:11px;color:var(--rose2)}
 .hs.typing{color:var(--rose2);font-style:normal;font-family:var(--font)}
-.ib{flex:none;width:42px;height:42px;border-radius:14px;display:grid;place-items:center;color:var(--muted);transition:transform .2s var(--spring),background .2s,color .2s}
+.ib{flex:none;width:36px;height:36px;border-radius:12px;display:grid;place-items:center;color:var(--muted);transition:transform .2s var(--spring),background .2s,color .2s}
 .ib:active{transform:scale(.88);background:rgba(255,255,255,.08);color:var(--text)}
+.ib .ic{width:19px;height:19px}
+.ib.mini{width:32px;height:32px;border-radius:10px}
 
 #scroller{position:relative;z-index:1;flex:1;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:10px 12px 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 #scroller::-webkit-scrollbar{display:none}
@@ -127,10 +129,10 @@ section{position:absolute;inset:0}
 .sys .ic{width:13px;height:13px;flex:none}
 .day{display:flex;justify-content:center;margin:14px 0 8px}
 .day span{font-size:11.5px;color:var(--muted);background:rgba(255,255,255,.05);padding:4px 12px;border-radius:99px}
-.row{display:flex;margin-top:8px;position:relative;touch-action:pan-y}
+.row{display:flex;margin-top:6px;position:relative;touch-action:pan-y}
 .row.me{justify-content:flex-end}
 .row:not(.first){margin-top:2px}
-.b{position:relative;max-width:80%;padding:8px 13px 6px;font-size:15.5px;line-height:1.42;white-space:pre-wrap;overflow-wrap:anywhere;border-radius:20px}
+.b{position:relative;max-width:78%;padding:7px 11px 5px;font-size:14px;line-height:1.4;white-space:pre-wrap;overflow-wrap:anywhere;border-radius:17px}
 .me .b{background:linear-gradient(135deg,#ff5c8a,#e0459f 60%,#b455e6);color:#fff;box-shadow:0 4px 14px rgba(224,69,159,.22)}
 .them .b{background:var(--surface2);color:var(--text);border:1px solid var(--line)}
 .me:not(.first) .b{border-top-right-radius:7px}.me:not(.last) .b{border-bottom-right-radius:7px}.me.last .b{border-bottom-right-radius:5px}
@@ -174,21 +176,21 @@ section{position:absolute;inset:0}
 .row.them.enter .b,.row.them.enter .ph{transform-origin:0 100%}
 @keyframes popin{from{opacity:0;transform:translateY(16px) scale(.6)}60%{opacity:1}to{opacity:1;transform:none}}
 @keyframes pop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
-.b.photo{padding:4px}
-.ph{position:relative;overflow:hidden;width:min(62vw,236px);height:min(70vw,270px);border-radius:17px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:14px}
+.b.photo{padding:3px}
+.ph{position:relative;overflow:hidden;width:min(50vw,190px);height:min(56vw,215px);border-radius:15px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:12px}
 .ph.lock{cursor:pointer;background:radial-gradient(120% 90% at 15% 8%,#6b2f7e,transparent 60%),radial-gradient(100% 80% at 92% 92%,#a3305f,transparent 55%),#1c1327;transition:transform .2s var(--spring)}
 .ph.lock:active{transform:scale(.97)}
 .ph.lock::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.14) 50%,transparent 65%);transform:translateX(-100%);animation:sweep 3.2s ease-in-out infinite}
 @keyframes sweep{60%,100%{transform:translateX(100%)}}
-.ph .lk{position:relative;z-index:1;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.14);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+.ph .lk{position:relative;z-index:1;width:50px;height:50px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.14);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
   border:1px solid rgba(255,255,255,.22);animation:breathe 2.4s ease-in-out infinite}
-.ph .lk .ic{width:28px;height:28px;color:#fff}
+.ph .lk .ic{width:22px;height:22px;color:#fff}
 @keyframes breathe{50%{transform:scale(1.09);box-shadow:0 0 0 12px rgba(255,255,255,.06)}}
-.ph b{position:relative;z-index:1;font-size:14.5px;color:#fff}
-.ph small{position:relative;z-index:1;font-size:12px;color:rgba(255,255,255,.72);line-height:1.35}
-.ph.sent{width:min(56vw,208px);height:auto;padding:16px 14px;background:rgba(0,0,0,.18);border:1px dashed rgba(255,255,255,.35)}
-.ph.sent .lk{width:46px;height:46px;animation:none;background:rgba(255,255,255,.18)}
-.ph.sent .lk .ic{width:22px;height:22px}
+.ph b{position:relative;z-index:1;font-size:13px;color:#fff}
+.ph small{position:relative;z-index:1;font-size:11px;color:rgba(255,255,255,.72);line-height:1.35}
+.ph.sent{width:min(44vw,170px);height:auto;padding:13px 12px;background:rgba(0,0,0,.18);border:1px dashed rgba(255,255,255,.35)}
+.ph.sent .lk{width:38px;height:38px;animation:none;background:rgba(255,255,255,.18)}
+.ph.sent .lk .ic{width:19px;height:19px}
 .ph.seen .lk{background:rgba(255,255,255,.3)}
 .b.tomb{background:transparent!important;box-shadow:none!important;border:1px dashed rgba(255,255,255,.16)!important;color:var(--muted);font-size:13px;display:flex;align-items:center;gap:8px;padding:9px 14px}
 .b.tomb .ic{width:16px;height:16px}
@@ -227,14 +229,14 @@ section{position:absolute;inset:0}
 #replyBar .rb-x:active{color:var(--text)}
 #replyBar .rb-x:active::before{background:rgba(255,255,255,.1);transform:scale(.88)}
 #replyBar .rb-x .ic{width:17px;height:17px}
-#cmp{position:relative;z-index:5;display:flex;align-items:flex-end;gap:8px;padding:8px 10px calc(var(--sab) + 10px);background:linear-gradient(to top,rgba(12,9,17,.96) 60%,rgba(12,9,17,0))}
-.tw{flex:1;min-width:0;background:var(--surface);border:1.5px solid var(--line);border-radius:24px;transition:border-color .25s,box-shadow .25s}
+#cmp{position:relative;z-index:5;display:flex;align-items:flex-end;gap:7px;padding:6px 8px calc(var(--sab) + 8px);background:linear-gradient(to top,rgba(12,9,17,.96) 60%,rgba(12,9,17,0))}
+.tw{flex:1;min-width:0;background:var(--surface);border:1.5px solid var(--line);border-radius:22px;transition:border-color .25s,box-shadow .25s}
 .tw:focus-within{border-color:rgba(255,92,138,.55);box-shadow:0 0 0 4px rgba(255,92,138,.1)}
-#ta{display:block;width:100%;max-height:120px;min-height:44px;resize:none;border:0;outline:0;background:transparent;color:var(--text);font-size:16px;line-height:1.35;padding:11px 16px;overflow-y:auto}
+#ta{display:block;width:100%;max-height:120px;min-height:40px;resize:none;border:0;outline:0;background:transparent;color:var(--text);font-size:16px;line-height:1.3;padding:9px 15px;overflow-y:auto}
 #ta::placeholder{color:#7d6f8b}
-#btnPhoto{width:46px;height:46px;border-radius:50%;background:var(--surface);border:1.5px solid var(--line);color:var(--rose2)}
-.sendb{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:#7d6f8b;background:var(--surface);border:1.5px solid var(--line);transition:transform .35s var(--spring),background .3s,color .3s,box-shadow .3s}
-.sendb .ic{transition:transform .4s var(--spring);width:20px;height:20px}
+#btnPhoto{width:40px;height:40px;border-radius:50%;background:var(--surface);border:1.5px solid var(--line);color:var(--rose2)}
+.sendb{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#7d6f8b;background:var(--surface);border:1.5px solid var(--line);transition:transform .35s var(--spring),background .3s,color .3s,box-shadow .3s}
+.sendb .ic{transition:transform .4s var(--spring);width:18px;height:18px}
 .sendb.on{color:#fff;background:linear-gradient(135deg,#ff5c8a,#b455e6);border-color:transparent;box-shadow:0 6px 20px rgba(255,92,138,.45);transform:scale(1.06)}
 .sendb.on .ic{transform:translate(1px,-1px) rotate(0)}
 .sendb:active{transform:scale(.88)}
@@ -242,11 +244,11 @@ section{position:absolute;inset:0}
 @keyframes fly{0%{transform:none;opacity:1}45%{transform:translate(26px,-26px) scale(.6);opacity:0}46%{transform:translate(-26px,26px) scale(.6);opacity:0}100%{transform:none;opacity:1}}
 
 /* ---------- Tab obrolan (khusus Er) ---------- */
-#tabs{display:none;position:relative;z-index:4;margin:8px 12px 0;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:16px;grid-template-columns:1fr 1fr}
+#tabs{display:none;position:relative;z-index:4;margin:6px 10px 0;padding:3px;background:var(--surface);border:1px solid var(--line);border-radius:14px;grid-template-columns:1fr 1fr}
 #tabs.on{display:grid;animation:fadeup .5s var(--ease)}
-#tabs .sl{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:12px;background:linear-gradient(135deg,rgba(255,92,138,.32),rgba(184,107,255,.32));border:1px solid rgba(255,92,138,.35);transition:transform .45s var(--spring)}
+#tabs .sl{position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);border-radius:11px;background:linear-gradient(135deg,rgba(255,92,138,.32),rgba(184,107,255,.32));border:1px solid rgba(255,92,138,.35);transition:transform .45s var(--spring)}
 #tabs.r1 .sl{transform:translateX(100%)}
-.tab{position:relative;z-index:1;height:38px;font-weight:600;font-size:14px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:7px;transition:color .25s,transform .2s}
+.tab{position:relative;z-index:1;height:32px;font-weight:600;font-size:12.5px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px;transition:color .25s,transform .2s}
 .tab.on{color:var(--text)}
 .tab:active{transform:scale(.95)}
 .bd{min-width:19px;height:19px;padding:0 5px;border-radius:99px;background:var(--rose);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;animation:pop .4s var(--spring)}
@@ -291,6 +293,7 @@ section{position:absolute;inset:0}
 #pv.open .pv-card{transform:none}
 .pv-card img{width:100%;max-height:55vh;object-fit:contain;border-radius:20px;background:#000;box-shadow:0 20px 60px rgba(0,0,0,.6)}
 .pv-card p{font-size:13px;color:var(--muted);text-align:center;line-height:1.5}
+.pv-card p:empty{display:none}
 
 /* ---------- Viewer foto ---------- */
 #viewer{position:fixed;inset:0;z-index:140;background:rgba(0,0,0,0);display:flex;flex-direction:column;pointer-events:none;visibility:hidden;transition:background .35s,visibility 0s .4s}
@@ -308,6 +311,17 @@ section{position:absolute;inset:0}
 .vstage.er img{pointer-events:auto;-webkit-touch-callout:default;-webkit-user-select:auto;user-select:auto}
 .spin{width:36px;height:36px;border-radius:50%;border:3px solid rgba(255,255,255,.12);border-top-color:var(--rose);animation:rot .8s linear infinite}
 @keyframes rot{to{transform:rotate(360deg)}}
+
+/* ---------- Kamera ---------- */
+#cam{position:fixed;inset:0;z-index:150;background:#000;display:flex;flex-direction:column;opacity:0;pointer-events:none;visibility:hidden;transition:opacity .3s,visibility 0s .3s}
+#cam.open{opacity:1;pointer-events:auto;visibility:visible;transition:opacity .3s,visibility 0s}
+.cam-bar{display:flex;align-items:center;justify-content:space-between;padding:calc(var(--sat) + 10px) 10px 10px;color:#fff;font-size:13px;font-weight:600}
+.cam-bar .ib{background:rgba(255,255,255,.1);color:#fff;border-radius:50%}
+.cam-stage{flex:1;min-height:0;position:relative;overflow:hidden;background:#050505}
+.cam-stage video{width:100%;height:100%;object-fit:cover;display:block}
+.cam-acts{display:flex;align-items:center;justify-content:center;padding:16px 0 calc(var(--sab) + 20px)}
+#camShot{width:66px;height:66px;border-radius:50%;background:#fff;border:4px solid rgba(255,255,255,.35);box-shadow:0 0 0 2px rgba(255,255,255,.6) inset;transition:transform .18s var(--spring)}
+#camShot:active{transform:scale(.88)}
 
 /* ---------- Tautan pasang (login) ---------- */
 .lnk{display:block;margin:14px auto 0;padding:8px 14px;border-radius:12px;color:var(--muted);font-size:13px;text-decoration:underline;text-underline-offset:3px;transition:color .2s,transform .2s var(--spring)}
@@ -382,6 +396,8 @@ section{position:absolute;inset:0}
   Urutan setup:
   1) Supabase > Authentication > Users: buat 3 akun (saskia, selpia, er) sesuai CONFIG.ACCOUNTS.
   2) Jalankan setup.sql di SQL Editor.
+  2b) Jalankan sekali di SQL Editor (untuk fitur batas 5x lihat foto kiriman Ganteng):
+      alter table public.messages add column if not exists view_count integer not null default 0;
   3) Ganti kunci enkripsi (CHAT_SECRET) di objek CONFIG di bawah sebelum dipakai.
   4) Upload SEMUA file ke hosting HTTPS dalam satu folder: index.html, manifest.webmanifest,
      sw.js, dan folder icons/. Tanpa HTTPS, enkripsi & pemasangan di layar utama tidak jalan.
@@ -499,6 +515,16 @@ section{position:absolute;inset:0}
     </div>
     <div class="vstage" id="vStage"></div>
   </div>
+
+  <div id="cam">
+    <div class="cam-bar">
+      <button class="ib" id="camClose" aria-label="Tutup"></button>
+      <span>Ambil foto</span>
+      <button class="ib" id="camFlip" aria-label="Ganti kamera"></button>
+    </div>
+    <div class="cam-stage"><video id="camVid" autoplay playsinline muted></video></div>
+    <div class="cam-acts"><button id="camShot" aria-label="Jepret"></button></div>
+  </div>
 </div>
 <div id="shield"></div>
 <div id="toast"></div>
@@ -541,6 +567,7 @@ const CONFIG = {
 
   MSG_TTL_H: 24,             // pesan hilang setelah (jam)
   ER_PHOTO_MIN: 60,          // foto untuk Er bertahan (menit) setelah dibuka
+  PARTNER_PHOTO_VIEWS: 5,    // foto kiriman Ganteng: maksimal berapa kali Saskia/Selpia boleh membukanya
   LOCK_AFTER_MS: 120000      // otomatis terkunci jika ditinggal (ms)
 };
 
@@ -591,7 +618,9 @@ const I = {
   edit:  P('<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/>'),
   back:  P('<path d="m15 18-6-6 6-6"/>'),
   bell:  P('<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>'),
-  reply: P('<path d="M9 17 4 12l5-5"/><path d="M4 12h9a6 6 0 0 1 6 6v2"/>')
+  reply: P('<path d="M9 17 4 12l5-5"/><path d="M4 12h9a6 6 0 0 1 6 6v2"/>'),
+  camera:P('<path d="M4 8h3l1.6-2.4A2 2 0 0 1 10.3 4.6h3.4a2 2 0 0 1 1.7 1L17 8h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2z"/><circle cx="12" cy="14" r="4"/>'),
+  flip:  P('<path d="M17 2 21 6l-4 4"/><path d="M3 12v-2a4 4 0 0 1 4-4h14"/><path d="M7 22 3 18l4-4"/><path d="M21 12v2a4 4 0 0 1-4 4H3"/>')
 };
 
 /* ---------- SHA-256 (cadangan jika crypto.subtle tidak tersedia) ---------- */
@@ -778,7 +807,7 @@ function quoteHTML(m) {
 function rowSig(m, first, last, day) {
   const left = new Date(m.expires_at) - Date.now();
   const leftMin = (!decoy && left < 3600000 && left > 0) ? Math.max(1, Math.ceil(left / 60000)) : 0;
-  return [m.read_at ? 1 : 0, m.viewed_at ? 1 : 0, m.photo_gone ? 1 : 0, m.pending ? 1 : 0, m.failed ? 1 : 0, (m.body || '').length, first ? 1 : 0, last ? 1 : 0, day, leftMin, m._fresh ? 1 : 0, m.reply_to || ''].join('.');
+  return [m.read_at ? 1 : 0, m.viewed_at ? 1 : 0, m.photo_gone ? 1 : 0, m.pending ? 1 : 0, m.failed ? 1 : 0, (m.body || '').length, first ? 1 : 0, last ? 1 : 0, day, leftMin, m._fresh ? 1 : 0, m.reply_to || '', m.view_count || 0].join('.');
 }
 function rowHTML(m, first, last, enter, delay) {
   const mine = m.sender === me, now = Date.now();
@@ -804,10 +833,11 @@ function rowHTML(m, first, last, enter, delay) {
     return `<div class="${cls}" data-id="${m.id}"${st}>${rico}<div class="b photo${m.failed ? ' failed' : ''}">${nm}${q}<div class="ph sent${seenIt ? ' seen' : ''}"><div class="lk">${m.pending ? I.clock : (seenIt ? I.eye : I.image)}</div><b>Foto</b><small>${label}</small></div>${meta}${rbtn}</div></div>`;
   }
   let hint;
-  if (me !== 'er') hint = 'Hanya bisa dilihat sekali';
-  else if (m.viewed_at) hint = `Tersisa ${Math.max(1, Math.ceil((+new Date(m.viewed_at) + ER_MS - now) / 60000))} menit`;
-  else hint = `Bisa dilihat ${CONFIG.ER_PHOTO_MIN} menit setelah dibuka`;
-  return `<div class="${cls}" data-id="${m.id}"${st}>${rico}<div class="b photo">${nm}${q}<div class="ph lock" data-open="${m.id}"><div class="lk">${I.lock}</div><b>Ketuk untuk melihat foto</b><small>${hint}</small></div>${meta}${rbtn}</div></div>`;
+  if (me !== 'er') {
+    const remain = Math.max(0, CONFIG.PARTNER_PHOTO_VIEWS - (m.view_count || 0));
+    hint = m.viewed_at ? `Tersisa ${remain}x lagi` : `Bisa dilihat ${CONFIG.PARTNER_PHOTO_VIEWS}x`;
+  } else hint = '';
+  return `<div class="${cls}" data-id="${m.id}"${st}>${rico}<div class="b photo">${nm}${q}<div class="ph lock" data-open="${m.id}"><div class="lk">${I.lock}</div><b>Ketuk untuk melihat foto</b>${hint ? `<small>${hint}</small>` : ''}</div>${meta}${rbtn}</div></div>`;
 }
 function render(opts) {
   try { renderInner(opts); }
@@ -828,7 +858,7 @@ function renderInner(opts) {
   }
   const now = Date.now();
   const timeSens = msgs.some(m => new Date(m.expires_at) - now < 3600000 || (m.kind === 'image' && m.viewed_at && !m.photo_gone));
-  const sig = msgs.map(m => [m.id, m.read_at ? 1 : 0, m.viewed_at ? 1 : 0, m.photo_gone ? 1 : 0, m.pending ? 1 : 0, m.failed ? 1 : 0, (m.body || '').length].join('.')).join('|') + (timeSens ? '@' + Math.floor(now / 60000) : '');
+  const sig = msgs.map(m => [m.id, m.read_at ? 1 : 0, m.viewed_at ? 1 : 0, m.photo_gone ? 1 : 0, m.pending ? 1 : 0, m.failed ? 1 : 0, (m.body || '').length, m.view_count || 0].join('.')).join('|') + (timeSens ? '@' + Math.floor(now / 60000) : '');
   if (sig === lastSig && !opts.force) return;
   lastSig = sig;
   const wasStick = stick;
@@ -946,7 +976,7 @@ async function sync() {
   const myRoom = room;
   try {
     const nowI = iso();
-    const cols = 'id,room,sender,kind,reply_to,created_at,expires_at,read_at,viewed_at,photo_gone';
+    const cols = 'id,room,sender,kind,reply_to,created_at,expires_at,read_at,viewed_at,photo_gone,view_count';
     const [t, i] = await Promise.all([
       sb.from('messages').select(cols + ',body').eq('room', myRoom).eq('kind', 'text').gt('expires_at', nowI).order('created_at', { ascending: true }).limit(600),
       sb.from('messages').select(cols).eq('room', myRoom).eq('kind', 'image').gt('expires_at', nowI).order('created_at', { ascending: true }).limit(200)
@@ -964,7 +994,7 @@ async function sync() {
         if (body === undefined) { try { body = await dec(r.body); } catch (e) { body = 'Pesan tidak bisa dibuka'; } textCache.set(r.id, body); }
       }
       const old = byId.get(r.id), m = Object.assign({}, r, { body, pending: false, failed: false, localAt: old ? old.localAt : 0 });
-      if (old) { if (old.viewed_at && !m.viewed_at) m.viewed_at = old.viewed_at; if (old.photo_gone) m.photo_gone = true; }
+      if (old) { if (old.viewed_at && !m.viewed_at) m.viewed_at = old.viewed_at; if (old.photo_gone) m.photo_gone = true; if ((old.view_count || 0) > (m.view_count || 0)) m.view_count = old.view_count; }
       out.push(m);
     }
     for (const m of msgs) if (!ids.has(m.id) && (m.pending || m.failed || Date.now() - (m.localAt || 0) < 8000)) out.push(m);
@@ -996,7 +1026,8 @@ async function maintain() {
     const rcv = m.sender === 'er' ? m.room : 'er', va = +new Date(m.viewed_at);
     const inViewer = V && V.id === m.id;
     if (inViewer) continue;
-    if ((rcv === 'er' && now > va + ER_MS) || (rcv !== 'er' && now > va + 600000)) wipe(m.id);
+    if (rcv === 'er') { if (now > va + ER_MS) wipe(m.id); }
+    else { if ((m.view_count || 0) >= CONFIG.PARTNER_PHOTO_VIEWS) wipe(m.id); }
   }
   // tandai dibaca
   if (!document.hidden && !shieldOff) {
@@ -1080,7 +1111,9 @@ async function pushText(m) {
 
 /* ---------- Foto: pilih, kompres, kirim ---------- */
 $('btnPhoto').addEventListener('click', () => {
-  $('file').value = ''; $('file').click();
+  openSheet(`
+    <button class="it" data-act="pick-gallery">${I.image}<span>Pilih dari galeri</span></button>
+    <button class="it" data-act="pick-camera">${I.camera}<span>Ambil foto (kamera)</span></button>`);
 });
 async function compress(file) {
   let src;
@@ -1091,16 +1124,17 @@ async function compress(file) {
   const g = c.getContext('2d'); g.fillStyle = '#000'; g.fillRect(0, 0, c.width, c.height); g.drawImage(src, 0, 0, c.width, c.height);
   return c.toDataURL('image/jpeg', .74);
 }
+function openPreview(dataUrl) {
+  pendingPhoto = dataUrl;
+  $('pvImg').src = pendingPhoto;
+  $('pvNote').textContent = partner !== 'er'
+    ? `Dia hanya bisa membuka foto ini maksimal ${CONFIG.PARTNER_PHOTO_VIEWS}x, lalu foto otomatis terhapus. Tidak bisa diunduh atau discreenshot.`
+    : '';
+  $('pv').classList.add('open');
+}
 $('file').addEventListener('change', async () => {
   const f = $('file').files[0]; if (!f) return;
-  try {
-    pendingPhoto = await compress(f);
-    $('pvImg').src = pendingPhoto;
-    $('pvNote').textContent = partner !== 'er'
-      ? 'Dia hanya bisa melihat foto ini satu kali, lalu foto otomatis terhapus.'
-      : `Foto ini hilang ${CONFIG.ER_PHOTO_MIN} menit setelah dibuka.`;
-    $('pv').classList.add('open');
-  } catch (e) { toast('Foto tidak bisa dibaca'); }
+  try { openPreview(await compress(f)); } catch (e) { toast('Foto tidak bisa dibaca'); }
 });
 $('pvCancel').addEventListener('click', () => { $('pv').classList.remove('open'); pendingPhoto = null; });
 $('pvSend').addEventListener('click', async () => {
@@ -1108,7 +1142,7 @@ $('pvSend').addEventListener('click', async () => {
   pendingPhoto = null; $('pv').classList.remove('open');
   const rt = replyTo; cancelReply();
   const now = Date.now();
-  const m = { id: uid(), room, sender: me, kind: 'image', body: null, reply_to: rt, created_at: iso(now), expires_at: iso(now + TTL_MS), read_at: null, viewed_at: null, photo_gone: false, pending: true, localAt: now, _data: data };
+  const m = { id: uid(), room, sender: me, kind: 'image', body: null, reply_to: rt, created_at: iso(now), expires_at: iso(now + TTL_MS), read_at: null, viewed_at: null, photo_gone: false, view_count: 0, pending: true, localAt: now, _data: data };
   msgs.push(m); render({ scroll: true, smooth: true }); vib(10); tone([660, 880]);
   await pushPhoto(m);
 });
@@ -1242,6 +1276,7 @@ async function openPhoto(id) {
   if (!m || m.photo_gone || m.sender === me || decoy || V) return;
   const isEr = me === 'er';
   if (isEr && m.viewed_at && Date.now() > +new Date(m.viewed_at) + ER_MS) { wipe(id); toast('Foto sudah hilang'); return; }
+  if (!isEr && (m.view_count || 0) >= CONFIG.PARTNER_PHOTO_VIEWS) { wipe(id); toast('Foto sudah hilang'); return; }
   vib(10);
   V = { id, isEr, loaded: false, url: null, timer: null };
   const token = V;
@@ -1251,13 +1286,18 @@ async function openPhoto(id) {
   $('viewer').classList.add('open');
   if (isEr) shieldOff = true; // Er boleh screenshot
   try {
-    const { data, error } = await sb.from('messages').select('body,photo_gone').eq('id', id).single();
+    const { data, error } = await sb.from('messages').select('body,photo_gone,view_count').eq('id', id).single();
     if (V !== token) return;
     if (error) throw error;
-    if (data.photo_gone || !data.body) { closeViewer(true); m.photo_gone = true; m._fresh = true; render(); toast('Foto sudah hilang'); return; }
+    if (data.photo_gone || !data.body || (!isEr && (data.view_count || 0) >= CONFIG.PARTNER_PHOTO_VIEWS)) { closeViewer(true); m.photo_gone = true; m._fresh = true; render(); toast('Foto sudah hilang'); return; }
     const url = await dec(data.body);
     if (V !== token) return;
     if (!m.viewed_at) { const va = iso(); m.viewed_at = va; sb.from('messages').update({ viewed_at: va }).eq('id', id).is('viewed_at', null).then(() => {}); }
+    if (!isEr) {
+      const nv = (data.view_count || 0) + 1;
+      m.view_count = nv;
+      sb.from('messages').update({ view_count: nv }).eq('id', id).then(() => {});
+    }
     token.loaded = true; token.url = url;
     await showInViewer(m, url, isEr);
   } catch (e) { if (V === token) { closeViewer(true); toast('Foto gagal dibuka. Coba lagi.'); } }
@@ -1280,7 +1320,9 @@ function showInViewer(m, url, isEr) {
         for (let y = -c.height; y < c.height * 2; y += c.width / 5) for (let x = -c.width; x < c.width * 2; x += c.width / 2.2) g.fillText(USERS[me].own.split(' ')[0], x, y);
         g.restore();
         st.appendChild(c);
-        $('vS').textContent = 'Foto akan terhapus setelah ditutup'; $('vS').className = 'warn';
+        const remain = Math.max(0, CONFIG.PARTNER_PHOTO_VIEWS - (m.view_count || 0));
+        $('vS').textContent = remain <= 0 ? 'Foto akan terhapus setelah ditutup' : `Tersisa ${remain}x lagi setelah ini ditutup`;
+        $('vS').className = 'warn';
       }
       res();
     };
@@ -1294,7 +1336,10 @@ function closeViewer(silent) {
   const v = V; V = null; clearInterval(v.timer); shieldOff = false;
   $('viewer').classList.remove('open');
   setTimeout(() => { if (!V) $('vStage').innerHTML = ''; }, 450);
-  if (!silent && v.loaded && !v.isEr) burnPhoto(v.id);
+  if (!silent && v.loaded && !v.isEr) {
+    const m = msgs.find(x => x.id === v.id);
+    if (m && (m.view_count || 0) >= CONFIG.PARTNER_PHOTO_VIEWS) burnPhoto(v.id);
+  }
 }
 async function burnPhoto(id) {
   const el = list.querySelector(`.row[data-id="${id}"] .b`);
@@ -1410,6 +1455,8 @@ $('shCard').addEventListener('click', async e => {
   const b = e.target.closest('[data-act]'); if (!b) return;
   const a = b.dataset.act;
   if (a === 'lock') { closeSheet(); await wait(200); lockApp(); }
+  else if (a === 'pick-gallery') { closeSheet(); $('file').value = ''; $('file').click(); }
+  else if (a === 'pick-camera') { closeSheet(); await wait(200); openCamera(); }
   else if (a === 'snd') { soundOn = !soundOn; localStorage.setItem('sk_snd', soundOn ? '1' : '0'); closeSheet(); toast(soundOn ? 'Suara dinyalakan' : 'Suara dimatikan'); if (soundOn) tone([880]); }
   else if (a === 'push') pushToggle();
   else if (a === 'pw') pwForm();
@@ -1667,7 +1714,7 @@ function startSession(acc, animated) {
 function lockApp() {
   if (!me && !$('chat').classList.contains('show') && !$('poems').classList.contains('show')) return;
   const burning = !!(V && V.loaded && !V.isEr);
-  closeViewer(false); closeSheet(); $('pv').classList.remove('open'); pendingPhoto = null;
+  closeViewer(false); closeSheet(); $('pv').classList.remove('open'); pendingPhoto = null; closeCamera();
   teardown(); localStorage.removeItem('sk_sess'); hidePushAsk();
   killSession(burning ? 1500 : 0); // beri waktu foto sekali-lihat terhapus dulu
   me = null; partner = null; room = null; msgs = []; list.innerHTML = ''; updateTabs(); shieldOff = false;
@@ -1725,6 +1772,7 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     hiddenAt = Date.now(); touch(); shieldUp();
     if (V && !V.isEr) closeViewer(false);
+    closeCamera();
     if (chan) { try { chan.untrack(); } catch (e) {} }
   } else {
     shieldDown();
@@ -1763,6 +1811,40 @@ $('btnSend').innerHTML = I.send; $('vClose').innerHTML = I.x; $('vDl').innerHTML
 $('rbClose').innerHTML = I.x;
 
 $('pAdd').innerHTML = I.plus; $('pLock').innerHTML = I.lock; $('rBack').innerHTML = I.back; $('rEdit').innerHTML = I.edit; $('rDel').innerHTML = I.trash; $('eClose').innerHTML = I.x;
+$('camClose').innerHTML = I.x; $('camFlip').innerHTML = I.flip;
+
+/* ---------- Kamera (foto langsung, depan/belakang) ---------- */
+let camStream = null, camFacing = 'environment';
+async function openCamera() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { toast('Kamera tidak tersedia di perangkat ini'); return; }
+  camFacing = 'environment';
+  $('cam').classList.add('open');
+  await startCamStream();
+}
+async function startCamStream() {
+  stopCamStream();
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: camFacing } }, audio: false });
+    const v = $('camVid'); v.srcObject = camStream;
+    v.style.transform = camFacing === 'user' ? 'scaleX(-1)' : 'none';
+  } catch (e) { toast('Tidak bisa mengakses kamera. Cek izin kamera di browser.'); closeCamera(); }
+}
+function stopCamStream() { if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; } }
+function closeCamera() { $('cam').classList.remove('open'); stopCamStream(); }
+$('camClose').addEventListener('click', closeCamera);
+$('camFlip').addEventListener('click', () => { camFacing = camFacing === 'user' ? 'environment' : 'user'; startCamStream(); });
+$('camShot').addEventListener('click', () => {
+  const v = $('camVid'); if (!v.videoWidth) return;
+  vib(10);
+  const sc = Math.min(1, 1280 / Math.max(v.videoWidth, v.videoHeight));
+  const c = document.createElement('canvas'); c.width = Math.round(v.videoWidth * sc); c.height = Math.round(v.videoHeight * sc);
+  const g = c.getContext('2d');
+  if (camFacing === 'user') { g.translate(c.width, 0); g.scale(-1, 1); }
+  g.drawImage(v, 0, 0, c.width, c.height);
+  const data = c.toDataURL('image/jpeg', .74);
+  closeCamera();
+  openPreview(data);
+});
 
 // hati melayang di halaman login
 (function hearts() {
