@@ -1117,6 +1117,7 @@ function connectRealtime() {
   if (decoy || !ensureClient()) return;
   chan = sb.channel('ruang-' + room, { config: { private: !!CONFIG.PRIVATE_CHANNELS, presence: { key: me }, broadcast: { self: false } } });
   chan.on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => scheduleSync(200))
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'names' }, () => loadNames())
       .on('presence', { event: 'sync' }, () => { partnerOnline = !!chan.presenceState()[partner]; updateHeader(); })
       .on('broadcast', { event: 'typing' }, ({ payload }) => {
         if (payload && payload.u === partner) { typingUntil = Date.now() + 3500; updateHeader(); setTimeout(updateHeader, 3600); }
