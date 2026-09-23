@@ -585,6 +585,27 @@ const USERS = {
             views: { saskia: { name: 'Saskia Sayangku', sub: '', initial: 'S' },
                      selpia: { name: 'Selpia Sayangku', sub: '', initial: 'S' } } }
 };
+/* Nama tampilan bisa diganti oleh Er (tersimpan di tabel 'names' di Supabase, berlaku untuk semua perangkat).
+   Satu nama per orang: dipakai baik untuk tampilan diri sendiri maupun tampilan di mata pasangannya. */
+function applyNames(map) {
+  let changed = false;
+  const setV = (obj, key, val) => { if (val && obj[key] !== val) { obj[key] = val; changed = true; } };
+  const ini = s => { const c = (s || '').trim()[0]; return c ? c.toUpperCase() : ''; };
+  if (map.saskia) {
+    setV(USERS.saskia, 'own', map.saskia); setV(USERS.er.views.saskia, 'name', map.saskia);
+    const i = ini(map.saskia); if (i) setV(USERS.er.views.saskia, 'initial', i);
+  }
+  if (map.selpia) {
+    setV(USERS.selpia, 'own', map.selpia); setV(USERS.er.views.selpia, 'name', map.selpia);
+    const i = ini(map.selpia); if (i) setV(USERS.er.views.selpia, 'initial', i);
+  }
+  if (map.er) {
+    setV(USERS.er, 'own', map.er); setV(USERS.saskia.view, 'name', map.er); setV(USERS.selpia.view, 'name', map.er);
+    const i = ini(map.er); if (i) { setV(USERS.saskia.view, 'initial', i); setV(USERS.selpia.view, 'initial', i); }
+  }
+  return changed;
+}
+(() => { try { applyNames(JSON.parse(localStorage.getItem('sk_names') || '{}')); } catch (e) {} })();
 
 /* =====================================================================
    Util
@@ -619,6 +640,7 @@ const I = {
   heart: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
   warn:  P('<path d="M12 3 2 20h20z"/><path d="M12 10v5"/><path d="M12 18h.01"/>'),
   key:   P('<circle cx="8" cy="15" r="4"/><path d="m11 12 9-9"/><path d="m16 7 3 3"/>'),
+  edit:  P('<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/>'),
   plus:  P('<path d="M12 5v14M5 12h14"/>'),
   edit:  P('<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/>'),
   back:  P('<path d="m15 18-6-6 6-6"/>'),
@@ -1077,6 +1099,24 @@ async function wipe(id) {
   }
 }
 
+async function loadNames() {
+  if (decoy || !ensureClient()) return;
+  try {
+    const { data, error } = await sb.from('names').select('id,value');
+    if (error) throw error;
+    const map = {}; (data || []).forEach(r => { if (r.value) map[r.id] = r.value; });
+    if (applyNames(map)) {
+      try { const cur = JSON.parse(localStorage.getItem('sk_names') || '{}'); localStorage.setItem('sk_names', JSON.stringify(Object.assign(cur, map))); } catch (e) {}
+      updateHeader(); forceFullRerender();
+    }
+  } catch (e) {} // tabel nama belum dibuat, atau lagi offline — pakai nama yang sudah ada, tidak masalah
+}
+function forceFullRerender() {
+  lastSig = '';
+  list.querySelectorAll(':scope > [data-key]').forEach(n => n.remove());
+  render({ force: true });
+}
+
 function connectRealtime() {
   if (decoy || !ensureClient()) return;
   chan = sb.channel('ruang-' + room, { config: { private: !!CONFIG.PRIVATE_CHANNELS, presence: { key: me }, broadcast: { self: false } } });
@@ -1467,6 +1507,42 @@ function pwForm() {
     <div class="sh-msg" id="pwMsg" role="alert"></div>
     <div class="acts"><button class="btn ghost" data-act="close">Batal</button><button class="btn cta" id="pwSave" data-act="pwsave">Simpan</button></div>`);
 }
+function pwForm() {
+  const f = (id, ph, ac) => `<input class="fld" id="${id}" type="password" placeholder="${ph}" autocomplete="${ac}" autocapitalize="off" autocorrect="off" spellcheck="false">`;
+  openSheet(`<div class="sh-t">Ganti sandi</div><p class="sh-p">Sandi baru minimal 8 karakter. Pakai sandi yang belum pernah dipakai di tempat lain.</p>
+    ${f('pwCur', 'Sandi saat ini', 'current-password')}${f('pwNew', 'Sandi baru', 'new-password')}${f('pwNew2', 'Ulangi sandi baru', 'new-password')}
+    <div class="sh-msg" id="pwMsg" role="alert"></div>
+    <div class="acts"><button class="btn ghost" data-act="close">Batal</button><button class="btn cta" id="pwSave" data-act="pwsave">Simpan</button></div>`);
+}
+function namesForm() {
+  if (me !== 'er' || decoy) return;
+  const myName = USERS.er.own, prName = partnerView().name, prLabel = room === 'selpia' ? 'Selpia' : 'Saskia';
+  openSheet(`<div class="sh-t">Ganti nama</div><p class="sh-p">Nama ini dipakai di seluruh tampilan — untukmu sendiri, dan untuk ${esc(prLabel)}.</p>
+    <input class="fld" id="nmEr" maxlength="30" placeholder="Nama kamu (Er)" value="${esc(myName)}">
+    <input class="fld" id="nmPartner" maxlength="30" placeholder="Nama ${esc(prLabel)}" value="${esc(prName)}">
+    <div class="sh-msg" id="nmMsg" role="alert"></div>
+    <div class="acts"><button class="btn ghost" data-act="close">Batal</button><button class="btn cta" id="nmSave" data-act="namesave">Simpan</button></div>`);
+}
+async function saveNames() {
+  const msg = t => { $('nmMsg').textContent = t || ''; };
+  const myName = $('nmEr').value.trim(), prName = $('nmPartner').value.trim(), btn = $('nmSave');
+  if (!myName || !prName) return msg('Isi kedua kolom.');
+  if (myName.length > 30 || prName.length > 30) return msg('Nama maksimal 30 karakter.');
+  const c = ensureClient(); if (!c || decoy || me !== 'er') return;
+  btn.disabled = true; msg('');
+  try {
+    const { error } = await sb.from('names').upsert([{ id: 'er', value: myName }, { id: room, value: prName }]);
+    if (error) throw error;
+    const map = { er: myName, [room]: prName };
+    applyNames(map);
+    try { const cur = JSON.parse(localStorage.getItem('sk_names') || '{}'); localStorage.setItem('sk_names', JSON.stringify(Object.assign(cur, map))); } catch (x) {}
+    updateHeader(); forceFullRerender();
+    closeSheet(); toast('Nama disimpan'); vib(10);
+  } catch (e) {
+    const es = JSON.stringify(e);
+    msg(/relation|PGRST205|42P01/.test(es) ? 'Tabel nama belum dibuat. Jalankan SQL tambahan di Supabase.' : 'Gagal menyimpan. Coba lagi.');
+  } finally { btn.disabled = false; }
+}
 async function savePw() {
   const msg = t => { $('pwMsg').textContent = t || ''; };
   const cur = $('pwCur').value, nw = $('pwNew').value, nw2 = $('pwNew2').value, btn = $('pwSave');
@@ -1499,6 +1575,7 @@ $('btnMenu').addEventListener('click', () => {
     <button class="it" data-act="snd">${soundOn ? I.vol : I.mute}<span>Suara pesan</span><em>${soundOn ? 'Nyala' : 'Mati'}</em></button>
     ${decoy ? '' : `<button class="it" data-act="push">${I.bell}<span>Notifikasi</span><em id="pushSt"></em></button>`}
     ${decoy ? '' : `<button class="it" data-act="pw">${I.key}<span>Ganti sandi</span></button>`}
+    ${(!decoy && me === 'er') ? `<button class="it" data-act="names">${I.edit}<span>Ganti nama</span></button>` : ''}
     <button class="it dng" data-act="wipeask">${I.trash}<span>Hapus semua obrolan</span></button>`);
   if (!decoy) pushState().then(st => { const el = $('pushSt'); if (el) el.textContent = PUSH_LABEL[st] || ''; });
 });
@@ -1512,6 +1589,8 @@ $('shCard').addEventListener('click', async e => {
   else if (a === 'push') pushToggle();
   else if (a === 'pw') pwForm();
   else if (a === 'pwsave') savePw();
+  else if (a === 'names') namesForm();
+  else if (a === 'namesave') saveNames();
   else if (a === 'pdel') delPoem(b.dataset.id);
   else if (a === 'discard') { closeSheet(); closeEditor(); }
   else if (a === 'del') deleteMsg(b.dataset.id);
@@ -1735,15 +1814,14 @@ function enterChat() {
   msgs = []; seen = new Set(); textCache = new Map(); lastSig = ''; firstRender = true; firstSync = true; stick = true; unread = 0; errShown = false;
   partnerOnline = false; typingUntil = 0; ta.value = ''; autosize(); updateSendBtn();
   updateHeader(); updateTabs(); render({ force: true });
-  sync(); connectRealtime(); pollT = setInterval(() => { if (!document.hidden) sync(); }, 5000);
+  sync(); connectRealtime(); loadNames(); pollT = setInterval(() => { if (!document.hidden) sync(); }, 5000);
   tickT = setInterval(() => {
     if (!me) return; touch();
     const now = Date.now(), before = msgs.length;
     msgs = msgs.filter(m => new Date(m.expires_at) > now || m.pending);
     render({ force: msgs.length !== before });
-    if (!decoy) maintain();
-  }, 15000);
-}
+    if (!decoy) { maintain(); loadNames(); }
+  }, 15000);}
 function teardown() {
   clearInterval(pollT); clearInterval(tickT); clearTimeout(syncTimer);
   if (chan && sb) { try { sb.removeChannel(chan); } catch (e) {} }
