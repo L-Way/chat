@@ -723,6 +723,12 @@ let stick = true, unread = 0, lastSig = '', firstRender = true, firstSync = true
 let shieldOff = false, hiddenAt = 0, V = null, syncing = false, syncQueued = false, syncTimer = null;
 let pollT = null, tickT = null, lastClean = 0, lgFails = 0, lgLock = 0, pendingPhoto = null;
 let replyTo = null, lastSwipeAt = 0, swipeLock = false, renderPending = null, swipeWatchdog = null;
+let deletedIds = new Set((() => { try { return JSON.parse(localStorage.getItem('sk_deleted') || '[]'); } catch (e) { return []; } })());
+function markDeleted(id) {
+  deletedIds.add(id);
+  while (deletedIds.size > 500) deletedIds.delete(deletedIds.values().next().value);
+  try { localStorage.setItem('sk_deleted', JSON.stringify([...deletedIds])); } catch (e) {}
+}
 let syncFails = 0, badSince = 0, connShown = false, connTimer = null, connOkTimer = null;
 let killing = Promise.resolve(), loginBusy = false;
 const AUTH_KEY = 'sk_auth';
@@ -804,7 +810,10 @@ const nameOf = m => m.sender === me ? USERS[me].own : partnerView().name;   // n
 function quoteHTML(m) {
   if (!m.reply_to) return '';
   const o = msgs.find(x => x.id === m.reply_to);
-  if (!o) return `<div class="qref gone"><span class="ql"></span><div class="qb"><span class="qt">Pesan sudah tidak ada</span></div></div>`;
+  if (!o) {
+    const label = deletedIds.has(m.reply_to) ? 'Pesan sudah dihapus' : 'Pesan sudah kadaluarsa';
+    return `<div class="qref gone"><span class="ql"></span><div class="qb"><span class="qt">${label}</span></div></div>`;
+  }
   const name = nameOf(o);
   const snip = o.kind === 'image' ? (o.photo_gone ? 'Foto sudah hilang' : '📷 Foto') : (o.body || '').slice(0, 80);
   return `<div class="qref" data-jump="${o.id}"><span class="ql"></span><div class="qb"><span class="qn">${esc(name)}</span><span class="qt">${esc(snip)}</span></div></div>`;
@@ -1271,6 +1280,7 @@ async function deleteMsg(id) {
   const row = list.querySelector(`.row[data-id="${id}"] .b`);
   if (row) { const r = row.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2); row.classList.add('dissolve'); }
   vib(12); await wait(520);
+  markDeleted(id);
   msgs = msgs.filter(m => m.id !== id); render({ force: true });
   try { await sb.from('messages').delete().eq('id', id); } catch (e) {}
 }
@@ -1331,9 +1341,16 @@ function showInViewer(m, url, isEr, mine) {
       if (mine) {
         img.draggable = false; img.alt = 'Foto'; st.appendChild(img);
         $('vDl').hidden = true; // pengirim tidak bisa mengunduh dari sini — hanya pratinjau
-        const left = new Date(m.expires_at) - Date.now();
-        $('vS').textContent = left > 0 ? 'Pratinjau kiriman · hilang dalam ' + fmtCount(left) : 'Pratinjau kiriman';
-        $('vS').className = '';
+        const rcvIsEr = m.sender !== 'er'; // foto yang dikirim ke Er punya batas waktu tersendiri setelah dibuka
+        const dl = () => {
+          if (!V) return;
+          let left = new Date(m.expires_at) - Date.now();
+          if (rcvIsEr && m.viewed_at) left = Math.min(left, +new Date(m.viewed_at) + ER_MS - Date.now());
+          left = Math.max(0, left);
+          $('vS').textContent = left > 0 ? 'Pratinjau kiriman · hilang dalam ' + fmtCount(left) : 'Pratinjau kiriman';
+          $('vS').className = '';
+        };
+        dl(); V.timer = setInterval(dl, 1000);
       } else if (isEr) {
         img.draggable = false; img.alt = 'Foto'; st.appendChild(img);
         $('vDl').hidden = false;
