@@ -818,10 +818,16 @@ function quoteHTML(m) {
   const snip = o.kind === 'image' ? (o.photo_gone ? 'Foto sudah hilang' : '📷 Foto') : (o.body || '').slice(0, 80);
   return `<div class="qref" data-jump="${o.id}"><span class="ql"></span><div class="qb"><span class="qn">${esc(name)}</span><span class="qt">${esc(snip)}</span></div></div>`;
 }
+function quoteSig(m) {
+  if (!m.reply_to) return '';
+  const o = msgs.find(x => x.id === m.reply_to);
+  if (!o) return deletedIds.has(m.reply_to) ? 'd' : 'x';
+  return '1' + (o.photo_gone ? 'g' : '');
+}
 function rowSig(m, first, last, day) {
   const left = new Date(m.expires_at) - Date.now();
   const leftMin = (!decoy && left < 3600000 && left > 0) ? Math.max(1, Math.ceil(left / 60000)) : 0;
-  return [m.read_at ? 1 : 0, m.viewed_at ? 1 : 0, m.photo_gone ? 1 : 0, m.pending ? 1 : 0, m.failed ? 1 : 0, (m.body || '').length, first ? 1 : 0, last ? 1 : 0, day, leftMin, m._fresh ? 1 : 0, m.reply_to || '', m.view_count || 0].join('.');
+  return [m.read_at ? 1 : 0, m.viewed_at ? 1 : 0, m.photo_gone ? 1 : 0, m.pending ? 1 : 0, m.failed ? 1 : 0, (m.body || '').length, first ? 1 : 0, last ? 1 : 0, day, leftMin, m._fresh ? 1 : 0, m.reply_to || '', m.view_count || 0, quoteSig(m)].join('.');
 }
 function rowHTML(m, first, last, enter, delay) {
   const mine = m.sender === me, now = Date.now();
@@ -1004,6 +1010,7 @@ async function sync() {
     const prevIds = new Set(msgs.map(m => m.id)), byId = new Map(msgs.map(m => [m.id, m]));
     const out = [];
     for (const r of rows) {
+      if (r.kind === 'text' && r.photo_gone) { markDeleted(r.id); continue; } // pesan teks yang sudah dihapus untuk semua — jangan ditampilkan sebagai bubble
       let body = null;
       if (r.kind === 'text') {
         body = textCache.get(r.id);
@@ -1282,7 +1289,8 @@ async function deleteMsg(id) {
   vib(12); await wait(520);
   markDeleted(id);
   msgs = msgs.filter(m => m.id !== id); render({ force: true });
-  try { await sb.from('messages').delete().eq('id', id); } catch (e) {}
+  // tandai dihapus (bukan hapus baris), supaya perangkat lain juga tahu ini "dihapus", bukan sekadar hilang/kadaluarsa
+  try { await sb.from('messages').update({ body: null, photo_gone: true }).eq('id', id); } catch (e) {}
 }
 
 /* =====================================================================
