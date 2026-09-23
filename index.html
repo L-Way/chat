@@ -282,6 +282,7 @@ section{position:absolute;inset:0}
 .acts{display:flex;gap:10px}.acts .btn{flex:1}
 .sh-card{max-height:100%;overflow-y:auto;overscroll-behavior:contain}
 .fld{display:block;width:100%;height:50px;border-radius:14px;border:1.5px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);font-size:16px;padding:0 16px;margin:0 0 10px;outline:none;transition:border-color .25s,box-shadow .25s}
+.fld-lbl{display:block;font-size:12px;color:var(--muted);margin:0 6px 6px}
 .fld:focus{border-color:var(--rose);box-shadow:0 0 0 4px rgba(255,92,138,.16)}
 .fld::placeholder{color:#7d6f8b}
 .sh-msg{min-height:20px;margin:-2px 6px 8px;font-size:13px;color:var(--danger)}
@@ -586,23 +587,18 @@ const USERS = {
                      selpia: { name: 'Selpia Sayangku', sub: '', initial: 'S' } } }
 };
 /* Nama tampilan bisa diganti oleh Er (tersimpan di tabel 'names' di Supabase, berlaku untuk semua perangkat).
-   Satu nama per orang: dipakai baik untuk tampilan diri sendiri maupun tampilan di mata pasangannya. */
+   4 nilai per pasangan — nama sendiri vs nama di mata pasangan bisa beda (nama panggilan sayang). */
 function applyNames(map) {
   let changed = false;
   const setV = (obj, key, val) => { if (val && obj[key] !== val) { obj[key] = val; changed = true; } };
   const ini = s => { const c = (s || '').trim()[0]; return c ? c.toUpperCase() : ''; };
-  if (map.saskia) {
-    setV(USERS.saskia, 'own', map.saskia); setV(USERS.er.views.saskia, 'name', map.saskia);
-    const i = ini(map.saskia); if (i) setV(USERS.er.views.saskia, 'initial', i);
-  }
-  if (map.selpia) {
-    setV(USERS.selpia, 'own', map.selpia); setV(USERS.er.views.selpia, 'name', map.selpia);
-    const i = ini(map.selpia); if (i) setV(USERS.er.views.selpia, 'initial', i);
-  }
-  if (map.er) {
-    setV(USERS.er, 'own', map.er); setV(USERS.saskia.view, 'name', map.er); setV(USERS.selpia.view, 'name', map.er);
-    const i = ini(map.er); if (i) { setV(USERS.saskia.view, 'initial', i); setV(USERS.selpia.view, 'initial', i); }
-  }
+  if (map.er_own) setV(USERS.er, 'own', map.er_own);
+  if (map.saskia_own) setV(USERS.saskia, 'own', map.saskia_own);
+  if (map.selpia_own) setV(USERS.selpia, 'own', map.selpia_own);
+  if (map.er_seen_by_saskia) { setV(USERS.saskia.view, 'name', map.er_seen_by_saskia); const i = ini(map.er_seen_by_saskia); if (i) setV(USERS.saskia.view, 'initial', i); }
+  if (map.er_seen_by_selpia) { setV(USERS.selpia.view, 'name', map.er_seen_by_selpia); const i = ini(map.er_seen_by_selpia); if (i) setV(USERS.selpia.view, 'initial', i); }
+  if (map.saskia_seen_by_er) { setV(USERS.er.views.saskia, 'name', map.saskia_seen_by_er); const i = ini(map.saskia_seen_by_er); if (i) setV(USERS.er.views.saskia, 'initial', i); }
+  if (map.selpia_seen_by_er) { setV(USERS.er.views.selpia, 'name', map.selpia_seen_by_er); const i = ini(map.selpia_seen_by_er); if (i) setV(USERS.er.views.selpia, 'initial', i); }
   return changed;
 }
 (() => { try { applyNames(JSON.parse(localStorage.getItem('sk_names') || '{}')); } catch (e) {} })();
@@ -1516,24 +1512,34 @@ function pwForm() {
 }
 function namesForm() {
   if (me !== 'er' || decoy) return;
-  const myName = USERS.er.own, prName = partnerView().name, prLabel = room === 'selpia' ? 'Selpia' : 'Saskia';
-  openSheet(`<div class="sh-t">Ganti nama</div><p class="sh-p">Nama ini dipakai di seluruh tampilan — untukmu sendiri, dan untuk ${esc(prLabel)}.</p>
-    <input class="fld" id="nmEr" maxlength="30" placeholder="Nama kamu (Er)" value="${esc(myName)}">
-    <input class="fld" id="nmPartner" maxlength="30" placeholder="Nama ${esc(prLabel)}" value="${esc(prName)}">
+  const r = room, label = r === 'selpia' ? 'Selpia' : 'Saskia';
+  const erOwn = USERS.er.own, erSeen = USERS[r].view.name, prOwn = USERS[r].own, prSeen = USERS.er.views[r].name;
+  openSheet(`<div class="sh-t">Ganti nama — ${esc(label)}</div><p class="sh-p">Nama sendiri dan nama di mata pasangan boleh beda (nama panggilan).</p>
+    <label class="fld-lbl">Nama kamu, tampil di akunmu</label>
+    <input class="fld" id="nmErOwn" maxlength="30" value="${esc(erOwn)}">
+    <label class="fld-lbl">Nama kamu, tampil di akun ${esc(label)}</label>
+    <input class="fld" id="nmErSeen" maxlength="30" value="${esc(erSeen)}">
+    <label class="fld-lbl">Nama ${esc(label)}, tampil di akunnya sendiri</label>
+    <input class="fld" id="nmPrOwn" maxlength="30" value="${esc(prOwn)}">
+    <label class="fld-lbl">Nama ${esc(label)}, tampil di akunmu</label>
+    <input class="fld" id="nmPrSeen" maxlength="30" value="${esc(prSeen)}">
     <div class="sh-msg" id="nmMsg" role="alert"></div>
     <div class="acts"><button class="btn ghost" data-act="close">Batal</button><button class="btn cta" id="nmSave" data-act="namesave">Simpan</button></div>`);
 }
 async function saveNames() {
   const msg = t => { $('nmMsg').textContent = t || ''; };
-  const myName = $('nmEr').value.trim(), prName = $('nmPartner').value.trim(), btn = $('nmSave');
-  if (!myName || !prName) return msg('Isi kedua kolom.');
-  if (myName.length > 30 || prName.length > 30) return msg('Nama maksimal 30 karakter.');
+  const erOwn = $('nmErOwn').value.trim(), erSeen = $('nmErSeen').value.trim();
+  const prOwn = $('nmPrOwn').value.trim(), prSeen = $('nmPrSeen').value.trim(), btn = $('nmSave');
+  if (!erOwn || !erSeen || !prOwn || !prSeen) return msg('Isi keempat kolom.');
+  if ([erOwn, erSeen, prOwn, prSeen].some(v => v.length > 30)) return msg('Nama maksimal 30 karakter.');
   const c = ensureClient(); if (!c || decoy || me !== 'er') return;
+  const r = room;
   btn.disabled = true; msg('');
   try {
-    const { error } = await sb.from('names').upsert([{ id: 'er', value: myName }, { id: room, value: prName }]);
+    const map = { er_own: erOwn, ['er_seen_by_' + r]: erSeen, [r + '_own']: prOwn, [r + '_seen_by_er']: prSeen };
+    const rows = Object.entries(map).map(([id, value]) => ({ id, value }));
+    const { error } = await sb.from('names').upsert(rows);
     if (error) throw error;
-    const map = { er: myName, [room]: prName };
     applyNames(map);
     try { const cur = JSON.parse(localStorage.getItem('sk_names') || '{}'); localStorage.setItem('sk_names', JSON.stringify(Object.assign(cur, map))); } catch (x) {}
     updateHeader(); forceFullRerender();
