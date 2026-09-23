@@ -192,6 +192,8 @@ section{position:absolute;inset:0}
 .ph.sent .lk{width:38px;height:38px;animation:none;background:rgba(255,255,255,.18)}
 .ph.sent .lk .ic{width:19px;height:19px}
 .ph.seen .lk{background:rgba(255,255,255,.3)}
+.ph.sent[data-open]{cursor:pointer;transition:transform .2s var(--spring)}
+.ph.sent[data-open]:active{transform:scale(.97)}
 .b.tomb{background:transparent!important;box-shadow:none!important;border:1px dashed rgba(255,255,255,.16)!important;color:var(--muted);font-size:13px;display:flex;align-items:center;gap:8px;padding:9px 14px}
 .b.tomb .ic{width:16px;height:16px}
 .b.tomb.in{animation:fadeup .5s var(--ease)}
@@ -398,6 +400,9 @@ section{position:absolute;inset:0}
   2) Jalankan setup.sql di SQL Editor.
   2b) Jalankan sekali di SQL Editor (untuk fitur batas 5x lihat foto kiriman Ganteng):
       alter table public.messages add column if not exists view_count integer not null default 0;
+  2c) Jalankan juga fungsi view_photo.sql di SQL Editor (menghitung + mengecek batas lihat
+      secara atomik di server, agar batas 5x tidak bisa terlewati saat foto dibuka nyaris
+      bersamaan dari 2 perangkat/tab). Lihat file view_photo.sql yang disertakan.
   3) Ganti kunci enkripsi (CHAT_SECRET) di objek CONFIG di bawah sebelum dipakai.
   4) Upload SEMUA file ke hosting HTTPS dalam satu folder: index.html, manifest.webmanifest,
      sw.js, dan folder icons/. Tanpa HTTPS, enkripsi & pemasangan di layar utama tidak jalan.
@@ -829,8 +834,10 @@ function rowHTML(m, first, last, enter, delay) {
   }
   if (mine) {
     const seenIt = !!m.viewed_at;
-    const label = m.pending ? 'Mengirim foto…' : (m.failed ? 'Gagal terkirim' : (seenIt ? 'Sudah dilihat' : 'Terkirim, belum dibuka'));
-    return `<div class="${cls}" data-id="${m.id}"${st}>${rico}<div class="b photo${m.failed ? ' failed' : ''}">${nm}${q}<div class="ph sent${seenIt ? ' seen' : ''}"><div class="lk">${m.pending ? I.clock : (seenIt ? I.eye : I.image)}</div><b>Foto</b><small>${label}</small></div>${meta}${rbtn}</div></div>`;
+    const canOpen = !m.pending && !m.failed;
+    const label = m.pending ? 'Mengirim foto…' : (m.failed ? 'Gagal terkirim' : (seenIt ? 'Sudah dilihat · ketuk untuk pratinjau' : 'Terkirim, belum dibuka · ketuk untuk pratinjau'));
+    const openAttr = canOpen ? ` data-open="${m.id}"` : '';
+    return `<div class="${cls}" data-id="${m.id}"${st}>${rico}<div class="b photo${m.failed ? ' failed' : ''}">${nm}${q}<div class="ph sent${seenIt ? ' seen' : ''}"${openAttr}><div class="lk">${m.pending ? I.clock : (seenIt ? I.eye : I.image)}</div><b>Foto</b><small>${label}</small></div>${meta}${rbtn}</div></div>`;
   }
   let hint;
   if (me !== 'er') {
@@ -1273,42 +1280,61 @@ async function deleteMsg(id) {
    ===================================================================== */
 async function openPhoto(id) {
   const m = msgs.find(x => x.id === id);
-  if (!m || m.photo_gone || m.sender === me || decoy || V) return;
+  if (!m || decoy || V) return;
+  const mine = m.sender === me;
+  if (m.photo_gone) { if (mine) toast('Foto sudah tidak tersedia'); return; }
   const isEr = me === 'er';
-  if (isEr && m.viewed_at && Date.now() > +new Date(m.viewed_at) + ER_MS) { wipe(id); toast('Foto sudah hilang'); return; }
-  if (!isEr && (m.view_count || 0) >= CONFIG.PARTNER_PHOTO_VIEWS) { wipe(id); toast('Foto sudah hilang'); return; }
+  if (!mine) {
+    if (isEr && m.viewed_at && Date.now() > +new Date(m.viewed_at) + ER_MS) { wipe(id); toast('Foto sudah hilang'); return; }
+    if (!isEr && (m.view_count || 0) >= CONFIG.PARTNER_PHOTO_VIEWS) { wipe(id); toast('Foto sudah hilang'); return; }
+  }
   vib(10);
-  V = { id, isEr, loaded: false, url: null, timer: null };
+  V = { id, isEr, mine, loaded: false, url: null, timer: null };
   const token = V;
-  $('vStage').className = 'vstage' + (isEr ? ' er' : ''); $('vStage').style.transform = ''; $('vStage').innerHTML = '<div class="spin"></div>';
-  $('vT').textContent = partnerView().name; $('vS').textContent = 'Membuka…'; $('vS').className = '';
+  $('vStage').className = 'vstage' + (isEr || mine ? ' er' : ''); $('vStage').style.transform = ''; $('vStage').innerHTML = '<div class="spin"></div>';
+  $('vT').textContent = mine ? USERS[me].own : partnerView().name; $('vS').textContent = 'Membuka…'; $('vS').className = '';
   $('vDl').hidden = true;
   $('viewer').classList.add('open');
-  if (isEr) shieldOff = true; // Er boleh screenshot
+  if (isEr || mine) shieldOff = true; // Er, dan pengirim untuk foto sendiri, boleh screenshot
   try {
-    const { data, error } = await sb.from('messages').select('body,photo_gone,view_count').eq('id', id).single();
+    let data;
+    if (mine) {
+      // pratinjau milik pengirim: baca saja, tidak memengaruhi hitungan/waktu lihat penerima
+      const r = await sb.from('messages').select('body,photo_gone').eq('id', id).single();
+      if (r.error) throw r.error;
+      data = r.data;
+    } else {
+      // hitung + cek batas lihat dilakukan atomik di server (fungsi view_photo), supaya tidak bisa dilewati
+      // dengan membuka foto bersamaan dari 2 perangkat/tab sebelum hitungannya sempat tersimpan
+      const r = await sb.rpc('view_photo', { p_id: id });
+      if (r.error) throw r.error;
+      data = Array.isArray(r.data) ? r.data[0] : r.data;
+    }
     if (V !== token) return;
-    if (error) throw error;
-    if (data.photo_gone || !data.body || (!isEr && (data.view_count || 0) >= CONFIG.PARTNER_PHOTO_VIEWS)) { closeViewer(true); m.photo_gone = true; m._fresh = true; render(); toast('Foto sudah hilang'); return; }
+    if (!data || data.photo_gone || !data.body) { closeViewer(true); m.photo_gone = true; m._fresh = true; render(); toast('Foto sudah hilang'); return; }
     const url = await dec(data.body);
     if (V !== token) return;
-    if (!m.viewed_at) { const va = iso(); m.viewed_at = va; sb.from('messages').update({ viewed_at: va }).eq('id', id).is('viewed_at', null).then(() => {}); }
-    if (!isEr) {
-      const nv = (data.view_count || 0) + 1;
-      m.view_count = nv;
-      sb.from('messages').update({ view_count: nv }).eq('id', id).then(() => {});
+    if (!mine) {
+      if (!m.viewed_at) m.viewed_at = iso();
+      if (!isEr) m.view_count = (data.view_count != null) ? data.view_count : (m.view_count || 0) + 1;
     }
     token.loaded = true; token.url = url;
-    await showInViewer(m, url, isEr);
+    await showInViewer(m, url, isEr, mine);
   } catch (e) { if (V === token) { closeViewer(true); toast('Foto gagal dibuka. Coba lagi.'); } }
 }
-function showInViewer(m, url, isEr) {
+function showInViewer(m, url, isEr, mine) {
   return new Promise(res => {
     const img = new Image();
     img.onload = () => {
       if (!V) return res();
       const st = $('vStage'); st.innerHTML = '';
-      if (isEr) {
+      if (mine) {
+        img.draggable = false; img.alt = 'Foto'; st.appendChild(img);
+        $('vDl').hidden = true; // pengirim tidak bisa mengunduh dari sini — hanya pratinjau
+        const left = new Date(m.expires_at) - Date.now();
+        $('vS').textContent = left > 0 ? 'Pratinjau kiriman · hilang dalam ' + fmtCount(left) : 'Pratinjau kiriman';
+        $('vS').className = '';
+      } else if (isEr) {
         img.draggable = false; img.alt = 'Foto'; st.appendChild(img);
         $('vDl').hidden = false;
         const dl = () => { const left = +new Date(m.viewed_at) + ER_MS - Date.now(); $('vS').textContent = 'Hilang dalam ' + fmtCount(left); $('vS').className = left < 300000 ? 'warn' : ''; if (left <= 0) { closeViewer(true); wipe(m.id); toast('Waktu foto habis'); } };
@@ -1336,7 +1362,7 @@ function closeViewer(silent) {
   const v = V; V = null; clearInterval(v.timer); shieldOff = false;
   $('viewer').classList.remove('open');
   setTimeout(() => { if (!V) $('vStage').innerHTML = ''; }, 450);
-  if (!silent && v.loaded && !v.isEr) {
+  if (!silent && v.loaded && !v.isEr && !v.mine) {
     const m = msgs.find(x => x.id === v.id);
     if (m && (m.view_count || 0) >= CONFIG.PARTNER_PHOTO_VIEWS) burnPhoto(v.id);
   }
@@ -1713,7 +1739,7 @@ function startSession(acc, animated) {
 }
 function lockApp() {
   if (!me && !$('chat').classList.contains('show') && !$('poems').classList.contains('show')) return;
-  const burning = !!(V && V.loaded && !V.isEr);
+  const burning = !!(V && V.loaded && !V.isEr && !V.mine);
   closeViewer(false); closeSheet(); $('pv').classList.remove('open'); pendingPhoto = null; closeCamera();
   teardown(); localStorage.removeItem('sk_sess'); hidePushAsk();
   killSession(burning ? 1500 : 0); // beri waktu foto sekali-lihat terhapus dulu
@@ -1771,7 +1797,7 @@ window.addEventListener('pagehide', shieldUp);
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     hiddenAt = Date.now(); touch(); shieldUp();
-    if (V && !V.isEr) closeViewer(false);
+    if (V && !V.isEr && !V.mine) closeViewer(false);
     closeCamera();
     if (chan) { try { chan.untrack(); } catch (e) {} }
   } else {
@@ -1787,7 +1813,7 @@ document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && ['p', 's'].includes(e.key.toLowerCase())) e.preventDefault();
   if (e.metaKey && e.shiftKey && ['3', '4', '5'].includes(e.key)) shieldUp();
 });
-document.addEventListener('contextmenu', e => { if (!(V && V.isEr)) e.preventDefault(); });
+document.addEventListener('contextmenu', e => { if (!(V && V.isEr && !V.mine)) e.preventDefault(); });
 document.addEventListener('dragstart', e => e.preventDefault());
 document.addEventListener('copy', e => { if (!e.target.closest || !e.target.closest('input,textarea')) e.preventDefault(); });
 
