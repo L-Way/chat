@@ -2245,6 +2245,53 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
   window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
 }
 
+/* =====================================================================
+   Tombol kembali (HP)
+   Setiap lapisan yang terbuka (sidebar, menu/sheet, pratinjau & penampil foto, kamera,
+   pembaca/penulis puisi, mode balas) mendapat satu entri riwayat. Tombol kembali menutup
+   lapisan paling atas, satu per satu. Baru kalau tidak ada lagi yang bisa ditutup,
+   tombol kembali keluar dari aplikasi seperti biasa.
+   Lapisan yang ditutup lewat tombol di layar juga membuang entri riwayatnya (tidak menumpuk).
+   ===================================================================== */
+(function () {
+  const defs = [
+    { id: 'drawer',   cls: 'open', close: () => closeDrawer() },
+    { id: 'sheet',    cls: 'open', close: () => closeSheet() },
+    { id: 'pv',       cls: 'open', close: () => { $('pv').classList.remove('open'); pendingPhoto = null; } },
+    { id: 'viewer',   cls: 'open', close: () => closeViewer(false) },
+    { id: 'cam',      cls: 'open', close: () => closeCamera() },
+    { id: 'pRead',    cls: 'open', close: () => closeReader() },
+    { id: 'pEdit',    cls: 'open', close: () => tryCloseEditor() },      // ada konfirmasi jika belum disimpan
+    { id: 'replyBar', cls: 'on',   close: () => cancelReply() }
+  ].map(d => Object.assign(d, { node: document.getElementById(d.id), on: false }));
+  const layers = [];                       // urutan buka; yang terakhir = paling atas
+  let chain = Promise.resolve(), waiter = null;
+  const enqueue = fn => { chain = chain.then(fn).catch(() => {}); };   // operasi riwayat dijalankan satu per satu
+  const hPush = () => enqueue(() => { try { history.pushState({ rk: 1 }, ''); } catch (e) {} });
+  const hBack = () => enqueue(() => new Promise(res => {                // tunggu popstate milik kita sendiri
+    const t = setTimeout(() => { waiter = null; res(); }, 700);
+    waiter = () => { clearTimeout(t); waiter = null; res(); };
+    try { history.back(); } catch (e) { waiter(); }
+  }));
+  function reconcile() {
+    for (const d of defs) {
+      const open = d.node.classList.contains(d.cls);
+      if (open && !d.on) { d.on = true; layers.push(d); hPush(); }
+      else if (!open && d.on) { d.on = false; const i = layers.indexOf(d); if (i >= 0) layers.splice(i, 1); hBack(); }
+    }
+  }
+  window.addEventListener('popstate', () => {
+    if (waiter) { waiter(); return; }      // dipicu oleh kode kita (membuang entri), bukan tombol kembali
+    const d = layers.pop();
+    if (!d) return;                        // tidak ada lapisan: biarkan browser/aplikasi keluar seperti biasa
+    d.on = false;                          // entri riwayat sudah dibuang browser
+    try { d.close(); } catch (e) {}
+    reconcile();                           // jika penutupan ditolak (mis. puisi belum disimpan), daftarkan lagi
+  });
+  const mo = new MutationObserver(reconcile);
+  defs.forEach(d => mo.observe(d.node, { attributes: true, attributeFilter: ['class'] }));
+})();
+
 vvUpdate();
 (async function restore() {
   try {
