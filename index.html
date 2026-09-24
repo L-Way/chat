@@ -245,14 +245,39 @@ section{position:absolute;inset:0}
 .sendb.fly .ic{animation:fly .55s var(--ease)}
 @keyframes fly{0%{transform:none;opacity:1}45%{transform:translate(26px,-26px) scale(.6);opacity:0}46%{transform:translate(-26px,26px) scale(.6);opacity:0}100%{transform:none;opacity:1}}
 
-/* ---------- Tab obrolan (khusus Er) ---------- */
-#tabs{display:none;position:relative;z-index:4;margin:6px 10px 0;padding:3px;background:var(--surface);border:1px solid var(--line);border-radius:14px;grid-template-columns:1fr 1fr}
-#tabs.on{display:grid;animation:fadeup .5s var(--ease)}
-#tabs .sl{position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);border-radius:11px;background:linear-gradient(135deg,rgba(255,92,138,.32),rgba(184,107,255,.32));border:1px solid rgba(255,92,138,.35);transition:transform .45s var(--spring)}
-#tabs.r1 .sl{transform:translateX(100%)}
-.tab{position:relative;z-index:1;height:32px;font-weight:600;font-size:12.5px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px;transition:color .25s,transform .2s}
-.tab.on{color:var(--text)}
-.tab:active{transform:scale(.95)}
+/* ---------- Sidebar obrolan (khusus Er) ---------- */
+#btnRooms{position:relative}
+#btnRooms[hidden],#drEdge[hidden]{display:none}
+#hdr.rooms{padding-left:7px}
+#btnRooms .bd{position:absolute;top:-3px;right:-4px;min-width:17px;height:17px;padding:0 4px;font-size:10px;box-shadow:0 0 0 2px #140f1c}
+#drEdge{position:absolute;left:0;top:calc(var(--sat) + 56px);bottom:calc(var(--sab) + 76px);width:12px;z-index:7;touch-action:pan-y}
+#drawer{position:absolute;inset:0;z-index:118;pointer-events:none;visibility:hidden;transition:visibility 0s .45s}
+#drawer.open{pointer-events:auto;visibility:visible;transition:visibility 0s}
+.dr-back{position:absolute;inset:0;background:rgba(6,4,10,0);-webkit-backdrop-filter:blur(0);backdrop-filter:blur(0);transition:background .4s var(--ease),backdrop-filter .4s,-webkit-backdrop-filter .4s}
+#drawer.open .dr-back{background:rgba(6,4,10,.66);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px)}
+.dr-panel{position:absolute;left:0;top:0;bottom:0;width:min(82vw,310px);display:flex;flex-direction:column;padding:calc(var(--sat) + 18px) 14px calc(var(--sab) + 18px);
+  background:linear-gradient(180deg,#1f1629 0%,#150f1e 100%);border-right:1px solid var(--line);border-radius:0 28px 28px 0;box-shadow:26px 0 70px rgba(0,0,0,.55);
+  transform:translateX(-106%);transition:transform .5s var(--ease);touch-action:pan-y;overflow:hidden}
+.dr-panel::before{content:"";position:absolute;left:-40%;top:-20%;width:120%;height:60%;background:radial-gradient(closest-side,rgba(255,92,138,.16),transparent);pointer-events:none}
+#drawer.open .dr-panel{transform:none}
+.dr-panel.drag{transition:none}
+.dr-top{position:relative;display:flex;align-items:center;justify-content:space-between;padding:2px 6px 16px}
+.dr-top b{font-family:var(--serif);font-style:italic;font-weight:600;font-size:24px;letter-spacing:-.4px}
+.dr-list{position:relative;display:flex;flex-direction:column;gap:8px}
+.dr-it{position:relative;display:flex;align-items:center;gap:12px;width:100%;padding:11px 12px;border-radius:20px;text-align:left;background:rgba(255,255,255,.035);border:1.5px solid transparent;
+  opacity:0;transform:translateX(-14px);transition:transform .2s var(--spring),background .25s,border-color .25s,opacity .4s var(--ease)}
+#drawer.open .dr-it{opacity:1;transform:none}
+#drawer.open .dr-it:active{transform:scale(.97)}
+.dr-it.on{background:linear-gradient(135deg,rgba(255,92,138,.17),rgba(184,107,255,.17));border-color:rgba(255,92,138,.38)}
+.dr-it .av{width:42px;height:42px}
+.dr-it .tx{flex:1;min-width:0}
+.dr-it .tx b{display:block;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dr-it .tx span{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
+.dr-it.on .tx span{color:var(--rose2)}
+.dr-it .bd{flex:none}
+.dr-ck{flex:none;width:17px;height:17px;color:var(--rose)}
+.dr-ck svg{width:100%;height:100%}
+.dr-foot{position:relative;margin-top:auto;padding:14px 8px 0;font-size:11.5px;line-height:1.5;color:var(--muted);text-align:center}
 .bd{min-width:19px;height:19px;padding:0 5px;border-radius:99px;background:var(--rose);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;animation:pop .4s var(--spring)}
 .bd:empty{display:none}
 #list.swap{animation:swapIn .45s var(--ease)}
@@ -433,6 +458,7 @@ section{position:absolute;inset:0}
   <section id="chat">
     <div class="aurora"></div>
     <header id="hdr">
+      <button class="ib" id="btnRooms" aria-label="Pilih obrolan" aria-haspopup="dialog" hidden></button>
       <div class="av" id="hAv"><span id="hIn"></span><i class="dot"></i></div>
       <div class="hm">
         <div class="hn"><span id="hName"></span><b class="chip" id="hChip" hidden>online</b></div>
@@ -442,10 +468,6 @@ section{position:absolute;inset:0}
       <button class="ib" id="btnMenu" aria-label="Menu"></button>
     </header>
     <div id="connBar"><div class="cb-in"><i class="cb-dot"></i><span id="cbTxt"></span></div></div>
-    <div id="tabs" role="tablist"><i class="sl"></i>
-      <button class="tab" data-room="saskia">Saskia<b class="bd"></b></button>
-      <button class="tab" data-room="selpia">Selpia<b class="bd"></b></button>
-    </div>
     <div id="pushAsk" hidden>
       <div class="pa-t"><div class="pa-ic" id="paIc"></div><div><b>Aktifkan notifikasi?</b><span class="pa-s">Supaya tahu ada yang baru walau aplikasi tertutup. Isi pesan tidak pernah tampil di layar kunci.</span></div></div>
       <div class="pa-b"><button class="btn ghost" type="button" data-pa="later">Nanti saja</button><button class="btn cta" type="button" data-pa="yes">Aktifkan</button></div>
@@ -466,6 +488,15 @@ section{position:absolute;inset:0}
       <button class="sendb" id="btnSend" aria-label="Kirim"></button>
     </footer>
     <input type="file" id="file" accept="image/*" hidden>
+    <div id="drEdge" hidden></div>
+    <div id="drawer" aria-hidden="true">
+      <div class="dr-back"></div>
+      <aside class="dr-panel" id="drPanel" role="dialog" aria-modal="true" aria-label="Pilih obrolan">
+        <div class="dr-top"><b>Obrolan</b><button class="ib mini" id="drClose" type="button" aria-label="Tutup"></button></div>
+        <div class="dr-list" id="drList"></div>
+        <p class="dr-foot">Daftar ini menutup sendiri dalam beberapa detik.</p>
+      </aside>
+    </div>
   </section>
 
   <!-- PUISI (tampilan sandi palsu) -->
@@ -643,6 +674,7 @@ const I = {
   bell:  P('<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>'),
   reply: P('<path d="M9 17 4 12l5-5"/><path d="M4 12h9a6 6 0 0 1 6 6v2"/>'),
   camera:P('<path d="M4 8h3l1.6-2.4A2 2 0 0 1 10.3 4.6h3.4a2 2 0 0 1 1.7 1L17 8h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2z"/><circle cx="12" cy="14" r="4"/>'),
+  side:  P('<rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16"/>'),
   flip:  P('<path d="M17 2 21 6l-4 4"/><path d="M3 12v-2a4 4 0 0 1 4-4h14"/><path d="M7 22 3 18l4-4"/><path d="M21 12v2a4 4 0 0 1-4 4H3"/>')
 };
 
@@ -1452,17 +1484,76 @@ $('vDl').addEventListener('click', () => {
 })();
 
 /* =====================================================================
-   Tab obrolan (Er): Saskia / Selpia
+   Sidebar obrolan (Er): pindah antara dua ruang
    ===================================================================== */
+const ROOMS = ['saskia', 'selpia'];
+const drawer = $('drawer'), drPanel = $('drPanel');
+let drTimer = null;
+
+/* Nama kedua pasangan tidak lagi tampil di layar chat. Untuk pindah obrolan, buka sidebar
+   (tombol di kiri header, atau geser dari tepi kiri layar). Sidebar menutup sendiri setelah 10 detik. */
 function updateTabs() {
-  const t = $('tabs'); if (!t) return;
-  t.classList.toggle('on', !decoy && me === 'er');
-  t.classList.toggle('r1', room === 'selpia');
-  t.querySelectorAll('.tab').forEach(b => {
-    const r = b.dataset.room; b.classList.toggle('on', r === room);
-    b.querySelector('.bd').textContent = (r !== room && badge[r]) ? badge[r] : '';
-  });
+  const b = $('btnRooms'); if (!b) return;
+  const isEr = !decoy && me === 'er';
+  b.hidden = !isEr; $('drEdge').hidden = !isEr; $('hdr').classList.toggle('rooms', isEr);
+  const n = ROOMS.reduce((sum, r) => sum + (r !== room ? (badge[r] || 0) : 0), 0);
+  b.querySelector('.bd').textContent = (isEr && n) ? n : '';
+  if (!isEr) closeDrawer(); else if (drawer.classList.contains('open')) renderDrawer();
 }
+function renderDrawer() {
+  $('drList').innerHTML = ROOMS.map(r => {
+    const v = USERS.er.views[r], on = r === room, n = badge[r] || 0;
+    const sub = on ? 'Sedang dibuka' : n ? n + ' pesan baru' : 'Ketuk untuk membuka';
+    return `<button class="dr-it${on ? ' on' : ''}" data-room="${r}" type="button"><div class="av"><span>${esc(v.initial)}</span></div>`
+      + `<div class="tx"><b>${esc(v.name)}</b><span>${sub}</span></div>`
+      + (on ? `<span class="dr-ck">${I.heart}</span>` : `<b class="bd">${n || ''}</b>`) + `</button>`;
+  }).join('');
+}
+function drawerIdle() { clearTimeout(drTimer); drTimer = setTimeout(closeDrawer, 10000); }
+function openDrawer() {
+  if (me !== 'er' || decoy || !$('chat').classList.contains('show')) return;
+  closeSheet(); renderDrawer(); vib(8);
+  drawer.classList.add('open'); drawer.setAttribute('aria-hidden', 'false'); drawerIdle();
+}
+function closeDrawer() {
+  clearTimeout(drTimer);
+  if (!drawer.classList.contains('open')) return;
+  drawer.classList.remove('open'); drawer.setAttribute('aria-hidden', 'true');
+  drPanel.classList.remove('drag'); drPanel.style.transform = '';
+}
+$('btnRooms').addEventListener('click', openDrawer);
+$('drClose').addEventListener('click', closeDrawer);
+drawer.querySelector('.dr-back').addEventListener('click', closeDrawer);
+$('drList').addEventListener('click', e => {
+  const b = e.target.closest('[data-room]'); if (!b) return;
+  const r = b.dataset.room; closeDrawer(); if (r !== room) switchRoom(r);
+});
+/* Geser ke kiri pada panel = tutup (panel ikut jari) */
+(function () {
+  let sx = 0, sy = 0, dx = 0, decided = false, dragging = false;
+  drPanel.addEventListener('touchstart', e => { const t = e.touches[0]; sx = t.clientX; sy = t.clientY; dx = 0; decided = dragging = false; drawerIdle(); }, { passive: true });
+  drPanel.addEventListener('touchmove', e => {
+    const t = e.touches[0], mx = t.clientX - sx, my = t.clientY - sy;
+    if (!decided && (Math.abs(mx) > 8 || Math.abs(my) > 8)) { decided = true; dragging = mx < 0 && Math.abs(mx) > Math.abs(my); if (dragging) drPanel.classList.add('drag'); }
+    if (!dragging) return;
+    dx = Math.min(0, mx); drPanel.style.transform = 'translateX(' + dx + 'px)';
+  }, { passive: true });
+  const end = () => {
+    if (!dragging) return;
+    dragging = false; drPanel.classList.remove('drag');
+    if (dx < -70) closeDrawer(); else drPanel.style.transform = '';
+  };
+  drPanel.addEventListener('touchend', end); drPanel.addEventListener('touchcancel', end);
+})();
+/* Geser dari tepi kiri layar = buka */
+(function () {
+  const edge = $('drEdge'); let sx = 0, sy = 0, done = false;
+  edge.addEventListener('touchstart', e => { const t = e.touches[0]; sx = t.clientX; sy = t.clientY; done = false; }, { passive: true });
+  edge.addEventListener('touchmove', e => {
+    if (done) return; const t = e.touches[0], mx = t.clientX - sx, my = t.clientY - sy;
+    if (mx > 36 && mx > Math.abs(my) * 1.5) { done = true; openDrawer(); }
+  }, { passive: true });
+})();
 async function checkOther() {
   if (decoy || me !== 'er' || !sb) return;
   const other = room === 'saskia' ? 'selpia' : 'saskia', myRoom = room;
@@ -1470,13 +1561,13 @@ async function checkOther() {
     const { data, error } = await sb.from('messages').select('id,kind,read_at,viewed_at,photo_gone').eq('room', other).eq('sender', other).gt('expires_at', iso());
     if (error || myRoom !== room) return;
     const n = data.filter(m => m.kind === 'text' ? !m.read_at : (!m.viewed_at && !m.photo_gone)).length;
-    if (n > badge[other]) { tone([880, 1175]); vib(12); toast('Pesan baru dari ' + USERS.er.views[other].name); }
+    if (n > badge[other]) { tone([880, 1175]); vib(12); toast('Ada pesan baru di obrolan lain'); }
     badge[other] = n; updateTabs();
   } catch (e) {}
 }
 function switchRoom(r) {
   if (me !== 'er' || decoy || r === room || (r !== 'saskia' && r !== 'selpia')) return;
-  vib(8); tone([740]);
+  closeDrawer(); vib(8); tone([740]);
   room = r; partner = r; badge[r] = 0; localStorage.setItem('sk_room', r); clearNotifs(r);
   if (chan && sb) { try { sb.removeChannel(chan); } catch (e) {} }
   chan = null; rtOk = false;
@@ -1486,7 +1577,6 @@ function switchRoom(r) {
   list.classList.remove('swap'); void list.offsetWidth; list.classList.add('swap');
   connectRealtime(); sync();
 }
-$('tabs').addEventListener('click', e => { const b = e.target.closest('.tab'); if (b) switchRoom(b.dataset.room); });
 
 /* =====================================================================
    Menu
@@ -1850,7 +1940,7 @@ function startSession(acc, animated) {
 function lockApp() {
   if (!me && !$('chat').classList.contains('show') && !$('poems').classList.contains('show')) return;
   const burning = !!(V && V.loaded && !V.isEr && !V.mine);
-  closeViewer(false); closeSheet(); $('pv').classList.remove('open'); pendingPhoto = null; closeCamera();
+  closeViewer(false); closeSheet(); closeDrawer(); $('pv').classList.remove('open'); pendingPhoto = null; closeCamera();
   teardown(); localStorage.removeItem('sk_sess'); hidePushAsk();
   killSession(burning ? 1500 : 0); // beri waktu foto sekali-lihat terhapus dulu
   me = null; partner = null; room = null; msgs = []; list.innerHTML = ''; updateTabs(); shieldOff = false;
@@ -1898,7 +1988,7 @@ $('eye').addEventListener('click', () => { const p = $('pw'); const show = p.typ
    ===================================================================== */
 const shield = $('shield');
 shield.innerHTML = I.lock + '<span>Terkunci sementara — ketuk untuk kembali</span>';
-const shieldUp = () => { if (me && !decoy && !shieldOff) shield.classList.add('on'); };
+const shieldUp = () => { if (me && !decoy && !shieldOff) { closeDrawer(); shield.classList.add('on'); } };
 const shieldDown = () => shield.classList.remove('on');
 shield.addEventListener('pointerdown', shieldDown);
 window.addEventListener('blur', shieldUp);
@@ -1917,9 +2007,10 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 document.addEventListener('keyup', e => {
-  if (e.key === 'PrintScreen') { try { navigator.clipboard.writeText(' '); } catch (x) {} if (me && !decoy && !shieldOff) { shield.classList.add('on'); setTimeout(shieldDown, 1500); } }
+  if (e.key === 'PrintScreen') { try { navigator.clipboard.writeText(' '); } catch (x) {} if (me && !decoy && !shieldOff) { closeDrawer(); shield.classList.add('on'); setTimeout(shieldDown, 1500); } }
 });
 document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeDrawer();
   if ((e.ctrlKey || e.metaKey) && ['p', 's'].includes(e.key.toLowerCase())) e.preventDefault();
   if (e.metaKey && e.shiftKey && ['3', '4', '5'].includes(e.key)) shieldUp();
 });
@@ -1942,7 +2033,7 @@ window.addEventListener('resize', vvUpdate);
 window.addEventListener('scroll', () => window.scrollTo(0, 0));
 
 // ikon statis
-$('btnLock').innerHTML = I.lock; $('btnMenu').innerHTML = I.more; $('btnPhoto').innerHTML = I.image;
+$('btnRooms').innerHTML = I.side + '<b class="bd"></b>'; $('drClose').innerHTML = I.x; $('btnLock').innerHTML = I.lock; $('btnMenu').innerHTML = I.more; $('btnPhoto').innerHTML = I.image;
 $('btnSend').innerHTML = I.send; $('vClose').innerHTML = I.x; $('vDl').innerHTML = I.dl; $('fab').insertAdjacentHTML('afterbegin', I.down); $('eye').innerHTML = I.eye;
 $('rbClose').innerHTML = I.x;
 

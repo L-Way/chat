@@ -1,10 +1,13 @@
-/* Service worker Ruang Kita
+/* Service worker Puisi
    - Halaman: jaringan dulu (update langsung terpakai), cadangan dari cache saat offline
    - Ikon, manifest, pustaka & font: dari cache sambil diperbarui di latar belakang
    - Permintaan ke Supabase TIDAK pernah disentuh: selalu langsung ke jaringan
    - Notifikasi push: teks generik (isi pesan tidak pernah dikirim), digabung per ruang, dengan lencana ikon
    Naikkan VERSION jika daftar SHELL berubah. */
 const VERSION = 'rk-v2';
+// Teks notifikasi ditetapkan DI SINI (bukan dari server), sama untuk pesan dari siapa pun.
+const NOTIF_TITLE = 'Puisi Cinta';
+const NOTIF_TEXT = 'Ada puisi baru hari ini?';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png', 'icons/badge-96.png'];
 const CDN = ['cdn.jsdelivr.net', 'fonts.googleapis.com', 'fonts.gstatic.com'];
 
@@ -69,11 +72,8 @@ async function showPush(d) {
   const tag = 'rk-' + (d.room || 'x');
   const old = await self.registration.getNotifications({ tag });
   const count = old.reduce((n, x) => Math.max(n, (x.data && x.data.count) || 1), 0) + 1;
-  const body = count > 1
-    ? String(d.many || 'Ada {n} yang baru untukmu').replace('{n}', count)
-    : String(d.body || 'Ada yang baru untukmu');
-  await self.registration.showNotification(String(d.title || 'Puisi Cinta'), {
-    body, tag, renotify: true,
+  await self.registration.showNotification(NOTIF_TITLE, {
+    body: NOTIF_TEXT, tag, renotify: true,
     icon: 'icons/icon-192.png', badge: 'icons/badge-96.png',
     data: { room: d.room || null, count },
     timestamp: Number(d.ts) || Date.now(),
