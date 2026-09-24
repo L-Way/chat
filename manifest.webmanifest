@@ -1,6 +1,6 @@
 {
-  "name": "Ruang Kita",
-  "short_name": "Ruang Kita",
+  "name": "Puisi",
+  "short_name": "Puisi",
   "description": "Kumpulan puisi romantis",
   "start_url": "./",
   "scope": "./",
