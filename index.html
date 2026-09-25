@@ -367,7 +367,7 @@ section{position:absolute;inset:0}
 #pAdd:active{background:linear-gradient(135deg,#ff5c8a,#b455e6);color:#fff}
 #pScroll{position:relative;z-index:1;flex:1;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:14px 14px calc(var(--sab) + 24px);-webkit-overflow-scrolling:touch;scrollbar-width:none}
 #pScroll::-webkit-scrollbar{display:none}
-.pc{position:relative;overflow:hidden;padding:18px 18px 14px 22px;margin-bottom:12px;border-radius:22px;background:var(--surface);border:1px solid var(--line);cursor:pointer;transition:transform .25s var(--spring),background .2s}
+.pc{position:relative;overflow:hidden;padding:18px 92px 14px 22px;margin-bottom:12px;border-radius:22px;background:var(--surface);border:1px solid var(--line);cursor:pointer;transition:transform .25s var(--spring),background .2s}
 .pc::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:linear-gradient(var(--rose),var(--violet))}
 .pc:active{transform:scale(.98);background:var(--surface2)}
 #pList.anim .pc{animation:popin .55s var(--spring) both;animation-delay:calc(var(--i) * 60ms)}
@@ -376,6 +376,53 @@ section{position:absolute;inset:0}
 .pm{display:flex;justify-content:space-between;gap:10px;margin-top:12px;font-size:11.5px;color:#7d6f8b}
 .pm span:first-child{color:var(--rose2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pm span:last-child{flex:none}
+
+/* ---------- Kategori & progres kunci (puisi) ---------- */
+#pProgWrap{position:relative;z-index:1;margin:0 14px 12px;height:5px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden;flex:none}
+#pProgWrap[hidden]{display:none}
+#pProgBar{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--rose),var(--violet));transition:width .6s var(--ease)}
+#pCats{position:relative;z-index:1;flex:none;display:flex;gap:8px;overflow-x:auto;padding:0 14px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+#pCats::-webkit-scrollbar{display:none}
+#pCats[hidden]{display:none}
+.catchip{flex:none;padding:8px 15px;border-radius:99px;font-size:12.5px;font-weight:700;background:rgba(255,255,255,.05);border:1.5px solid var(--line);color:var(--muted);transition:transform .2s var(--spring),background .25s,color .2s,border-color .25s}
+.catchip.on{background:linear-gradient(135deg,rgba(255,92,138,.22),rgba(184,107,255,.2));border-color:rgba(255,92,138,.42);color:var(--text)}
+.catchip:active{transform:scale(.93)}
+.ctag{display:inline-flex;max-width:100%;padding:4px 11px;border-radius:99px;font-size:10.5px;font-weight:800;letter-spacing:.25px;margin-bottom:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-transform:uppercase}
+
+.pcx{position:absolute;top:15px;right:15px;z-index:2;display:flex;gap:6px}
+.pcxb{width:32px;height:32px;flex:none;border-radius:11px;display:grid;place-items:center;background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--line);transition:transform .2s var(--spring),background .2s,color .2s}
+.pcxb svg{width:16px;height:16px}
+.pcxb:active{transform:scale(.88);background:var(--surface2)}
+.pcxb.danger:active{background:rgba(255,107,129,.16);color:var(--danger)}
+@media (hover:hover) and (pointer:fine){.pcxb:hover{background:var(--surface2);color:var(--text)}.pcxb.danger:hover{background:rgba(255,107,129,.14);color:var(--danger)}}
+
+/* ---------- Aksi salin & status terkunci pada kartu ---------- */
+.pcact{display:flex;gap:8px;margin-top:13px}
+.pcact button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;height:38px;border-radius:12px;font-size:12px;font-weight:700;background:rgba(255,255,255,.055);color:var(--text);border:1px solid var(--line);transition:transform .2s var(--spring),background .2s,filter .2s}
+.pcact button svg{width:15px;height:15px;flex:none}
+.pcact button:active{transform:scale(.94);background:var(--surface2)}
+.pcact button.lockcopy{background:linear-gradient(135deg,rgba(255,92,138,.2),rgba(184,107,255,.2));border-color:rgba(255,92,138,.36);color:var(--rose2)}
+.lockbadge{display:flex;align-items:center;gap:7px;margin-top:2px;font-size:12.5px;font-weight:700;color:#8a7d99}
+.lockbadge svg{width:15px;height:15px;flex:none}
+.pc.locked{cursor:default;background:rgba(255,255,255,.02)}
+.pc.locked::before{background:linear-gradient(#5a516a,#3a3346)}
+.pc.locked h3{color:#8a7d99}
+.pc.locked:active{transform:none;background:rgba(255,255,255,.02)}
+
+/* ---------- Kategori: kolom isian + saran ---------- */
+.catwrap{position:relative}
+.catsug{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:6;max-height:216px;overflow-y:auto;background:var(--surface2);border:1px solid var(--line);border-radius:16px;padding:6px;box-shadow:0 16px 38px rgba(0,0,0,.42);-webkit-overflow-scrolling:touch}
+.catsug[hidden]{display:none}
+.catsug button{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:10px 11px;border-radius:11px;font-size:14.5px;color:var(--text)}
+.catsug button:active{background:rgba(255,255,255,.07)}
+.catsug button.new{color:var(--rose2);font-weight:600}
+.catsug button.new svg{width:15px;height:15px;flex:none}
+
+/* ---------- Bilah salin di layar baca puisi ---------- */
+.pcopybar{flex:none;display:flex;gap:10px;padding:13px 20px calc(var(--sab) + 18px);border-top:1px solid var(--line);background:rgba(20,15,28,.78);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.pcbtn{flex:1;width:auto;display:flex;align-items:center;justify-content:center;gap:8px;font-size:14px}
+.pcbtn svg{width:17px;height:17px;flex:none}
+.pcbtn.lockcopy{background:linear-gradient(135deg,#ff5c8a,#b455e6);color:#fff;box-shadow:0 8px 22px rgba(255,92,138,.32)}
 
 .pov{position:absolute;inset:0;z-index:110;display:flex;flex-direction:column;background:var(--bg);transform:translateY(100%);visibility:hidden;transition:transform .5s var(--ease),visibility 0s .5s}
 .pov.open{transform:none;visibility:visible;transition:transform .5s var(--ease),visibility 0s}
@@ -507,6 +554,8 @@ section{position:absolute;inset:0}
       <button class="ib" id="pAdd" aria-label="Tambah puisi"></button>
       <button class="ib" id="pLock" aria-label="Kunci"></button>
     </header>
+    <div id="pProgWrap" hidden><div id="pProgBar"></div></div>
+    <div id="pCats" hidden></div>
     <div id="pScroll"><div id="pList"></div></div>
   </section>
 
@@ -518,6 +567,10 @@ section{position:absolute;inset:0}
       <button class="ib" id="rDel" aria-label="Hapus"></button>
     </div>
     <div class="pbody" id="rBody"></div>
+    <div class="pcopybar">
+      <button class="btn ghost pcbtn" id="rCopy" type="button"><span id="rCopyIcon"></span>Salin</button>
+      <button class="btn pcbtn lockcopy" id="rCopyLock" type="button"><span id="rCopyLockIcon"></span>Salin &amp; Kunci</button>
+    </div>
   </div>
 
   <div class="pov" id="pEdit" role="dialog" aria-modal="true" aria-label="Tulis puisi">
@@ -529,6 +582,10 @@ section{position:absolute;inset:0}
     <div class="pbody">
       <input class="fld" id="eTitle" type="text" maxlength="80" placeholder="Judul" autocomplete="off" autocapitalize="sentences">
       <input class="fld" id="eBy" type="text" maxlength="60" placeholder="Penulis (boleh dikosongkan)" autocomplete="off" autocapitalize="words">
+      <div class="catwrap">
+        <input class="fld" id="eCategory" type="text" maxlength="40" placeholder="Kategori (mis. Rindu, Kebersamaan)" autocomplete="off" autocapitalize="words">
+        <div class="catsug" id="catSug" hidden></div>
+      </div>
       <textarea class="fld tx" id="eText" placeholder="Tulis puisimu di sini…" autocomplete="off"></textarea>
       <div class="sh-msg" id="eMsg" role="alert"></div>
     </div>
@@ -675,7 +732,8 @@ const I = {
   reply: P('<path d="M9 17 4 12l5-5"/><path d="M4 12h9a6 6 0 0 1 6 6v2"/>'),
   camera:P('<path d="M4 8h3l1.6-2.4A2 2 0 0 1 10.3 4.6h3.4a2 2 0 0 1 1.7 1L17 8h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2z"/><circle cx="12" cy="14" r="4"/>'),
   side:  P('<rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16"/>'),
-  flip:  P('<path d="M17 2 21 6l-4 4"/><path d="M3 12v-2a4 4 0 0 1 4-4h14"/><path d="M7 22 3 18l4-4"/><path d="M21 12v2a4 4 0 0 1-4 4H3"/>')
+  flip:  P('<path d="M17 2 21 6l-4 4"/><path d="M3 12v-2a4 4 0 0 1 4-4h14"/><path d="M7 22 3 18l4-4"/><path d="M21 12v2a4 4 0 0 1-4 4H3"/>'),
+  clip:  P('<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>')
 };
 
 /* ---------- SHA-256 (cadangan jika crypto.subtle tidak tersedia) ---------- */
@@ -1689,6 +1747,7 @@ $('shCard').addEventListener('click', async e => {
   else if (a === 'names') namesForm();
   else if (a === 'namesave') saveNames();
   else if (a === 'pdel') delPoem(b.dataset.id);
+  else if (a === 'copylock') copyAndLock(b.dataset.id);
   else if (a === 'discard') { closeSheet(); closeEditor(); }
   else if (a === 'del') deleteMsg(b.dataset.id);
   else if (a === 'reply') { closeSheet(); startReply(b.dataset.id); }
@@ -1709,7 +1768,7 @@ $('btnLock').addEventListener('click', () => { vib(10); lockApp(); });
    ===================================================================== */
 const POEM_KEY = 'sk_poems', POEM_SEEDED = 'sk_poems_seeded';
 const SEED_POEMS = [
-  { title: 'Rumah Bernama Kamu', body: [
+  { title: 'Rumah Bernama Kamu', category: 'Kepulangan', body: [
     'Aku pernah mencari rumah',
     'di peta, di pelabuhan, di kota-kota yang jauh,',
     'tetapi pintunya selalu terkunci',
@@ -1719,7 +1778,7 @@ const SEED_POEMS = [
     'melainkan namamu',
     'yang kusebut pelan-pelan',
     'setiap kali dunia terasa asing.'].join('\n') },
-  { title: 'Hujan dan Kamu', body: [
+  { title: 'Hujan dan Kamu', category: 'Rindu', body: [
     'Hujan turun di jendela malam ini,',
     'dan aku teringat caramu tertawa:',
     'pelan, lalu tiba-tiba,',
@@ -1729,7 +1788,7 @@ const SEED_POEMS = [
     'ia adalah rintik pertama',
     'yang jatuh di atap hatiku,',
     'menyebut namamu berulang kali.'].join('\n') },
-  { title: 'Sederhana', body: [
+  { title: 'Sederhana', category: 'Kebersamaan', body: [
     'Aku tidak meminta bintang,',
     'tidak pula bulan di telapak tangan.',
     'Cukup kamu di sampingku',
@@ -1739,7 +1798,7 @@ const SEED_POEMS = [
     'hanyalah dua cangkir',
     'dan satu cerita',
     'yang tak pernah habis kita bagi.'].join('\n') },
-  { title: 'Jarak', body: [
+  { title: 'Jarak', category: 'Rindu', body: [
     'Jarak hanyalah angka',
     'yang tak tahu cara menghitung rindu.',
     'Sejauh apa pun kau berada,',
@@ -1749,7 +1808,7 @@ const SEED_POEMS = [
     'kupandangi langit yang sama denganmu;',
     'di sana kita bertemu',
     'tanpa perlu satu langkah pun.'].join('\n') },
-  { title: 'Janji Kecil', body: [
+  { title: 'Janji Kecil', category: 'Janji', body: [
     'Aku berjanji dengan hal-hal kecil:',
     'menggenggam tanganmu saat ramai,',
     'mendengarkan ceritamu sampai ujungnya,',
@@ -1762,13 +1821,41 @@ const SEED_POEMS = [
 let poems = [], editId = null, readId = null, editSnap = '';
 
 const fmtDate = t => new Date(t).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
-const cleanPoem = p => ({ id: String(p.id), title: String(p.title || ''), by: String(p.by || ''), body: String(p.body), at: Number(p.at) || Date.now() });
+const cleanPoem = p => ({
+  id: String(p.id), title: String(p.title || ''), by: String(p.by || ''),
+  category: String(p.category || '').trim().slice(0, 40), body: String(p.body), at: Number(p.at) || Date.now(),
+  locked: !!p.locked, lockedAt: p.lockedAt ? Number(p.lockedAt) || null : null
+});
+let catFilter = null;
+
+/* ---------- Kategori: daftar yang pernah dipakai, untuk saran saat menulis ---------- */
+const POEM_CATS_KEY = 'sk_poem_cats';
+let poemCats = [];
+function catsLoad() {
+  try { const a = JSON.parse(localStorage.getItem(POEM_CATS_KEY) || '[]'); poemCats = Array.isArray(a) ? a.filter(c => typeof c === 'string' && c.trim()).map(c => c.trim().slice(0, 40)) : []; }
+  catch (e) { poemCats = []; }
+}
+function catsPersist() { try { localStorage.setItem(POEM_CATS_KEY, JSON.stringify(poemCats)); } catch (e) {} }
+function catsCanon(raw) {
+  const t = String(raw || '').trim().slice(0, 40);
+  if (!t) return '';
+  const hit = poemCats.find(c => c.toLowerCase() === t.toLowerCase());
+  if (hit) return hit;
+  poemCats.push(t); catsPersist();
+  return t;
+}
+function catColor(cat) {
+  let h = 0; for (let i = 0; i < cat.length; i++) h = (h * 31 + cat.charCodeAt(i)) >>> 0;
+  const hue = h % 360;
+  return `background:hsla(${hue},72%,55%,.2);color:hsl(${hue},88%,82%);border:1px solid hsla(${hue},70%,60%,.36)`;
+}
 
 function poemsPersist() {
   try { localStorage.setItem(POEM_KEY, JSON.stringify(poems)); return true; }
   catch (e) { toast('Puisi tidak bisa disimpan di perangkat ini.'); return false; }
 }
 function poemsLoad() {
+  catsLoad();
   let arr = null;
   try {
     const raw = localStorage.getItem(POEM_KEY);
@@ -1779,28 +1866,54 @@ function poemsLoad() {
     if (seeded) arr = [];
     else {
       const t = Date.now();
-      arr = SEED_POEMS.map((p, i) => ({ id: uid(), title: p.title, by: '', body: p.body, at: t - i * 1000 }));
+      arr = SEED_POEMS.map((p, i) => ({ id: uid(), title: p.title, by: '', category: p.category || '', body: p.body, at: t - i * 1000, locked: false, lockedAt: null }));
       poems = arr; poemsPersist();
       try { localStorage.setItem(POEM_SEEDED, '1'); } catch (e) {}
     }
   }
+  arr.forEach(p => { if (p.category) p.category = catsCanon(p.category); });
   poems = arr;
 }
 function poemsRender(anim) {
-  const list = poems.slice().sort((a, b) => b.at - a.at);
-  $('pCount').textContent = list.length ? list.length + ' puisi' : '';
+  const all = poems.slice().sort((a, b) => b.at - a.at);
+  const cats = [...new Set(all.map(p => p.category).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'id'));
+  if (catFilter && !cats.includes(catFilter)) catFilter = null;   // kategori sudah tidak dipakai lagi
+
+  const catsEl = $('pCats');
+  if (cats.length) {
+    catsEl.hidden = false;
+    catsEl.innerHTML = `<button type="button" class="catchip${catFilter === null ? ' on' : ''}" data-cat="">Semua</button>`
+      + cats.map(c => `<button type="button" class="catchip${catFilter === c ? ' on' : ''}" data-cat="${esc(c)}">${esc(c)}</button>`).join('');
+  } else { catsEl.hidden = true; catsEl.innerHTML = ''; }
+
+  const list = catFilter ? all.filter(p => p.category === catFilter) : all;
+  const total = all.length, lockedN = all.filter(p => p.locked).length;
+  $('pCount').textContent = total
+    ? (catFilter ? list.length + ' dari ' + total + ' puisi' : total + ' puisi') + (lockedN ? ' · ' + lockedN + ' terkunci' : '')
+    : '';
+  const pw = $('pProgWrap');
+  if (total > 1) { pw.hidden = false; $('pProgBar').style.width = Math.round(lockedN / total * 100) + '%'; }
+  else pw.hidden = true;
+
   const pl = $('pList');
   pl.classList.toggle('anim', !!anim);
   pl.innerHTML = list.length ? list.map((p, i) => {
-    const prev = p.body.split('\n').filter(l => l.trim()).slice(0, 3).join('\n');
-    return `<article class="pc" data-id="${esc(p.id)}" style="--i:${Math.min(i, 8)}"><h3>${esc(p.title || 'Tanpa judul')}</h3><p>${esc(prev)}</p><div class="pm"><span>${p.by ? 'oleh ' + esc(p.by) : ''}</span><span>${fmtDate(p.at)}</span></div></article>`;
-  }).join('') : `<div class="empty"><div class="hrt">${I.heart}</div><b>Belum ada puisi</b><span>Ketuk tombol + untuk menulis puisi pertamamu.</span></div>`;
+    const locked = p.locked;
+    const tag = p.category ? `<span class="ctag" style="${catColor(p.category)}">${esc(p.category)}</span>` : '';
+    const body = locked
+      ? `<div class="lockbadge">${I.lock}<span>Disalin &amp; terkunci</span></div>`
+      : `<p>${esc(p.body.split('\n').filter(l => l.trim()).slice(0, 3).join('\n'))}</p>`;
+    const acts = locked ? '' : `<div class="pcact"><button type="button" data-copy="${esc(p.id)}">${I.clip}Salin</button><button type="button" class="lockcopy" data-copylock="${esc(p.id)}">${I.lock}Salin &amp; Kunci</button></div>`;
+    const pcx = `<div class="pcx">${locked ? '' : `<button type="button" class="pcxb" data-edit="${esc(p.id)}" aria-label="Ubah puisi">${I.edit}</button>`}<button type="button" class="pcxb danger" data-pdel="${esc(p.id)}" aria-label="Hapus puisi">${I.trash}</button></div>`;
+    return `<article class="pc${locked ? ' locked' : ''}" data-id="${esc(p.id)}" style="--i:${Math.min(i, 8)}">${pcx}${tag}<h3>${esc(p.title || 'Tanpa judul')}</h3>${body}<div class="pm"><span>${p.by ? 'oleh ' + esc(p.by) : ''}</span><span>${fmtDate(p.at)}</span></div>${acts}</article>`;
+  }).join('') : `<div class="empty"><div class="hrt">${I.heart}</div><b>${all.length ? 'Tidak ada di kategori ini' : 'Belum ada puisi'}</b><span>${all.length ? 'Pilih "Semua" untuk melihat yang lain.' : 'Ketuk tombol + untuk menulis puisi pertamamu.'}</span></div>`;
 }
 function poemsReset() {
-  poems = []; editId = null; readId = null; editSnap = '';
+  poems = []; editId = null; readId = null; editSnap = ''; catFilter = null;
   $('pList').innerHTML = ''; $('rBody').innerHTML = '';
-  $('eTitle').value = ''; $('eBy').value = ''; $('eText').value = ''; $('eMsg').textContent = '';
-  $('pRead').classList.remove('open'); $('pEdit').classList.remove('open');
+  $('eTitle').value = ''; $('eBy').value = ''; $('eCategory').value = ''; $('eText').value = ''; $('eMsg').textContent = '';
+  $('pRead').classList.remove('open'); $('pEdit').classList.remove('open'); $('catSug').hidden = true;
+  $('pCats').hidden = true; $('pCats').innerHTML = ''; $('pProgWrap').hidden = true;
 }
 function enterPoems() {
   poemsLoad(); poemsRender(true);
@@ -1809,7 +1922,7 @@ function enterPoems() {
 
 /* ---------- Baca ---------- */
 function openReader(id) {
-  const p = poems.find(x => x.id === id); if (!p) return;
+  const p = poems.find(x => x.id === id); if (!p || p.locked) return;
   readId = id;
   $('rBody').innerHTML = `<h3 class="rt">${esc(p.title || 'Tanpa judul')}</h3>${p.by ? `<div class="rby">oleh ${esc(p.by)}</div>` : ''}<div class="rx">${esc(p.body)}</div><div class="orn">${I.heart}</div><div class="rdate">${fmtDate(p.at)}</div>`;
   $('rBody').scrollTop = 0;
@@ -1818,13 +1931,14 @@ function openReader(id) {
 function closeReader() { $('pRead').classList.remove('open'); readId = null; }
 
 /* ---------- Tulis / ubah ---------- */
-const editVals = () => JSON.stringify([$('eTitle').value.trim(), $('eBy').value.trim(), $('eText').value.trim()]);
+const editVals = () => JSON.stringify([$('eTitle').value.trim(), $('eBy').value.trim(), $('eCategory').value.trim(), $('eText').value.trim()]);
 function openEditor(id) {
   const p = id ? poems.find(x => x.id === id) : null;
+  if (p && p.locked) return;   // jaga-jaga: puisi terkunci tidak bisa diubah
   editId = p ? p.id : null;
   $('eBar').textContent = p ? 'Ubah puisi' : 'Puisi baru';
-  $('eTitle').value = p ? p.title : ''; $('eBy').value = p ? p.by : ''; $('eText').value = p ? p.body : '';
-  $('eMsg').textContent = ''; editSnap = editVals();
+  $('eTitle').value = p ? p.title : ''; $('eBy').value = p ? p.by : ''; $('eCategory').value = p ? p.category : ''; $('eText').value = p ? p.body : '';
+  $('eMsg').textContent = ''; editSnap = editVals(); $('catSug').hidden = true;
   $('pEdit').classList.add('open');
   $('pEdit').querySelector('.pbody').scrollTop = 0;
 }
@@ -1837,10 +1951,11 @@ function tryCloseEditor() {
   openSheet(`<div class="sh-t">Buang perubahan?</div><p class="sh-p">Puisi yang belum disimpan akan hilang.</p><div class="acts"><button class="btn ghost" data-act="close">Lanjut menulis</button><button class="btn danger" data-act="discard">Buang</button></div>`);
 }
 function savePoem() {
-  const title = $('eTitle').value.trim(), by = $('eBy').value.trim(), body = $('eText').value.replace(/^\s*\n/, '').replace(/\s+$/, '');
+  const title = $('eTitle').value.trim(), by = $('eBy').value.trim(), category = catsCanon($('eCategory').value);
+  const body = $('eText').value.replace(/^\s*\n/, '').replace(/\s+$/, '');
   if (!body.trim()) { $('eMsg').textContent = 'Isi puisi belum ditulis.'; return; }
-  if (editId) { const p = poems.find(x => x.id === editId); if (p) { p.title = title; p.by = by; p.body = body; } }
-  else poems.push({ id: uid(), title, by, body, at: Date.now() });
+  if (editId) { const p = poems.find(x => x.id === editId); if (p) { p.title = title; p.by = by; p.category = category; p.body = body; } }
+  else poems.push({ id: uid(), title, by, category, body, at: Date.now(), locked: false, lockedAt: null });
   const ok = poemsPersist();
   closeEditor(); poemsRender(false);
   if (readId) openReader(readId);
@@ -1854,17 +1969,103 @@ function askDeletePoem(id) {
 function delPoem(id) {
   poems = poems.filter(p => p.id !== id);
   poemsPersist(); closeSheet(); closeReader(); poemsRender(false); toast('Puisi dihapus'); vib(12);
+  checkAllLocked();
 }
 
-$('pList').addEventListener('click', e => { const c = e.target.closest('.pc'); if (c) openReader(c.dataset.id); });
+/* ---------- Salin, dan salin+kunci ---------- */
+function poemCopyText(p) {
+  const parts = [];
+  if (p.title) parts.push(p.title);
+  parts.push(p.body);
+  if (p.by) parts.push('— ' + p.by);
+  return parts.join('\n\n');
+}
+async function copyText(t) {
+  try { if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(t); return true; } }
+  catch (e) {}
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = t; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:-9999px;opacity:0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    const ok = document.execCommand('copy'); ta.remove(); return ok;
+  } catch (e2) { return false; }
+}
+async function copyPoemPlain(id) {
+  const p = poems.find(x => x.id === id); if (!p || p.locked) return;
+  const ok = await copyText(poemCopyText(p));
+  toast(ok ? 'Puisi disalin' : 'Gagal menyalin, coba lagi'); vib(ok ? 10 : [10, 30, 10]);
+}
+function askCopyLock(id) {
+  const p = poems.find(x => x.id === id); if (!p || p.locked) return;
+  openSheet(`<div class="sh-t">Salin &amp; kunci puisi ini?</div><p class="sh-p">Teksnya disalin sekali, lalu puisi ini terkunci — tidak bisa dibuka, diubah, atau disalin lagi sampai semua puisi lain juga selesai disalin.</p><div class="acts"><button class="btn ghost" data-act="close">Batal</button><button class="btn cta" data-act="copylock" data-id="${esc(id)}">Salin &amp; Kunci</button></div>`);
+}
+async function copyAndLock(id) {
+  const p = poems.find(x => x.id === id); if (!p || p.locked) { closeSheet(); return; }
+  const ok = await copyText(poemCopyText(p));
+  p.locked = true; p.lockedAt = Date.now(); poemsPersist();
+  closeSheet(); if (readId === id) closeReader();
+  poemsRender(false);
+  toast(ok ? 'Disalin & dikunci' : 'Dikunci (salin manual gagal, coba salin ulang sebelum tertutup)'); vib([10, 20, 10]);
+  checkAllLocked();
+}
+function checkAllLocked() {
+  if (!poems.length || !poems.every(p => p.locked)) return;
+  setTimeout(() => {
+    if (!poems.length || !poems.every(p => p.locked)) return;   // sempat berubah selagi menunggu
+    poems.forEach(p => { p.locked = false; p.lockedAt = null; });
+    poemsPersist(); poemsRender(true);
+    toast('Semua puisi sudah disalin — semuanya terbuka kembali'); vib([12, 40, 12, 40, 12]);
+    const r = $('pHdr').getBoundingClientRect(); burst(r.left + r.width / 2, r.bottom);
+  }, 900);
+}
+function notifyLocked(id) {
+  const total = poems.length, lockedN = poems.filter(p => p.locked).length, left = total - lockedN;
+  toast(left > 0 ? `Terkunci — salin ${left} puisi lagi untuk membukanya kembali` : 'Terkunci');
+  vib(8);
+}
+
+$('pList').addEventListener('click', e => {
+  const cp = e.target.closest('[data-copy]'); if (cp) { copyPoemPlain(cp.dataset.copy); return; }
+  const lk = e.target.closest('[data-copylock]'); if (lk) { askCopyLock(lk.dataset.copylock); return; }
+  const ed = e.target.closest('[data-edit]'); if (ed) { openEditor(ed.dataset.edit); return; }
+  const dl = e.target.closest('[data-pdel]'); if (dl) { askDeletePoem(dl.dataset.pdel); return; }
+  const c = e.target.closest('.pc'); if (!c) return;
+  if (c.classList.contains('locked')) { notifyLocked(c.dataset.id); return; }
+  openReader(c.dataset.id);
+});
+$('pCats').addEventListener('click', e => {
+  const b = e.target.closest('.catchip'); if (!b) return;
+  catFilter = b.dataset.cat || null; poemsRender(false); vib(4);
+});
 $('pAdd').addEventListener('click', () => openEditor(null));
 $('pLock').addEventListener('click', () => { vib(10); lockApp(); });
 $('rBack').addEventListener('click', closeReader);
 $('rEdit').addEventListener('click', () => { if (readId) openEditor(readId); });
 $('rDel').addEventListener('click', () => { if (readId) askDeletePoem(readId); });
+$('rCopy').addEventListener('click', () => { if (readId) copyPoemPlain(readId); });
+$('rCopyLock').addEventListener('click', () => { if (readId) askCopyLock(readId); });
 $('eClose').addEventListener('click', tryCloseEditor);
 $('eSave').addEventListener('click', savePoem);
 $('eText').addEventListener('input', () => { $('eMsg').textContent = ''; });
+
+/* ---------- Kategori: saran otomatis saat mengetik ---------- */
+function renderCatSug() {
+  const box = $('catSug'), raw = $('eCategory').value, q = raw.trim().toLowerCase();
+  let items = poemCats.filter(c => !q || c.toLowerCase().includes(q)).slice(0, 6);
+  let html = items.map(c => `<button type="button" data-cat="${esc(c)}">${esc(c)}</button>`).join('');
+  if (q && !poemCats.some(c => c.toLowerCase() === q)) {
+    html += `<button type="button" class="new" data-cat="${esc(raw.trim())}">${I.plus}Buat &ldquo;${esc(raw.trim())}&rdquo;</button>`;
+  }
+  box.innerHTML = html; box.hidden = !html;
+}
+$('eCategory').addEventListener('focus', renderCatSug);
+$('eCategory').addEventListener('input', renderCatSug);
+$('catSug').addEventListener('mousedown', e => e.preventDefault());
+$('catSug').addEventListener('click', e => {
+  const b = e.target.closest('[data-cat]'); if (!b) return;
+  $('eCategory').value = b.dataset.cat; $('catSug').hidden = true;
+});
+$('eCategory').addEventListener('blur', () => setTimeout(() => { $('catSug').hidden = true; }, 150));
 
 /* =====================================================================
    Sesi: login, kunci
@@ -2038,6 +2239,7 @@ $('btnSend').innerHTML = I.send; $('vClose').innerHTML = I.x; $('vDl').innerHTML
 $('rbClose').innerHTML = I.x;
 
 $('pAdd').innerHTML = I.plus; $('pLock').innerHTML = I.lock; $('rBack').innerHTML = I.back; $('rEdit').innerHTML = I.edit; $('rDel').innerHTML = I.trash; $('eClose').innerHTML = I.x;
+$('rCopyIcon').innerHTML = I.clip; $('rCopyLockIcon').innerHTML = I.lock;
 $('camClose').innerHTML = I.x; $('camFlip').innerHTML = I.flip;
 
 /* ---------- Kamera (foto langsung, depan/belakang) ---------- */
