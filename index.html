@@ -204,6 +204,17 @@ section{position:absolute;inset:0}
 .ph.seen .lk{background:rgba(255,255,255,.3)}
 .ph.sent[data-open]{cursor:pointer;transition:transform .2s var(--spring)}
 .ph.sent[data-open]:active{transform:scale(.97)}
+.b.audio{padding:8px 10px 5px}
+.b.audio .nm{padding:0 1px 4px}
+.aud{display:flex;align-items:center;gap:9px;width:min(62vw,240px)}
+.aud audio{display:none}
+.apbtn{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.16);color:inherit;transition:transform .15s var(--spring)}
+.apbtn:active{transform:scale(.88)}
+.apbtn .ic{width:14px;height:14px}
+.apwave{position:relative;flex:1;height:26px;min-width:60px;border-radius:99px;background:rgba(255,255,255,.14);overflow:hidden;cursor:pointer}
+.apfill{position:absolute;left:0;top:0;bottom:0;width:0%;background:rgba(255,255,255,.4);border-radius:99px;pointer-events:none}
+.them .apfill{background:linear-gradient(90deg,#ff5c8a,#b86bff)}
+.aptime{flex:none;font-size:11px;opacity:.85;font-variant-numeric:tabular-nums;min-width:32px;text-align:right}
 .b.tomb{background:transparent!important;box-shadow:none!important;border:1px dashed rgba(255,255,255,.16)!important;color:var(--muted);font-size:13px;display:flex;align-items:center;gap:8px;padding:9px 14px}
 .b.tomb .ic{width:16px;height:16px}
 .b.tomb.in{animation:fadeup .5s var(--ease)}
@@ -247,6 +258,15 @@ section{position:absolute;inset:0}
 #ta{display:block;width:100%;max-height:120px;min-height:40px;resize:none;border:0;outline:0;background:transparent;color:var(--text);font-size:16px;line-height:1.3;padding:9px 15px;overflow-y:auto}
 #ta::placeholder{color:#7d6f8b}
 #btnPhoto{width:40px;height:40px;border-radius:50%;background:var(--surface);border:1.5px solid var(--line);color:var(--rose2)}
+#btnPhoto[hidden]{display:none}
+#recBar[hidden]{display:none}
+#recBar{flex:1;min-width:0;display:flex;align-items:center;gap:10px;height:40px;padding:0 8px 0 6px;background:var(--surface);border:1.5px solid var(--line);border-radius:22px;animation:popin .25s var(--spring)}
+.recx{width:32px;height:32px;color:var(--muted)}
+.recx .ic{width:17px;height:17px}
+.recdot{flex:none;width:9px;height:9px;border-radius:50%;background:var(--danger);animation:recPulse 1s ease-in-out infinite}
+@keyframes recPulse{50%{opacity:.25}}
+.rectxt{flex:1;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rectime{font-variant-numeric:tabular-nums;color:var(--text)}
 .sendb{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#7d6f8b;background:var(--surface);border:1.5px solid var(--line);transition:transform .35s var(--spring),background .3s,color .3s,box-shadow .3s}
 .sendb .ic{transition:transform .4s var(--spring);width:18px;height:18px}
 .sendb.on{color:#fff;background:linear-gradient(135deg,#ff5c8a,#b455e6);border-color:transparent;box-shadow:0 6px 20px rgba(255,92,138,.45);transform:scale(1.06)}
@@ -360,6 +380,40 @@ section{position:absolute;inset:0}
 .cam-acts{display:flex;align-items:center;justify-content:center;padding:16px 0 calc(var(--sab) + 20px)}
 #camShot{width:66px;height:66px;border-radius:50%;background:#fff;border:4px solid rgba(255,255,255,.35);box-shadow:0 0 0 2px rgba(255,255,255,.6) inset;transition:transform .18s var(--spring)}
 #camShot:active{transform:scale(.88)}
+
+/* ---------- Panggilan suara/video ---------- */
+#callOv{position:fixed;inset:0;z-index:170;background:linear-gradient(180deg,#1c1226,#0c0911 70%);display:flex;flex-direction:column;
+  opacity:0;pointer-events:none;visibility:hidden;transition:opacity .3s,visibility 0s .3s}
+#callOv.open{opacity:1;pointer-events:auto;visibility:visible;transition:opacity .3s,visibility 0s}
+#callOv.video.active .call-top{opacity:0;transform:translateY(-10px)}
+.call-top{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  padding:calc(var(--sat) + 20px) 24px 0;text-align:center;transition:opacity .3s,transform .3s}
+.call-av{width:96px;height:96px;border-radius:50%;display:grid;place-items:center;font-family:var(--serif);font-style:italic;font-size:34px;font-weight:600;
+  background:radial-gradient(circle at 30% 25%,#ff8fab,#e0459f 55%,#7a2fb0);box-shadow:0 14px 50px rgba(255,92,138,.4)}
+#callOv.ring .call-av{animation:callpulse 1.6s ease-in-out infinite}
+@keyframes callpulse{0%,100%{box-shadow:0 0 0 0 rgba(255,92,138,.5)}50%{box-shadow:0 0 0 20px rgba(255,92,138,0)}}
+#callName{font-family:var(--serif);font-style:italic;font-weight:600;font-size:22px}
+#callStatus{color:var(--muted);font-size:13.5px}
+.call-vids{position:absolute;inset:0;z-index:1;background:#000;opacity:0;visibility:hidden;transition:opacity .3s .2s}
+#callOv.video.active .call-vids{opacity:1;visibility:visible}
+#callRemoteVid{width:100%;height:100%;object-fit:cover;background:#000}
+#callDur{position:absolute;top:calc(var(--sat) + 14px);left:50%;transform:translateX(-50%);z-index:4;font-size:12.5px;font-weight:700;
+  background:rgba(0,0,0,.45);padding:5px 14px;border-radius:20px;backdrop-filter:blur(8px);opacity:0;transition:opacity .3s}
+#callOv.active #callDur{opacity:1}
+#callLocalVid{position:absolute;right:12px;bottom:calc(var(--sab) + 120px);width:96px;height:132px;border-radius:16px;object-fit:cover;
+  background:#111;box-shadow:0 8px 24px rgba(0,0,0,.5);transform:scaleX(-1);transition:transform .2s;z-index:3}
+#callLocalVid.rear{transform:none}
+#callLocalVid[hidden],#callRemoteVid[hidden]{display:none}
+.call-acts{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:16px;padding:22px 24px calc(var(--sab) + 26px)}
+.cbtn{flex:none;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.12);color:#fff;
+  backdrop-filter:blur(10px);transition:transform .18s var(--spring),background .2s}
+.cbtn:active{transform:scale(.9)}
+.cbtn .ic{width:24px;height:24px}
+.cbtn.off{background:#fff;color:#141018}
+.cbtn.end{background:var(--danger);box-shadow:0 8px 24px rgba(255,107,129,.4)}
+.cbtn.end .ic{transform:rotate(135deg)}
+.cbtn.accept{background:var(--ok);box-shadow:0 8px 24px rgba(91,227,161,.4)}
+.call-acts.wide{gap:26px}
 
 /* ---------- Tautan pasang (login) ---------- */
 .lnk{display:block;margin:14px auto 0;padding:8px 14px;border-radius:12px;color:var(--muted);font-size:13px;text-decoration:underline;text-underline-offset:3px;transition:color .2s,transform .2s var(--spring)}
@@ -521,6 +575,8 @@ section{position:absolute;inset:0}
         <div class="hn"><span id="hName"></span><b class="chip" id="hChip" hidden>online</b></div>
         <div class="hs" id="hSub"></div>
       </div>
+      <button class="ib" id="btnCallV" aria-label="Panggilan suara"></button>
+      <button class="ib" id="btnCallC" aria-label="Panggilan video"></button>
       <button class="ib" id="btnLock" aria-label="Kunci"></button>
       <button class="ib" id="btnMenu" aria-label="Menu"></button>
     </header>
@@ -541,7 +597,12 @@ section{position:absolute;inset:0}
     </div>
     <footer id="cmp">
       <button class="ib" id="btnPhoto" aria-label="Kirim foto"></button>
-      <div class="tw"><textarea id="ta" rows="1" placeholder="Tulis pesan…" enterkeyhint="send" autocomplete="off" autocorrect="on" aria-label="Pesan"></textarea></div>
+      <div class="tw" id="twWrap"><textarea id="ta" rows="1" placeholder="Tulis pesan…" enterkeyhint="send" autocomplete="off" autocorrect="on" aria-label="Pesan"></textarea></div>
+      <div id="recBar" hidden>
+        <button type="button" class="ib recx" id="recCancel" aria-label="Batal rekam"></button>
+        <i class="recdot"></i>
+        <span class="rectxt">Merekam… <span class="rectime" id="recTime">0:00</span></span>
+      </div>
       <button class="sendb" id="btnSend" aria-label="Kirim"></button>
     </footer>
     <input type="file" id="file" accept="image/*" hidden>
@@ -629,6 +690,29 @@ section{position:absolute;inset:0}
     <div class="cam-stage"><video id="camVid" autoplay playsinline muted></video></div>
     <div class="cam-acts"><button id="camShot" aria-label="Jepret"></button></div>
   </div>
+
+  <div id="callOv" role="dialog" aria-modal="true" aria-label="Panggilan">
+    <div id="callDur" hidden></div>
+    <div class="call-vids">
+      <video id="callRemoteVid" autoplay playsinline hidden></video>
+      <video id="callLocalVid" autoplay playsinline muted hidden></video>
+    </div>
+    <div class="call-top">
+      <div class="call-av" id="callAv"><span id="callAvIn"></span></div>
+      <b id="callName"></b>
+      <span id="callStatus"></span>
+    </div>
+    <div class="call-acts" id="callActsRing">
+      <button class="cbtn end" id="callDecline" aria-label="Tolak"></button>
+      <button class="cbtn accept" id="callAccept" aria-label="Terima"></button>
+    </div>
+    <div class="call-acts wide" id="callActsActive" hidden>
+      <button class="cbtn" id="callMicBtn" aria-label="Mikrofon"></button>
+      <button class="cbtn" id="callCamBtn" aria-label="Kamera"></button>
+      <button class="cbtn" id="callFlipBtn" aria-label="Ganti kamera"></button>
+      <button class="cbtn end" id="callEndBtn" aria-label="Tutup panggilan"></button>
+    </div>
+  </div>
 </div>
 <div id="shield"></div>
 <div id="toast"></div>
@@ -672,7 +756,17 @@ const CONFIG = {
   MSG_TTL_H: 24,             // pesan hilang setelah (jam)
   ER_PHOTO_MIN: 60,          // foto untuk Er bertahan (menit) setelah dibuka
   PARTNER_PHOTO_VIEWS: 5,    // foto kiriman Ganteng: maksimal berapa kali Saskia/Selpia boleh membukanya
-  LOCK_AFTER_MS: 120000      // otomatis terkunci jika ditinggal (ms)
+  LOCK_AFTER_MS: 120000,     // otomatis terkunci jika ditinggal (ms)
+
+  // Panggilan suara/video (WebRTC). STUN gratis Google cukup untuk kebanyakan jaringan;
+  // kalau panggilan sering gagal tersambung (beda operator/jaringan yang "ketat"),
+  // tambahkan server TURN (mis. dari Metered.ca / Twilio) di sini:
+  // { urls: 'turn:ALAMAT:3478', username: '...', credential: '...' }
+  CALL_ICE_SERVERS: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' }
+  ],
+  CALL_RING_MS: 45000        // batas dering sebelum panggilan dibatalkan otomatis (ms)
 };
 
 const USERS = {
@@ -743,7 +837,13 @@ const I = {
   camera:P('<path d="M4 8h3l1.6-2.4A2 2 0 0 1 10.3 4.6h3.4a2 2 0 0 1 1.7 1L17 8h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2z"/><circle cx="12" cy="14" r="4"/>'),
   side:  P('<rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16"/>'),
   flip:  P('<path d="M17 2 21 6l-4 4"/><path d="M3 12v-2a4 4 0 0 1 4-4h14"/><path d="M7 22 3 18l4-4"/><path d="M21 12v2a4 4 0 0 1-4 4H3"/>'),
-  clip:  P('<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>')
+  clip:  P('<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>'),
+  mic:   P('<path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v4"/><path d="M8 22h8"/>'),
+  play:  P('<path d="M6.5 4.5v15l13-7.5-13-7.5z"/>', 'f'),
+  pause: P('<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>', 'f'),
+  call:  P('<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>'),
+  vcam:  P('<rect x="2" y="6" width="15" height="12" rx="2"/><path d="m22 8-5 4 5 4V8z"/>'),
+  vcamoff:P('<rect x="2" y="6" width="15" height="12" rx="2"/><path d="m22 8-5 4 5 4V8z"/><path d="M2 2l20 20"/>')
 };
 
 /* ---------- SHA-256 (cadangan jika crypto.subtle tidak tersedia) ---------- */
@@ -842,6 +942,9 @@ let stick = true, unread = 0, lastSig = '', firstRender = true, firstSync = true
 let shieldOff = false, hiddenAt = 0, V = null, syncing = false, syncQueued = false, syncTimer = null;
 let pollT = null, tickT = null, lastClean = 0, lgFails = 0, lgLock = 0, pendingPhoto = null;
 let replyTo = null, lastSwipeAt = 0, swipeLock = false, renderPending = null, swipeWatchdog = null;
+let recording = false, mediaRec = null, recChunks = [], recStream = null, recStart = 0, recTimer = null;
+let curAudio = null, curAudioId = null;
+const AUDIO_MAX_SEC = 120;
 let deletedIds = new Set((() => { try { return JSON.parse(localStorage.getItem('sk_deleted') || '[]'); } catch (e) { return []; } })());
 function markDeleted(id) {
   deletedIds.add(id);
@@ -949,7 +1052,7 @@ function quoteHTML(m) {
     return `<div class="qref gone"><span class="ql"></span><div class="qb"><span class="qt">${label}</span></div></div>`;
   }
   const name = nameOf(o);
-  const snip = o.kind === 'image' ? (o.photo_gone ? 'Foto sudah hilang' : '📷 Foto') : (o.body || '').slice(0, 80);
+  const snip = o.kind === 'image' ? (o.photo_gone ? 'Foto sudah hilang' : '📷 Foto') : o.kind === 'audio' ? '🎤 Pesan suara' : (o.body || '').slice(0, 80);
   return `<div class="qref" data-jump="${o.id}"><span class="ql"></span><div class="qb"><span class="qn">${esc(name)}</span><span class="qt">${esc(snip)}</span></div></div>`;
 }
 function quoteSig(m) {
@@ -976,6 +1079,11 @@ function rowHTML(m, first, last, enter, delay) {
   const rbtn = (m.pending || m.failed) ? '' : `<button type="button" class="rbtn" data-reply="${m.id}" aria-label="Balas pesan">${I.reply}</button>`;
   if (m.kind === 'text') {
     return `<div class="${cls}" data-id="${m.id}"${st}>${rico}<div class="b${m.failed ? ' failed' : ''}">${nm}${q}${esc(m.body || '')}${meta}${rbtn}</div></div>`;
+  }
+  if (m.kind === 'audio') {
+    let a; try { a = JSON.parse(m.body || '{}'); } catch (e) { a = {}; }
+    const dur = a.dur || 0, src = a.data || '';
+    return `<div class="${cls}" data-id="${m.id}"${st}>${rico}<div class="b audio${m.failed ? ' failed' : ''}">${nm}${q}<div class="aud" data-mid="${m.id}" data-dur="${dur}"><button type="button" class="apbtn" data-aplay="${m.id}" aria-label="Putar pesan suara">${I.play}</button><div class="apwave" data-aseek="${m.id}"><div class="apfill"></div></div><span class="aptime">${fmtCount(dur * 1000)}</span><audio preload="metadata" data-a="${m.id}" src="${src}"></audio></div>${meta}${rbtn}</div></div>`;
   }
   // foto
   if (m.photo_gone) {
@@ -1064,6 +1172,10 @@ function renderInner(opts) {
     prev = el;
   }
   for (const el of existing.values()) el.remove(); // pesan yang sudah kedaluwarsa/terhapus / pembatas hari yang usang
+  if (curAudioId) { // baris audio yang diputar mungkin dibangun ulang (mis. status "dibaca" berubah) — sambung lagi
+    const na = audioEl(curAudioId);
+    if (na && na !== curAudio) { const t = curAudio ? curAudio.currentTime : 0; curAudio = na; try { na.currentTime = t; na.play().catch(() => {}); } catch (e) {} }
+  }
 
   firstRender = false;
   msgs.forEach(m => { delete m._fresh; });
@@ -1155,7 +1267,7 @@ async function sync() {
     const nowI = iso();
     const cols = 'id,room,sender,kind,reply_to,created_at,expires_at,read_at,delivered_at,viewed_at,photo_gone,view_count';
     const [t, i] = await Promise.all([
-      sb.from('messages').select(cols + ',body').eq('room', myRoom).eq('kind', 'text').gt('expires_at', nowI).order('created_at', { ascending: true }).limit(600),
+      sb.from('messages').select(cols + ',body').eq('room', myRoom).in('kind', ['text', 'audio']).gt('expires_at', nowI).order('created_at', { ascending: true }).limit(600),
       sb.from('messages').select(cols).eq('room', myRoom).eq('kind', 'image').gt('expires_at', nowI).order('created_at', { ascending: true }).limit(200)
     ]);
     if (myRoom !== room) return;
@@ -1165,11 +1277,11 @@ async function sync() {
     const prevIds = new Set(msgs.map(m => m.id)), byId = new Map(msgs.map(m => [m.id, m]));
     const out = [];
     for (const r of rows) {
-      if (r.kind === 'text' && r.photo_gone) { markDeleted(r.id); continue; } // pesan teks yang sudah dihapus untuk semua — jangan ditampilkan sebagai bubble
+      if ((r.kind === 'text' || r.kind === 'audio') && r.photo_gone) { markDeleted(r.id); continue; } // pesan teks/suara yang sudah dihapus untuk semua — jangan ditampilkan sebagai bubble
       let body = null;
-      if (r.kind === 'text') {
+      if (r.kind === 'text' || r.kind === 'audio') {
         body = textCache.get(r.id);
-        if (body === undefined) { try { body = await dec(r.body); } catch (e) { body = 'Pesan tidak bisa dibuka'; } textCache.set(r.id, body); }
+        if (body === undefined) { try { body = await dec(r.body); } catch (e) { body = r.kind === 'audio' ? '{}' : 'Pesan tidak bisa dibuka'; } textCache.set(r.id, body); }
       }
       const old = byId.get(r.id), m = Object.assign({}, r, { body, pending: false, failed: false, localAt: old ? old.localAt : 0 });
       if (old) { if (old.viewed_at && !m.viewed_at) m.viewed_at = old.viewed_at; if (old.delivered_at && !m.delivered_at) m.delivered_at = old.delivered_at; if (old.photo_gone) m.photo_gone = true; if ((old.view_count || 0) > (m.view_count || 0)) m.view_count = old.view_count; }
@@ -1217,7 +1329,7 @@ async function maintain() {
   }
   // tandai dibaca
   if (!document.hidden && !shieldOff) {
-    const ids = msgs.filter(m => m.sender === partner && m.kind === 'text' && !m.read_at).map(m => m.id);
+    const ids = msgs.filter(m => m.sender === partner && (m.kind === 'text' || m.kind === 'audio') && !m.read_at).map(m => m.id);
     if (ids.length) { const t = iso(); msgs.forEach(m => { if (ids.includes(m.id)) m.read_at = t; }); sb.from('messages').update({ read_at: t }).in('id', ids).then(() => {}); clearNotifs(room); }
   }
   // buang kadaluarsa
@@ -1272,6 +1384,7 @@ function connectRealtime() {
       .on('broadcast', { event: 'typing' }, ({ payload }) => {
         if (payload && payload.u === partner) { typingUntil = Date.now() + 3500; updateHeader(); setTimeout(updateHeader, 3600); }
       })
+      .on('broadcast', { event: 'call' }, ({ payload }) => { if (payload && payload.from === partner) handleCallSignal(payload); })
       .subscribe(status => {
         rtOk = status === 'SUBSCRIBED';
         if (rtOk && !document.hidden) chan.track({ t: Date.now() });
@@ -1283,7 +1396,11 @@ function connectRealtime() {
    Kirim pesan
    ===================================================================== */
 function autosize() { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 120) + 'px'; }
-function updateSendBtn() { $('btnSend').classList.toggle('on', !!ta.value.trim()); }
+function updateSendBtn() {
+  const hasText = !!ta.value.trim();
+  $('btnSend').classList.toggle('on', hasText || recording);
+  if (!recording) $('btnSend').innerHTML = hasText ? I.send : I.mic;
+}
 ta.addEventListener('input', () => {
   autosize(); updateSendBtn();
   if (!decoy && rtOk && chan && Date.now() - lastTypeSent > 2000) { lastTypeSent = Date.now(); chan.send({ type: 'broadcast', event: 'typing', payload: { u: me } }); }
@@ -1294,7 +1411,11 @@ ta.addEventListener('keydown', e => {
   else if (e.key === 'Escape' && replyTo) { cancelReply(); }
 });
 $('btnSend').addEventListener('pointerdown', e => e.preventDefault()); // jaga keyboard tetap terbuka
-$('btnSend').addEventListener('click', sendText);
+$('btnSend').addEventListener('click', () => {
+  if (recording) { finishRecording(); return; }
+  if (ta.value.trim()) { sendText(); return; }
+  startRecording();
+});
 
 async function sendText() {
   const v = ta.value.trim(); if (!v) return;
@@ -1368,6 +1489,116 @@ async function pushPhoto(m) {
   } catch (e) { m.pending = false; m.failed = true; render({ force: true }); toast('Foto gagal terkirim. Ketuk foto untuk coba lagi.'); }
 }
 
+/* ---------- Suara: rekam & kirim ---------- */
+function recUI(rec) {
+  $('twWrap').hidden = rec; $('btnPhoto').hidden = rec; $('recBar').hidden = !rec;
+  updateSendBtn();
+}
+async function startRecording() {
+  if (decoy || recording || !navigator.mediaDevices || !window.MediaRecorder) { if (!window.MediaRecorder) toast('Perekam suara tidak didukung di perangkat ini'); return; }
+  let stream;
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+  catch (e) { toast('Tidak bisa mengakses mikrofon'); return; }
+  const mime = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/ogg;codecs=opus'].find(t => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || '';
+  let rec;
+  try { rec = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream); }
+  catch (e) { stream.getTracks().forEach(t => t.stop()); toast('Perekam suara tidak didukung di perangkat ini'); return; }
+  recChunks = []; recStream = stream; mediaRec = rec;
+  rec.ondataavailable = e => { if (e.data && e.data.size) recChunks.push(e.data); };
+  recording = true; recStart = Date.now(); recUI(true); vib(10);
+  $('recTime').textContent = '0:00';
+  recTimer = setInterval(() => {
+    const s = Math.floor((Date.now() - recStart) / 1000);
+    $('recTime').textContent = fmtCount(s * 1000);
+    if (s >= AUDIO_MAX_SEC) finishRecording();
+  }, 250);
+  rec.start();
+}
+function stopRecStream() { if (recStream) { recStream.getTracks().forEach(t => t.stop()); recStream = null; } }
+function cancelRecording() {
+  if (!recording) return;
+  clearInterval(recTimer); recTimer = null;
+  recording = false; recUI(false);
+  const rec = mediaRec; mediaRec = null; recChunks = [];
+  try { rec && rec.state !== 'inactive' && rec.stop(); } catch (e) {}
+  stopRecStream();
+  vib(8);
+}
+function finishRecording() {
+  if (!recording || !mediaRec) return;
+  clearInterval(recTimer); recTimer = null;
+  const dur = Math.max(1, Math.round((Date.now() - recStart) / 1000));
+  const rec = mediaRec; mediaRec = null; recording = false; recUI(false);
+  rec.addEventListener('stop', async () => {
+    stopRecStream();
+    const chunks = recChunks; recChunks = [];
+    if (!chunks.length) { toast('Rekaman terlalu pendek'); return; }
+    try {
+      const blob = new Blob(chunks, { type: rec.mimeType || 'audio/webm' });
+      const dataUrl = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(blob); });
+      await sendAudio(dataUrl, dur);
+    } catch (e) { toast('Rekaman gagal diproses'); }
+  }, { once: true });
+  try { rec.stop(); } catch (e) { stopRecStream(); }
+}
+$('recCancel').addEventListener('click', cancelRecording);
+async function sendAudio(dataUrl, dur) {
+  const rt = replyTo; cancelReply();
+  vib(8); tone([660, 880]);
+  const now = Date.now();
+  const payload = JSON.stringify({ data: dataUrl, dur });
+  const m = { id: uid(), room, sender: me, kind: 'audio', body: payload, reply_to: rt, created_at: iso(now), expires_at: iso(now + TTL_MS), read_at: null, delivered_at: null, viewed_at: null, photo_gone: false, pending: true, localAt: now };
+  msgs.push(m); textCache.set(m.id, payload); render({ scroll: true, smooth: true });
+  await pushAudio(m);
+}
+async function pushAudio(m) {
+  if (!ensureClient()) { m.pending = false; m.failed = true; render({ force: true }); return; }
+  m.pending = true; m.failed = false; render({ force: true });
+  try {
+    const body = await enc(m.body);
+    const { data, error } = await sb.from('messages').insert({ id: m.id, room: m.room, sender: me, kind: 'audio', body, reply_to: m.reply_to || null }).select('created_at,expires_at').single();
+    if (error) throw error;
+    m.created_at = data.created_at; m.expires_at = data.expires_at; m.pending = false; m.localAt = Date.now();
+    render({ force: true });
+  } catch (e) { m.pending = false; m.failed = true; render({ force: true }); toast('Pesan suara gagal terkirim. Ketuk pesan untuk coba lagi.'); }
+}
+function audioEl(id) { return list.querySelector(`audio[data-a="${id}"]`); }
+function toggleAudio(id) {
+  const el = audioEl(id); if (!el) return;
+  if (curAudio && curAudio !== el) { try { curAudio.pause(); } catch (e) {} }
+  if (el.paused) el.play().catch(() => toast('Tidak bisa memutar pesan suara'));
+  else el.pause();
+}
+function seekAudio(wave, e) {
+  const aud = wave.closest('.aud'); if (!aud) return;
+  const dur = +aud.dataset.dur || 0, el = audioEl(aud.dataset.mid);
+  if (!el || !dur) return;
+  const r = wave.getBoundingClientRect(), p = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+  el.currentTime = p * dur;
+  const fill = wave.querySelector('.apfill'); if (fill) fill.style.width = (p * 100) + '%';
+}
+list.addEventListener('play', e => {
+  if (e.target.tagName !== 'AUDIO') return;
+  const id = e.target.dataset.a;
+  if (curAudio && curAudio !== e.target) { try { curAudio.pause(); } catch (er) {} }
+  curAudio = e.target; curAudioId = id;
+  const btn = list.querySelector(`[data-aplay="${id}"]`); if (btn) btn.innerHTML = I.pause;
+}, true);
+list.addEventListener('pause', e => {
+  if (e.target.tagName !== 'AUDIO') return;
+  const id = e.target.dataset.a;
+  const btn = list.querySelector(`[data-aplay="${id}"]`); if (btn) btn.innerHTML = I.play;
+  if (curAudio === e.target) { curAudio = null; curAudioId = null; }
+}, true);
+list.addEventListener('ended', e => { if (e.target.tagName === 'AUDIO') e.target.currentTime = 0; }, true);
+list.addEventListener('timeupdate', e => {
+  if (e.target.tagName !== 'AUDIO') return;
+  const id = e.target.dataset.a, aud = list.querySelector(`.aud[data-mid="${id}"]`); if (!aud) return;
+  const dur = +aud.dataset.dur || 0; if (!dur) return;
+  const fill = aud.querySelector('.apfill'); if (fill) fill.style.width = Math.min(100, e.target.currentTime / dur * 100) + '%';
+  const t = aud.querySelector('.aptime'); if (t) t.textContent = fmtCount(e.target.currentTime * 1000);
+}, true);
+
 /* ---------- Interaksi daftar pesan ---------- */
 list.addEventListener('click', e => {
   if (Date.now() - lastSwipeAt < 250) return; // abaikan klik yang terpicu setelah geser
@@ -1384,10 +1615,14 @@ list.addEventListener('click', e => {
   }
   const open = e.target.closest('[data-open]');
   if (open) { openPhoto(open.dataset.open); return; }
+  const aplay = e.target.closest('[data-aplay]');
+  if (aplay) { toggleAudio(aplay.dataset.aplay); return; }
+  const aseek = e.target.closest('[data-aseek]');
+  if (aseek) { seekAudio(aseek, e); return; }
   const row = e.target.closest('.row[data-id]');
   if (row) {
     const m = msgs.find(x => x.id === row.dataset.id);
-    if (m && m.failed) { m.kind === 'text' ? pushText(m) : pushPhoto(m); }
+    if (m && m.failed) { m.kind === 'text' ? pushText(m) : m.kind === 'audio' ? pushAudio(m) : pushPhoto(m); }
   }
 });
 let lp = null, lpXY = null;
@@ -1406,7 +1641,7 @@ function startReply(id) {
   if (m.pending || m.failed) { if (m.pending) toast('Tunggu pesannya terkirim dulu'); return; }   // pesan yang belum tersimpan di server belum bisa dikutip
   replyTo = id;
   const name = nameOf(m);
-  const snip = m.kind === 'image' ? (m.photo_gone ? 'Foto sudah hilang' : '📷 Foto') : (m.body || '');
+  const snip = m.kind === 'image' ? (m.photo_gone ? 'Foto sudah hilang' : '📷 Foto') : m.kind === 'audio' ? '🎤 Pesan suara' : (m.body || '');
   $('rbName').textContent = 'Membalas ' + name;
   $('rbText').textContent = snip.length > 90 ? snip.slice(0, 90) + '…' : snip;
   $('replyBar').classList.add('on');
@@ -1678,14 +1913,15 @@ async function checkOther() {
   try {
     const { data, error } = await sb.from('messages').select('id,kind,read_at,viewed_at,photo_gone').eq('room', other).eq('sender', other).gt('expires_at', iso());
     if (error || myRoom !== room) return;
-    const n = data.filter(m => m.kind === 'text' ? !m.read_at : (!m.viewed_at && !m.photo_gone)).length;
+    const n = data.filter(m => (m.kind === 'text' || m.kind === 'audio') ? !m.read_at : (!m.viewed_at && !m.photo_gone)).length;
     if (n > badge[other]) { tone([880, 1175]); vib(12); toast('Ada pesan baru di obrolan lain'); }
     badge[other] = n; updateTabs();
   } catch (e) {}
 }
 function switchRoom(r) {
   if (me !== 'er' || decoy || r === room || (r !== 'saskia' && r !== 'selpia')) return;
-  closeDrawer(); vib(8); tone([740]);
+  closeDrawer(); vib(8); tone([740]); cancelRecording();
+  if (callState !== 'idle') endCall('room-switch');
   room = r; partner = r; badge[r] = 0; localStorage.setItem('sk_room', r); clearNotifs(r);
   if (chan && sb) { try { sb.removeChannel(chan); } catch (e) {} }
   chan = null; rtOk = false;
@@ -2205,7 +2441,8 @@ function startSession(acc, animated) {
 function lockApp() {
   if (!me && !$('chat').classList.contains('show') && !$('poems').classList.contains('show')) return;
   const burning = !!(V && V.loaded && !V.isEr && !V.mine);
-  closeViewer(false); closeSheet(); closeDrawer(); $('pv').classList.remove('open'); pendingPhoto = null; closeCamera();
+  closeViewer(false); closeSheet(); closeDrawer(); $('pv').classList.remove('open'); pendingPhoto = null; closeCamera(); cancelRecording();
+  if (callState !== 'idle') endCall('lock');
   teardown(); localStorage.removeItem('sk_sess'); hidePushAsk();
   killSession(burning ? 1500 : 0); // beri waktu foto sekali-lihat terhapus dulu
   me = null; partner = null; room = null; msgs = []; list.innerHTML = ''; updateTabs(); shieldOff = false;
@@ -2302,12 +2539,14 @@ window.addEventListener('scroll', () => window.scrollTo(0, 0));
 
 // ikon statis
 $('btnRooms').innerHTML = I.side + '<b class="bd"></b>'; $('drClose').innerHTML = I.x; $('btnLock').innerHTML = I.lock; $('btnMenu').innerHTML = I.more; $('btnPhoto').innerHTML = I.image;
-$('btnSend').innerHTML = I.send; $('vClose').innerHTML = I.x; $('vDl').innerHTML = I.dl; $('fab').insertAdjacentHTML('afterbegin', I.down); $('eye').innerHTML = I.eye;
+updateSendBtn(); $('vClose').innerHTML = I.x; $('vDl').innerHTML = I.dl; $('fab').insertAdjacentHTML('afterbegin', I.down); $('eye').innerHTML = I.eye;
 $('rbClose').innerHTML = I.x;
 
 $('pAdd').innerHTML = I.plus; $('pLock').innerHTML = I.lock; $('rBack').innerHTML = I.back; $('rEdit').innerHTML = I.edit; $('rDel').innerHTML = I.trash; $('eClose').innerHTML = I.x;
 $('rCopyIcon').innerHTML = I.clip; $('rCopyLockIcon').innerHTML = I.lock;
 $('camClose').innerHTML = I.x; $('camFlip').innerHTML = I.flip;
+$('btnCallV').innerHTML = I.call; $('btnCallC').innerHTML = I.vcam;
+$('callDecline').innerHTML = I.call; $('callAccept').innerHTML = I.call; $('callEndBtn').innerHTML = I.call;
 
 /* ---------- Kamera (foto langsung, depan/belakang) ---------- */
 let camStream = null, camFacing = 'environment';
@@ -2340,6 +2579,167 @@ $('camShot').addEventListener('click', () => {
   const data = c.toDataURL('image/jpeg', .74);
   closeCamera();
   openPreview(data);
+});
+
+/* =====================================================================
+   Panggilan suara & video (WebRTC)
+   - Sinyal (undangan/tawaran/jawaban/kandidat ICE/tutup) dikirim lewat kanal
+     realtime yang sama dengan chat ('ruang-' + room, event 'call'), jadi
+     hanya berlaku selagi kedua aplikasi terbuka & tersambung ke kanal itu.
+   - Media (suara/video) mengalir langsung antar 2 HP (peer-to-peer),
+     tidak lewat server chat.
+   ===================================================================== */
+let callState = 'idle';     // idle | outgoing | incoming | active
+let callPC = null, callId = null, callIsVideo = false;
+let callLocalStream = null, callRemoteStream = null;
+let callRingT = null, callDurT = null, callStartedAt = 0;
+let micOn = true, camOn = true, callFacing = 'user';
+
+function callPartnerView() { return partnerView(); }
+function callSignal(payload) { if (chan && rtOk) chan.send({ type: 'broadcast', event: 'call', payload: Object.assign({ from: me, id: callId }, payload) }); }
+function fmtDur(s) { const m = Math.floor(s / 60); return m + ':' + String(s % 60).padStart(2, '0'); }
+
+function callUIReset() {
+  clearInterval(callDurT); callDurT = null; clearTimeout(callRingT); callRingT = null;
+  const ov = $('callOv'); ov.className = ''; ov.classList.remove('open');
+  $('callActsRing').hidden = false; $('callActsActive').hidden = true; $('callDur').hidden = true;
+  const rv = $('callRemoteVid'), lv = $('callLocalVid'); rv.hidden = true; lv.hidden = true; rv.srcObject = null; lv.srcObject = null;
+}
+function callShow(mode) {
+  const ov = $('callOv'), v = callPartnerView();
+  ov.classList.add('open'); ov.classList.toggle('video', callIsVideo);
+  ov.classList.toggle('ring', mode === 'ring'); ov.classList.toggle('active', mode === 'active');
+  $('callAvIn').textContent = v.initial; $('callName').textContent = v.name;
+  $('callStatus').textContent = mode === 'out' ? 'Memanggil…' : mode === 'ring' ? (callIsVideo ? 'Panggilan video masuk' : 'Panggilan suara masuk')
+    : mode === 'connecting' ? 'Menyambungkan…' : '';
+  $('callActsRing').hidden = mode !== 'ring';
+  $('callActsActive').hidden = mode === 'ring';
+  if (mode === 'out' || mode === 'connecting') $('callActsActive').hidden = false; // tombol batal dipakai sbg akhiri
+  $('callDur').hidden = mode !== 'active';
+}
+function callTick() {
+  const s = Math.max(0, Math.floor((Date.now() - callStartedAt) / 1000));
+  const t = fmtDur(s); $('callStatus').textContent = t; $('callDur').textContent = t;
+}
+
+async function getCallMedia(video) {
+  const constraints = { audio: true, video: video ? { facingMode: { ideal: callFacing } } : false };
+  callLocalStream = await navigator.mediaDevices.getUserMedia(constraints);
+  const lv = $('callLocalVid');
+  if (video) { lv.srcObject = callLocalStream; lv.hidden = false; lv.classList.toggle('rear', callFacing !== 'user'); }
+  micOn = true; camOn = !!video; updateCallBtns();
+}
+function stopCallMedia() {
+  if (callLocalStream) { callLocalStream.getTracks().forEach(t => t.stop()); callLocalStream = null; }
+  if (callPC) { try { callPC.close(); } catch (e) {} callPC = null; }
+  callRemoteStream = null;
+}
+function createCallPC() {
+  const pc = new RTCPeerConnection({ iceServers: CONFIG.CALL_ICE_SERVERS });
+  pc.onicecandidate = e => { if (e.candidate) callSignal({ type: 'ice', candidate: e.candidate.toJSON() }); };
+  pc.ontrack = e => {
+    callRemoteStream = e.streams[0];
+    const rv = $('callRemoteVid');
+    if (callIsVideo) { rv.srcObject = callRemoteStream; rv.hidden = false; }
+    else { rv.srcObject = callRemoteStream; rv.hidden = true; } // audio tetap diputar walau video disembunyikan
+    if (callState !== 'active') { callState = 'active'; callStartedAt = Date.now(); callShow('active'); callDurT = setInterval(callTick, 1000); vib(12); }
+  };
+  pc.onconnectionstatechange = () => { if (['failed', 'closed'].includes(pc.connectionState) && callState !== 'idle') endCall('drop', false); };
+  callLocalStream.getTracks().forEach(t => pc.addTrack(t, callLocalStream));
+  callPC = pc;
+  return pc;
+}
+function updateCallBtns() {
+  const mb = $('callMicBtn'), cb = $('callCamBtn'), fb = $('callFlipBtn');
+  mb.classList.toggle('off', !micOn); mb.innerHTML = micOn ? I.mic : I.mute;
+  cb.hidden = !callIsVideo; fb.hidden = !callIsVideo;
+  cb.classList.toggle('off', !camOn); cb.innerHTML = camOn ? I.vcam : I.vcamoff;
+  fb.innerHTML = I.flip;
+}
+
+async function startCall(video) {
+  if (decoy || !me || callState !== 'idle') return;
+  if (!rtOk) { toast('Belum terhubung. Coba lagi.'); return; }
+  callId = uid(); callIsVideo = video; callState = 'outgoing'; vib(10);
+  callShow('out');
+  try { await getCallMedia(video); } catch (e) { toast('Tidak bisa akses mikrofon/kamera. Cek izin di browser.'); endCall('media', false); return; }
+  callSignal({ type: 'invite', video });
+  callRingT = setTimeout(() => { if (callState === 'outgoing') { toast('Tidak dijawab'); endCall('timeout'); } }, CONFIG.CALL_RING_MS);
+}
+async function acceptCall() {
+  if (callState !== 'incoming') return;
+  clearTimeout(callRingT); vib(10); callShow('connecting');
+  try { await getCallMedia(callIsVideo); } catch (e) { toast('Tidak bisa akses mikrofon/kamera. Cek izin di browser.'); declineCall('media'); return; }
+  callSignal({ type: 'accept' });
+}
+function declineCall(reason) {
+  if (callState === 'incoming') callSignal({ type: reason === 'busy' ? 'busy' : 'decline' });
+  endCall(reason || 'declined', false);
+}
+function endCall(reason, notify) {
+  if (callState === 'idle') return;
+  if (notify !== false) callSignal({ type: 'end' });
+  callState = 'idle'; stopCallMedia(); callUIReset();
+}
+async function handleCallSignal(p) {
+  if (!p || !p.type) return;
+  if (p.type === 'invite') {
+    if (callState !== 'idle') { chan && chan.send({ type: 'broadcast', event: 'call', payload: { from: me, id: p.id, type: 'busy' } }); return; }
+    callId = p.id; callIsVideo = !!p.video; callState = 'incoming'; vib([0, 200, 120, 200]);
+    callShow('ring');
+    callRingT = setTimeout(() => { if (callState === 'incoming') declineCall('timeout'); }, CONFIG.CALL_RING_MS);
+    return;
+  }
+  if (p.id !== callId) return; // sinyal panggilan lain/basi
+  if (p.type === 'accept' && callState === 'outgoing') {
+    clearTimeout(callRingT); callShow('connecting');
+    try {
+      const pc = createCallPC();
+      const offer = await pc.createOffer(); await pc.setLocalDescription(offer);
+      callSignal({ type: 'offer', sdp: offer });
+    } catch (e) { toast('Gagal menyambungkan panggilan'); endCall('error'); }
+  } else if (p.type === 'offer' && callState === 'incoming') {
+    try {
+      const pc = createCallPC();
+      await pc.setRemoteDescription(new RTCSessionDescription(p.sdp));
+      const answer = await pc.createAnswer(); await pc.setLocalDescription(answer);
+      callSignal({ type: 'answer', sdp: answer });
+    } catch (e) { toast('Gagal menyambungkan panggilan'); endCall('error'); }
+  } else if (p.type === 'answer' && callPC) {
+    try { await callPC.setRemoteDescription(new RTCSessionDescription(p.sdp)); } catch (e) {}
+  } else if (p.type === 'ice' && callPC && p.candidate) {
+    try { await callPC.addIceCandidate(new RTCIceCandidate(p.candidate)); } catch (e) {}
+  } else if (p.type === 'decline') { toast('Panggilan ditolak'); endCall('declined', false); }
+  else if (p.type === 'busy') { toast('Sedang di panggilan lain'); endCall('busy', false); }
+  else if (p.type === 'end') { endCall('remote', false); }
+}
+
+$('btnCallV').addEventListener('click', () => startCall(false));
+$('btnCallC').addEventListener('click', () => startCall(true));
+$('callAccept').addEventListener('click', acceptCall);
+$('callDecline').addEventListener('click', () => declineCall('declined'));
+$('callEndBtn').addEventListener('click', () => endCall('local'));
+$('callMicBtn').addEventListener('click', () => {
+  if (!callLocalStream) return;
+  micOn = !micOn; callLocalStream.getAudioTracks().forEach(t => t.enabled = micOn); updateCallBtns(); vib(6);
+});
+$('callCamBtn').addEventListener('click', () => {
+  if (!callLocalStream || !callIsVideo) return;
+  camOn = !camOn; callLocalStream.getVideoTracks().forEach(t => t.enabled = camOn); updateCallBtns(); vib(6);
+});
+$('callFlipBtn').addEventListener('click', async () => {
+  if (!callLocalStream || !callIsVideo) return;
+  callFacing = callFacing === 'user' ? 'environment' : 'user';
+  try {
+    const oldT = callLocalStream.getVideoTracks()[0];
+    const ns = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: callFacing } }, audio: false });
+    const nt = ns.getVideoTracks()[0];
+    const sender = callPC && callPC.getSenders().find(s => s.track && s.track.kind === 'video');
+    if (sender) await sender.replaceTrack(nt);
+    if (oldT) { callLocalStream.removeTrack(oldT); oldT.stop(); }
+    callLocalStream.addTrack(nt);
+    const lv = $('callLocalVid'); lv.srcObject = callLocalStream; lv.classList.toggle('rear', callFacing !== 'user');
+  } catch (e) { toast('Tidak bisa ganti kamera'); }
 });
 
 // hati melayang di halaman login
@@ -2529,6 +2929,7 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
     { id: 'pv',       cls: 'open', close: () => { $('pv').classList.remove('open'); pendingPhoto = null; } },
     { id: 'viewer',   cls: 'open', close: () => closeViewer(false) },
     { id: 'cam',      cls: 'open', close: () => closeCamera() },
+    { id: 'callOv',   cls: 'open', close: () => { if (callState === 'incoming') declineCall('declined'); else if (callState !== 'idle') endCall('back'); } },
     { id: 'pRead',    cls: 'open', close: () => closeReader() },
     { id: 'pEdit',    cls: 'open', close: () => tryCloseEditor() },      // ada konfirmasi jika belum disimpan
     { id: 'replyBar', cls: 'on',   close: () => cancelReply() }
