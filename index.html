@@ -117,6 +117,7 @@ section{position:absolute;inset:0}
 .hs{font-size:11px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .3s}
 .hs.love{font-family:var(--serif);font-style:italic;font-size:11px;color:var(--rose2)}
 .hs.typing{color:var(--rose2);font-style:normal;font-family:var(--font)}
+.hs.seen{color:var(--muted)}
 .ib{flex:none;width:36px;height:36px;border-radius:12px;display:grid;place-items:center;color:var(--muted);transition:transform .2s var(--spring),background .2s,color .2s}
 .ib:active{transform:scale(.88);background:rgba(255,255,255,.08);color:var(--text)}
 .ib .ic{width:19px;height:19px}
@@ -170,6 +171,15 @@ section{position:absolute;inset:0}
 .meta .ic{width:14px;height:14px;stroke-width:2.6}
 .meta .rd{opacity:1}
 .meta .ttl{color:#ffe08a}
+/* Status pesan: bulatan kecil — 1 abu (terkirim), 2 abu (diterima), 2 berwarna (dibaca) */
+.ticks{display:inline-flex;align-items:center;gap:2.5px;height:14px}
+.ticks i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.55);flex:none;transition:background .3s,box-shadow .3s,transform .25s var(--spring)}
+.ticks.read i{background:var(--rose2);box-shadow:0 0 5px rgba(255,143,171,.65)}
+.me .b:not(.failed) .ticks.read i{animation:tickPop .35s var(--spring)}
+@keyframes tickPop{0%{transform:scale(.4)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+.ticks .ic{width:13px;height:13px;stroke-width:2.6}
+.ticks.pend .ic{opacity:.75}
+.ticks.fail .ic{color:var(--danger)}
 .b.failed{box-shadow:0 0 0 1.5px var(--danger)}
 .row.enter .b,.row.enter .ph{animation:popin .5s var(--spring) both;animation-delay:var(--dl,0s)}
 .row.me.enter .b,.row.me.enter .ph{transform-origin:100% 100%}
@@ -827,6 +837,7 @@ function tone(freqs) {
 let me = null, partner = null, room = null, badge = { saskia: 0, selpia: 0 }, decoy = false, sb = null, chan = null, rtOk = false;
 let msgs = [], seen = new Set(), textCache = new Map();
 let partnerOnline = false, typingUntil = 0, lastTypeSent = 0;
+let partnerLastSeen = 0, presenceBusy = false;
 let stick = true, unread = 0, lastSig = '', firstRender = true, firstSync = true;
 let shieldOff = false, hiddenAt = 0, V = null, syncing = false, syncQueued = false, syncTimer = null;
 let pollT = null, tickT = null, lastClean = 0, lgFails = 0, lgLock = 0, pendingPhoto = null;
@@ -905,14 +916,29 @@ function dayLabel(t) {
   if (k(d) === k(y)) return 'Kemarin';
   return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long' });
 }
+function fmtLastSeen(t) {
+  const mins = Math.floor((Date.now() - t) / 60000);
+  if (mins < 1) return 'baru saja';
+  if (mins < 60) return mins + ' menit lalu';
+  const d = new Date(t), n = new Date();
+  const k = x => x.getFullYear() * 400 + x.getMonth() * 31 + x.getDate();
+  const y = new Date(n); y.setDate(n.getDate() - 1);
+  if (k(d) === k(n)) return 'hari ini pukul ' + fmtTime(t);
+  if (k(d) === k(y)) return 'kemarin pukul ' + fmtTime(t);
+  return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long' }) + ' pukul ' + fmtTime(t);
+}
 
 /* =====================================================================
    Render pesan
    ===================================================================== */
 function tickIcon(m) {
-  if (m.failed) return I.warn;
-  if (m.pending) return I.clock;
-  return m.read_at ? I.checks.replace('class="ic ', 'class="ic rd ') : I.check;
+  // Bulatan status: 1 titik abu = terkirim ke server, 2 titik abu = sudah diterima
+  // perangkat pasangan, 2 titik berwarna = sudah dibaca.
+  if (m.failed) return `<span class="ticks fail" title="Gagal terkirim">${I.warn}</span>`;
+  if (m.pending) return `<span class="ticks pend" title="Mengirim…">${I.clock}</span>`;
+  if (m.read_at) return `<span class="ticks read" title="Sudah dibaca"><i></i><i></i></span>`;
+  if (m.delivered_at) return `<span class="ticks" title="Sudah diterima"><i></i><i></i></span>`;
+  return `<span class="ticks" title="Terkirim"><i></i></span>`;
 }
 const nameOf = m => m.sender === me ? USERS[me].own : partnerView().name;   // nama sendiri / nama lawan chat (sesuai tampilan masing-masing akun)
 function quoteHTML(m) {
@@ -935,7 +961,7 @@ function quoteSig(m) {
 function rowSig(m, first, last, day) {
   const left = new Date(m.expires_at) - Date.now();
   const leftMin = (!decoy && left < 3600000 && left > 0) ? Math.max(1, Math.ceil(left / 60000)) : 0;
-  return [m.read_at ? 1 : 0, m.viewed_at ? 1 : 0, m.photo_gone ? 1 : 0, m.pending ? 1 : 0, m.failed ? 1 : 0, (m.body || '').length, first ? 1 : 0, last ? 1 : 0, day, leftMin, m._fresh ? 1 : 0, m.reply_to || '', m.view_count || 0, quoteSig(m)].join('.');
+  return [m.read_at ? 1 : 0, m.delivered_at ? 1 : 0, m.viewed_at ? 1 : 0, m.photo_gone ? 1 : 0, m.pending ? 1 : 0, m.failed ? 1 : 0, (m.body || '').length, first ? 1 : 0, last ? 1 : 0, day, leftMin, m._fresh ? 1 : 0, m.reply_to || '', m.view_count || 0, quoteSig(m)].join('.');
 }
 function rowHTML(m, first, last, enter, delay) {
   const mine = m.sender === me, now = Date.now();
@@ -988,7 +1014,7 @@ function renderInner(opts) {
   }
   const now = Date.now();
   const timeSens = msgs.some(m => new Date(m.expires_at) - now < 3600000 || (m.kind === 'image' && m.viewed_at && !m.photo_gone));
-  const sig = msgs.map(m => [m.id, m.read_at ? 1 : 0, m.viewed_at ? 1 : 0, m.photo_gone ? 1 : 0, m.pending ? 1 : 0, m.failed ? 1 : 0, (m.body || '').length, m.view_count || 0].join('.')).join('|') + (timeSens ? '@' + Math.floor(now / 60000) : '');
+  const sig = msgs.map(m => [m.id, m.read_at ? 1 : 0, m.delivered_at ? 1 : 0, m.viewed_at ? 1 : 0, m.photo_gone ? 1 : 0, m.pending ? 1 : 0, m.failed ? 1 : 0, (m.body || '').length, m.view_count || 0].join('.')).join('|') + (timeSens ? '@' + Math.floor(now / 60000) : '');
   if (sig === lastSig && !opts.force) return;
   lastSig = sig;
   const wasStick = stick;
@@ -1071,7 +1097,8 @@ function updateHeader() {
   $('hAv').classList.toggle('on', !decoy && partnerOnline);
   $('hChip').hidden = !(!decoy && partnerOnline && v.sub && !typing);
   if (typing) { hs.className = 'hs typing'; hs.textContent = 'sedang mengetik…'; }
-  else if (v.sub) { hs.className = 'hs love'; hs.textContent = v.sub; }
+  else if (v.sub && !(!decoy && !partnerOnline && partnerLastSeen)) { hs.className = 'hs love'; hs.textContent = v.sub; }
+  else if (!decoy && !partnerOnline && partnerLastSeen) { hs.className = 'hs seen'; hs.textContent = 'terakhir online ' + fmtLastSeen(partnerLastSeen); }
   else { hs.className = 'hs'; hs.textContent = partnerOnline ? 'online' : 'offline'; }
   const showT = typing && !decoy ? true : typing;
   $('typing').classList.toggle('on', showT);
@@ -1097,6 +1124,26 @@ function ensureClient(quiet) {
   return sb;
 }
 function scheduleSync(ms) { clearTimeout(syncTimer); syncTimer = setTimeout(sync, ms || 250); }
+/* ---------- Terakhir online (last seen) ----------
+   Disimpan di tabel 'user_presence' (id, last_seen) — lihat catatan SQL di akhir file.
+   upsertPresence(): kabari server "aku baru aktif barusan". loadLastSeen(): tanya kapan
+   pasangan terakhir aktif. Kedua fungsi diam-diam gagal (try/catch) jika tabelnya belum
+   dibuat, supaya fitur lain tidak ikut rusak. */
+async function upsertPresence() {
+  if (decoy || !me || presenceBusy || !ensureClient(true)) return;
+  presenceBusy = true;
+  try { await sb.from('user_presence').upsert({ id: me, last_seen: iso() }); } catch (e) {}
+  finally { presenceBusy = false; }
+}
+async function loadLastSeen() {
+  if (decoy || !me || !partner || !ensureClient(true)) return;
+  try {
+    const { data, error } = await sb.from('user_presence').select('last_seen').eq('id', partner).maybeSingle();
+    if (error || !data || !data.last_seen) return;
+    const t = +new Date(data.last_seen);
+    if (t !== partnerLastSeen) { partnerLastSeen = t; updateHeader(); }
+  } catch (e) {}
+}
 let errShown = false;
 async function sync() {
   if (decoy || !me) return;
@@ -1106,7 +1153,7 @@ async function sync() {
   const myRoom = room;
   try {
     const nowI = iso();
-    const cols = 'id,room,sender,kind,reply_to,created_at,expires_at,read_at,viewed_at,photo_gone,view_count';
+    const cols = 'id,room,sender,kind,reply_to,created_at,expires_at,read_at,delivered_at,viewed_at,photo_gone,view_count';
     const [t, i] = await Promise.all([
       sb.from('messages').select(cols + ',body').eq('room', myRoom).eq('kind', 'text').gt('expires_at', nowI).order('created_at', { ascending: true }).limit(600),
       sb.from('messages').select(cols).eq('room', myRoom).eq('kind', 'image').gt('expires_at', nowI).order('created_at', { ascending: true }).limit(200)
@@ -1125,13 +1172,21 @@ async function sync() {
         if (body === undefined) { try { body = await dec(r.body); } catch (e) { body = 'Pesan tidak bisa dibuka'; } textCache.set(r.id, body); }
       }
       const old = byId.get(r.id), m = Object.assign({}, r, { body, pending: false, failed: false, localAt: old ? old.localAt : 0 });
-      if (old) { if (old.viewed_at && !m.viewed_at) m.viewed_at = old.viewed_at; if (old.photo_gone) m.photo_gone = true; if ((old.view_count || 0) > (m.view_count || 0)) m.view_count = old.view_count; }
+      if (old) { if (old.viewed_at && !m.viewed_at) m.viewed_at = old.viewed_at; if (old.delivered_at && !m.delivered_at) m.delivered_at = old.delivered_at; if (old.photo_gone) m.photo_gone = true; if ((old.view_count || 0) > (m.view_count || 0)) m.view_count = old.view_count; }
       out.push(m);
     }
     for (const m of msgs) if (!ids.has(m.id) && (m.pending || m.failed || Date.now() - (m.localAt || 0) < 8000)) out.push(m);
     out.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
     const fresh = out.filter(m => !prevIds.has(m.id) && m.sender === partner);
     msgs = out;
+    // Pesan dari pasangan yang baru "tiba" di perangkat ini -> tandai sudah diterima
+    // (terpisah dari "sudah dibaca", yang baru terjadi saat ruang benar-benar dibuka).
+    const delIds = msgs.filter(m => m.sender === partner && !m.delivered_at && !m.pending && !m.failed).map(m => m.id);
+    if (delIds.length) {
+      const td = iso();
+      msgs.forEach(m => { if (delIds.includes(m.id)) m.delivered_at = td; });
+      sb.from('messages').update({ delivered_at: td }).in('id', delIds).is('delivered_at', null).then(() => {});
+    }
     if (!firstSync && fresh.length) { tone([880, 1175]); vib(12); if (!stick) { unread += fresh.length; updateFab(); } }
     firstSync = false;
     render();
@@ -1205,10 +1260,15 @@ function forceFullRerender() {
 
 function connectRealtime() {
   if (decoy || !ensureClient()) return;
+  loadLastSeen(); upsertPresence();
   chan = sb.channel('ruang-' + room, { config: { private: !!CONFIG.PRIVATE_CHANNELS, presence: { key: me }, broadcast: { self: false } } });
   chan.on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, () => scheduleSync(200))
       .on('postgres_changes', { event: '*', schema: 'public', table: 'names' }, () => loadNames())
-      .on('presence', { event: 'sync' }, () => { partnerOnline = !!chan.presenceState()[partner]; updateHeader(); })
+      .on('presence', { event: 'sync' }, () => {
+        const nowOnline = !!chan.presenceState()[partner];
+        if (partnerOnline && !nowOnline) { partnerLastSeen = Date.now(); setTimeout(loadLastSeen, 1200); } // pakai patokan kasar dulu, lalu selaraskan ke server
+        partnerOnline = nowOnline; updateHeader();
+      })
       .on('broadcast', { event: 'typing' }, ({ payload }) => {
         if (payload && payload.u === partner) { typingUntil = Date.now() + 3500; updateHeader(); setTimeout(updateHeader, 3600); }
       })
@@ -1243,7 +1303,7 @@ async function sendText() {
   const b = $('btnSend'); b.classList.remove('fly'); void b.offsetWidth; b.classList.add('fly');
   vib(8); tone([660, 880]);
   const now = Date.now();
-  const m = { id: uid(), room, sender: me, kind: 'text', body: v, reply_to: rt, created_at: iso(now), expires_at: iso(now + TTL_MS), read_at: null, viewed_at: null, photo_gone: false, pending: true, localAt: now };
+  const m = { id: uid(), room, sender: me, kind: 'text', body: v, reply_to: rt, created_at: iso(now), expires_at: iso(now + TTL_MS), read_at: null, delivered_at: null, viewed_at: null, photo_gone: false, pending: true, localAt: now };
   msgs.push(m); textCache.set(m.id, v); render({ scroll: true, smooth: true });
   await pushText(m);
 }
@@ -1292,7 +1352,7 @@ $('pvSend').addEventListener('click', async () => {
   pendingPhoto = null; $('pv').classList.remove('open');
   const rt = replyTo; cancelReply();
   const now = Date.now();
-  const m = { id: uid(), room, sender: me, kind: 'image', body: null, reply_to: rt, created_at: iso(now), expires_at: iso(now + TTL_MS), read_at: null, viewed_at: null, photo_gone: false, view_count: 0, pending: true, localAt: now, _data: data };
+  const m = { id: uid(), room, sender: me, kind: 'image', body: null, reply_to: rt, created_at: iso(now), expires_at: iso(now + TTL_MS), read_at: null, delivered_at: null, viewed_at: null, photo_gone: false, view_count: 0, pending: true, localAt: now, _data: data };
   msgs.push(m); render({ scroll: true, smooth: true }); vib(10); tone([660, 880]);
   await pushPhoto(m);
 });
@@ -1630,7 +1690,7 @@ function switchRoom(r) {
   if (chan && sb) { try { sb.removeChannel(chan); } catch (e) {} }
   chan = null; rtOk = false;
   msgs = []; seen = new Set(); lastSig = ''; firstRender = true; firstSync = true; stick = true; unread = 0;
-  partnerOnline = false; typingUntil = 0; ta.value = ''; autosize(); updateSendBtn(); cancelReply();
+  partnerOnline = false; partnerLastSeen = 0; typingUntil = 0; ta.value = ''; autosize(); updateSendBtn(); cancelReply();
   updateHeader(); updateTabs(); render({ force: true });
   list.classList.remove('swap'); void list.offsetWidth; list.classList.add('swap');
   connectRealtime(); sync();
@@ -2110,7 +2170,7 @@ async function authLogin(pw) {
 function enterChat() {
   if (decoy) { enterPoems(); tickT = setInterval(() => { if (me) touch(); }, 15000); return; }   // sandi palsu: tampilan puisi
   msgs = []; seen = new Set(); textCache = new Map(); lastSig = ''; firstRender = true; firstSync = true; stick = true; unread = 0; errShown = false;
-  partnerOnline = false; typingUntil = 0; ta.value = ''; autosize(); updateSendBtn();
+  partnerOnline = false; partnerLastSeen = 0; typingUntil = 0; ta.value = ''; autosize(); updateSendBtn();
   updateHeader(); updateTabs(); render({ force: true });
   sync(); connectRealtime(); loadNames(); pollT = setInterval(() => { if (!document.hidden) sync(); }, 5000);
   tickT = setInterval(() => {
@@ -2118,7 +2178,11 @@ function enterChat() {
     const now = Date.now(), before = msgs.length;
     msgs = msgs.filter(m => new Date(m.expires_at) > now || m.pending);
     render({ force: msgs.length !== before });
-    if (!decoy) { maintain(); loadNames(); }
+    if (!decoy) {
+      maintain(); loadNames();
+      if (!document.hidden) upsertPresence();   // "detak jantung" — aku masih aktif barusan
+      if (!partnerOnline) loadLastSeen();        // selaraskan teks "terakhir online" secara berkala
+    }
   }, 15000);}
 function teardown() {
   clearInterval(pollT); clearInterval(tickT); clearTimeout(syncTimer);
@@ -2145,6 +2209,7 @@ function lockApp() {
   teardown(); localStorage.removeItem('sk_sess'); hidePushAsk();
   killSession(burning ? 1500 : 0); // beri waktu foto sekali-lihat terhapus dulu
   me = null; partner = null; room = null; msgs = []; list.innerHTML = ''; updateTabs(); shieldOff = false;
+  partnerOnline = false; partnerLastSeen = 0;
   $('chat').classList.remove('show'); $('poems').classList.remove('show'); poemsReset();
   const lg = $('login'); lg.classList.remove('hide', 'unlocking'); $('pw').value = ''; $('pw').type = 'password'; $('eye').innerHTML = I.eye;
   const box = lg.querySelector('.lg'); box.style.animation = 'none'; void box.offsetWidth; box.style.animation = '';
@@ -2195,12 +2260,14 @@ shield.addEventListener('pointerdown', shieldDown);
 window.addEventListener('blur', shieldUp);
 window.addEventListener('focus', shieldDown);
 window.addEventListener('pagehide', shieldUp);
+window.addEventListener('pagehide', () => { if (me && !decoy) upsertPresence(); });
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     hiddenAt = Date.now(); touch(); shieldUp();
     if (V && !V.isEr && !V.mine) closeViewer(false);
     closeCamera();
     if (chan) { try { chan.untrack(); } catch (e) {} }
+    if (me && !decoy) upsertPresence(); // catat momen persis saat menyingkir, buat "terakhir online" pasangan
   } else {
     shieldDown();
     if (me && Date.now() - hiddenAt > CONFIG.LOCK_AFTER_MS) lockApp();
