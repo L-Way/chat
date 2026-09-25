@@ -4,10 +4,10 @@
    - Permintaan ke Supabase TIDAK pernah disentuh: selalu langsung ke jaringan
    - Notifikasi push: teks generik (isi pesan tidak pernah dikirim), digabung per ruang, dengan lencana ikon
    Naikkan VERSION jika daftar SHELL berubah. */
-const VERSION = 'rk-v2';
+const VERSION = 'rk-v4';
 // Teks notifikasi ditetapkan DI SINI (bukan dari server), sama untuk pesan dari siapa pun.
-const NOTIF_TITLE = 'Puisi Cinta';
-const NOTIF_TEXT = 'Ada puisi baru hari ini?';
+const NOTIF_TITLE = 'Puisi';
+const NOTIF_TEXT = 'Ada quote baru hari ini?';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png', 'icons/badge-96.png'];
 const CDN = ['cdn.jsdelivr.net', 'fonts.googleapis.com', 'fonts.gstatic.com'];
 
