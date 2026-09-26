@@ -20,7 +20,7 @@
 <style>
 :root{
   --bg:#0c0911;--bg2:#140f1c;--surface:#1b1425;--surface2:#261c34;--line:rgba(255,255,255,.07);
-  --text:#f7eefa;--muted:#a394b1;--rose:#ff5c8a;--rose2:#ff8fab;--violet:#b86bff;--ok:#5be3a1;--danger:#ff6b81;
+  --text:#f7eefa;--muted:#a394b1;--rose:#ff5c8a;--rose2:#ff8fab;--rosemid:#e0459f;--violet:#b86bff;--ok:#5be3a1;--danger:#ff6b81;
   --ease:cubic-bezier(.22,1,.36,1);--spring:cubic-bezier(.34,1.56,.64,1);
   --sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);
   --font:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
@@ -134,7 +134,7 @@ section{position:absolute;inset:0}
 .row.me{justify-content:flex-end}
 .row:not(.first){margin-top:2px}
 .b{position:relative;max-width:78%;padding:7px 11px 5px;font-size:14px;line-height:1.4;white-space:pre-wrap;overflow-wrap:anywhere;border-radius:17px}
-.me .b{background:linear-gradient(135deg,#ff5c8a,#e0459f 60%,#b455e6);color:#fff;box-shadow:0 4px 14px rgba(224,69,159,.22)}
+.me .b{background:linear-gradient(135deg,var(--rose),var(--rosemid) 60%,var(--violet));color:#fff;box-shadow:0 4px 14px rgba(224,69,159,.22)}
 .them .b{background:var(--surface2);color:var(--text);border:1px solid var(--line)}
 .me:not(.first) .b{border-top-right-radius:7px}.me:not(.last) .b{border-bottom-right-radius:7px}.me.last .b{border-bottom-right-radius:5px}
 .them:not(.first) .b{border-top-left-radius:7px}.them:not(.last) .b{border-bottom-left-radius:7px}.them.last .b{border-bottom-left-radius:5px}
@@ -187,6 +187,22 @@ section{position:absolute;inset:0}
 @keyframes popin{from{opacity:0;transform:translateY(16px) scale(.6)}60%{opacity:1}to{opacity:1;transform:none}}
 @keyframes pop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
 .b.photo{padding:3px}
+.react-chip{position:absolute;bottom:-11px;z-index:3;display:flex;align-items:center;padding:1.5px 7px;border-radius:99px;font-size:12.5px;line-height:1.5;background:var(--surface2);border:1px solid var(--line);box-shadow:0 3px 8px rgba(0,0,0,.35);pointer-events:none;white-space:nowrap}
+.me .react-chip{right:9px}
+.them .react-chip{left:9px}
+.react-bar{display:flex;justify-content:space-between;gap:2px;padding:8px 2px 14px}
+.react-op{flex:1;font-size:23px;padding:8px 0;border-radius:14px;line-height:1;transition:transform .15s var(--spring),background .15s}
+.react-op:active{transform:scale(.82)}
+.react-op.on{background:rgba(255,92,138,.18)}
+.theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:4px 0 14px}
+.theme-op{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 4px;border-radius:14px;border:1.5px solid var(--line);font-size:11.5px;color:var(--muted);transition:transform .15s var(--spring),border-color .15s,color .15s}
+.theme-op.on{border-color:var(--sw1);color:var(--text)}
+.theme-op:active{transform:scale(.93)}
+.theme-dot{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--sw1),var(--sw2));box-shadow:0 3px 10px rgba(0,0,0,.35)}
+.dnd-row{display:flex;align-items:center;gap:10px;padding:8px 2px 14px;font-size:14px}
+.dnd-row input[type=checkbox]{width:18px;height:18px;accent-color:var(--rose)}
+.dnd-times{display:flex;gap:10px;margin-top:4px}
+.dnd-times>div{flex:1}
 .ph{position:relative;overflow:hidden;width:min(50vw,190px);height:min(56vw,215px);border-radius:15px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:12px}
 .ph.lock{cursor:pointer;background:radial-gradient(120% 90% at 15% 8%,#6b2f7e,transparent 60%),radial-gradient(100% 80% at 92% 92%,#a3305f,transparent 55%),#1c1327;transition:transform .2s var(--spring)}
 .ph.lock:active{transform:scale(.97)}
@@ -213,7 +229,7 @@ section{position:absolute;inset:0}
 .apbtn .ic{width:14px;height:14px}
 .apwave{position:relative;flex:1;height:26px;min-width:60px;border-radius:99px;background:rgba(255,255,255,.14);overflow:hidden;cursor:pointer}
 .apfill{position:absolute;left:0;top:0;bottom:0;width:0%;background:rgba(255,255,255,.4);border-radius:99px;pointer-events:none}
-.them .apfill{background:linear-gradient(90deg,#ff5c8a,#b86bff)}
+.them .apfill{background:linear-gradient(90deg,var(--rose),var(--violet))}
 .aptime{flex:none;font-size:11px;opacity:.85;font-variant-numeric:tabular-nums;min-width:32px;text-align:right}
 .b.tomb{background:transparent!important;box-shadow:none!important;border:1px dashed rgba(255,255,255,.16)!important;color:var(--muted);font-size:13px;display:flex;align-items:center;gap:8px;padding:9px 14px}
 .b.tomb .ic{width:16px;height:16px}
@@ -269,7 +285,7 @@ section{position:absolute;inset:0}
 .rectime{font-variant-numeric:tabular-nums;color:var(--text)}
 .sendb{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#7d6f8b;background:var(--surface);border:1.5px solid var(--line);transition:transform .35s var(--spring),background .3s,color .3s,box-shadow .3s}
 .sendb .ic{transition:transform .4s var(--spring);width:18px;height:18px}
-.sendb.on{color:#fff;background:linear-gradient(135deg,#ff5c8a,#b455e6);border-color:transparent;box-shadow:0 6px 20px rgba(255,92,138,.45);transform:scale(1.06)}
+.sendb.on{color:#fff;background:linear-gradient(135deg,var(--rose),var(--violet));border-color:transparent;box-shadow:0 6px 20px rgba(255,92,138,.45);transform:scale(1.06)}
 .sendb.on .ic{transform:translate(1px,-1px) rotate(0)}
 .sendb:active{transform:scale(.88)}
 .sendb.fly .ic{animation:fly .55s var(--ease)}
@@ -540,6 +556,8 @@ section{position:absolute;inset:0}
   2b2) Jalankan juga sekali di SQL Editor (untuk fitur "pesan ke Er dihapus, tapi baru
        benar-benar hilang di sisi Er beberapa menit setelah dia membaca"nya):
       alter table public.messages add column if not exists delete_req_at timestamptz;
+  2b3) Jalankan juga sekali di SQL Editor (untuk fitur reaksi emoji cepat pada pesan):
+      alter table public.messages add column if not exists reactions jsonb not null default '{}'::jsonb;
   2c) Jalankan juga fungsi view_photo.sql di SQL Editor (menghitung + mengecek batas lihat
       secara atomik di server, agar batas 5x tidak bisa terlewati saat foto dibuka nyaris
       bersamaan dari 2 perangkat/tab). Lihat file view_photo.sql yang disertakan.
@@ -815,6 +833,69 @@ const ER_MS = CONFIG.ER_PHOTO_MIN * 60000;
 const ER_DELETE_MS = CONFIG.ER_DELETE_MIN * 60000;
 const PARTNER_PHOTO_MS = CONFIG.PARTNER_PHOTO_MAX_MIN * 60000;
 const TTL_MS = CONFIG.MSG_TTL_H * 3600000;
+
+/* ---------- Tema warna per ruang (tersimpan di perangkat, bukan di server) ---------- */
+const THEMES = {
+  rose:    { name: 'Rose',    rose: '#ff5c8a', rose2: '#ff8fab', rosemid: '#e0459f', violet: '#b86bff' },
+  sunset:  { name: 'Sunset',  rose: '#ff7a45', rose2: '#ffb677', rosemid: '#ef5da8', violet: '#ffcf6b' },
+  ocean:   { name: 'Ocean',   rose: '#3ea6ff', rose2: '#7fd1ff', rosemid: '#3e7bff', violet: '#5be3a1' },
+  grape:   { name: 'Grape',   rose: '#a85cff', rose2: '#c79bff', rosemid: '#8a3fe0', violet: '#5c7bff' },
+  mint:    { name: 'Mint',    rose: '#1fbf82', rose2: '#7de8bd', rosemid: '#18b37c', violet: '#5be3a1' },
+  crimson: { name: 'Crimson', rose: '#ff3860', rose2: '#ff7a94', rosemid: '#c81f4d', violet: '#ff8a5c' },
+};
+function themeKeyFor(r) { try { return localStorage.getItem('sk_theme_' + r) || 'rose'; } catch (e) { return 'rose'; } }
+function applyTheme(key) {
+  const t = THEMES[key] || THEMES.rose, s = document.documentElement.style;
+  s.setProperty('--rose', t.rose); s.setProperty('--rose2', t.rose2);
+  s.setProperty('--rosemid', t.rosemid); s.setProperty('--violet', t.violet);
+}
+function setThemeFor(r, key) {
+  try { localStorage.setItem('sk_theme_' + r, key); } catch (e) {}
+  if (r === room) applyTheme(key);
+}
+function themeForm() {
+  if (decoy) return;
+  const cur = themeKeyFor(room);
+  const sw = Object.entries(THEMES).map(([k, t]) => `<button type="button" class="theme-op${k === cur ? ' on' : ''}" data-act="themeset" data-key="${k}" style="--sw1:${t.rose};--sw2:${t.violet}"><span class="theme-dot"></span><span>${esc(t.name)}</span></button>`).join('');
+  openSheet(`<div class="sh-t">Tema warna</div><p class="sh-p">Ganti warna aksen obrolan ini. Cuma tersimpan di HP ini, tidak memengaruhi pasanganmu.</p><div class="theme-grid">${sw}</div><div class="acts"><button class="btn ghost" data-act="close">Tutup</button></div>`);
+}
+
+/* ---------- Mode senyap terjadwal (bisukan suara/getar pesan baru di jam tertentu) ---------- */
+function dndGet() {
+  try {
+    const v = JSON.parse(localStorage.getItem('sk_dnd') || 'null');
+    if (v && typeof v.on === 'boolean' && Number.isFinite(v.startMin) && Number.isFinite(v.endMin)) return v;
+  } catch (e) {}
+  return { on: false, startMin: 22 * 60, endMin: 7 * 60 };
+}
+function dndSet(v) { try { localStorage.setItem('sk_dnd', JSON.stringify(v)); } catch (e) {} }
+function fmtHM(mins) { const h = Math.floor(mins / 60) % 24, m = mins % 60; return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0'); }
+function dndLabel() { const d = dndGet(); return d.on ? `${fmtHM(d.startMin)}–${fmtHM(d.endMin)}` : 'Mati'; }
+function isQuietNow() {
+  const d = dndGet(); if (!d.on) return false;
+  const now = new Date(), mins = now.getHours() * 60 + now.getMinutes();
+  if (d.startMin === d.endMin) return true; // rentang 24 jam penuh
+  if (d.startMin < d.endMin) return mins >= d.startMin && mins < d.endMin;
+  return mins >= d.startMin || mins < d.endMin; // rentang lewat tengah malam, mis. 22.00–07.00
+}
+function dndForm() {
+  const d = dndGet();
+  openSheet(`<div class="sh-t">Mode senyap terjadwal</div><p class="sh-p">Selama jam ini, suara &amp; getar pesan baru dibisukan otomatis di HP ini. Centang/tanda terkirim &amp; dibaca tetap berjalan seperti biasa.</p>
+    <label class="dnd-row"><input type="checkbox" id="dndOn"${d.on ? ' checked' : ''}><span>Aktifkan mode senyap</span></label>
+    <div class="dnd-times">
+      <div><label class="fld-lbl">Mulai</label><input class="fld" id="dndStart" type="time" value="${fmtHM(d.startMin)}"></div>
+      <div><label class="fld-lbl">Sampai</label><input class="fld" id="dndEnd" type="time" value="${fmtHM(d.endMin)}"></div>
+    </div>
+    <div class="acts"><button class="btn ghost" data-act="close">Batal</button><button class="btn cta" data-act="dndsave">Simpan</button></div>`);
+}
+function saveDnd() {
+  const on = $('dndOn').checked;
+  const sv = $('dndStart').value || '22:00', ev = $('dndEnd').value || '07:00';
+  const [sh, sm] = sv.split(':').map(Number), [eh, em] = ev.split(':').map(Number);
+  if ([sh, sm, eh, em].some(n => !Number.isFinite(n))) return;
+  dndSet({ on, startMin: sh * 60 + sm, endMin: eh * 60 + em });
+  closeSheet(); toast(on ? 'Mode senyap diaktifkan' : 'Mode senyap dimatikan');
+}
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() :
   'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random()*16|0; return (c==='x'?r:(r&3|8)).toString(16); }));
 
@@ -853,7 +934,8 @@ const I = {
   pause: P('<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>', 'f'),
   call:  P('<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>'),
   vcam:  P('<rect x="2" y="6" width="15" height="12" rx="2"/><path d="m22 8-5 4 5 4V8z"/>'),
-  vcamoff:P('<rect x="2" y="6" width="15" height="12" rx="2"/><path d="m22 8-5 4 5 4V8z"/><path d="M2 2l20 20"/>')
+  vcamoff:P('<rect x="2" y="6" width="15" height="12" rx="2"/><path d="m22 8-5 4 5 4V8z"/><path d="M2 2l20 20"/>'),
+  palette:P('<path d="M12 22a10 10 0 1 1 0-20 8 8 0 0 1 8 8c0 2-1 3-3 3h-2a2 2 0 0 0-1 3.7A2 2 0 0 1 12 22z"/><circle cx="7.3" cy="10.8" r="1.3" fill="currentColor" stroke="none"/><circle cx="10.3" cy="7" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.2" cy="7.8" r="1.3" fill="currentColor" stroke="none"/><circle cx="16.7" cy="12.3" r="1.3" fill="currentColor" stroke="none"/>')
 };
 
 /* ---------- SHA-256 (cadangan jika crypto.subtle tidak tersedia) ---------- */
@@ -999,10 +1081,11 @@ function connEval() {
       connShown = false;
       setConnBar('ok', 'Tersambung kembali');
       clearTimeout(connOkTimer); connOkTimer = setTimeout(() => setConnBar(''), 1800);
+      retryFailed(); // koneksi baru pulih — coba kirim ulang pesan yang tadi gagal
     }
   }
 }
-window.addEventListener('online', connEval);
+window.addEventListener('online', () => { connEval(); retryFailed(); });
 window.addEventListener('offline', connEval);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) connEval(); });
 function burst(x, y, colors) {
@@ -1072,10 +1155,19 @@ function quoteSig(m) {
   if (!o) return deletedIds.has(m.reply_to) ? 'd' : 'x';
   return '1' + (o.photo_gone ? 'g' : '');
 }
+function reactSig(m) {
+  const r = m.reactions || {};
+  return Object.keys(r).sort().map(k => k + r[k]).join('');
+}
+function reactChip(m) {
+  const vals = Object.values(m.reactions || {}).filter(Boolean);
+  if (!vals.length) return '';
+  return `<span class="react-chip">${vals.join(' ')}</span>`;
+}
 function rowSig(m, first, last, day) {
   const left = new Date(m.expires_at) - Date.now();
   const leftMin = (!decoy && left < 3600000 && left > 0) ? Math.max(1, Math.ceil(left / 60000)) : 0;
-  return [m.read_at ? 1 : 0, m.delivered_at ? 1 : 0, m.viewed_at ? 1 : 0, m.photo_gone ? 1 : 0, m.pending ? 1 : 0, m.failed ? 1 : 0, (m.body || '').length, first ? 1 : 0, last ? 1 : 0, day, leftMin, m._fresh ? 1 : 0, m.reply_to || '', m.view_count || 0, quoteSig(m)].join('.');
+  return [m.read_at ? 1 : 0, m.delivered_at ? 1 : 0, m.viewed_at ? 1 : 0, m.photo_gone ? 1 : 0, m.pending ? 1 : 0, m.failed ? 1 : 0, (m.body || '').length, first ? 1 : 0, last ? 1 : 0, day, leftMin, m._fresh ? 1 : 0, m.reply_to || '', m.view_count || 0, quoteSig(m), reactSig(m)].join('.');
 }
 function rowHTML(m, first, last, enter, delay) {
   const mine = m.sender === me, now = Date.now();
@@ -1089,12 +1181,12 @@ function rowHTML(m, first, last, enter, delay) {
   const nm = `<span class="nm">${esc(nameOf(m))}</span>`;
   const rbtn = (m.pending || m.failed) ? '' : `<button type="button" class="rbtn" data-reply="${m.id}" aria-label="Balas pesan">${I.reply}</button>`;
   if (m.kind === 'text') {
-    return `<div class="${cls}" data-id="${m.id}"${st}>${rico}<div class="b${m.failed ? ' failed' : ''}">${nm}${q}${esc(m.body || '')}${meta}${rbtn}</div></div>`;
+    return `<div class="${cls}" data-id="${m.id}"${st}>${rico}<div class="b${m.failed ? ' failed' : ''}">${nm}${q}${esc(m.body || '')}${meta}${rbtn}${reactChip(m)}</div></div>`;
   }
   if (m.kind === 'audio') {
     let a; try { a = JSON.parse(m.body || '{}'); } catch (e) { a = {}; }
     const dur = a.dur || 0, src = a.data || '';
-    return `<div class="${cls}" data-id="${m.id}"${st}>${rico}<div class="b audio${m.failed ? ' failed' : ''}">${nm}${q}<div class="aud" data-mid="${m.id}" data-dur="${dur}"><button type="button" class="apbtn" data-aplay="${m.id}" aria-label="Putar pesan suara">${I.play}</button><div class="apwave" data-aseek="${m.id}"><div class="apfill"></div></div><span class="aptime">${fmtCount(dur * 1000)}</span><audio preload="metadata" data-a="${m.id}" src="${src}"></audio></div>${meta}${rbtn}</div></div>`;
+    return `<div class="${cls}" data-id="${m.id}"${st}>${rico}<div class="b audio${m.failed ? ' failed' : ''}">${nm}${q}<div class="aud" data-mid="${m.id}" data-dur="${dur}"><button type="button" class="apbtn" data-aplay="${m.id}" aria-label="Putar pesan suara">${I.play}</button><div class="apwave" data-aseek="${m.id}"><div class="apfill"></div></div><span class="aptime">${fmtCount(dur * 1000)}</span><audio preload="metadata" data-a="${m.id}" src="${src}"></audio></div>${meta}${rbtn}${reactChip(m)}</div></div>`;
   }
   // foto
   if (m.photo_gone) {
@@ -1105,14 +1197,14 @@ function rowHTML(m, first, last, enter, delay) {
     const canOpen = !m.pending && !m.failed;
     const label = m.pending ? 'Mengirim foto…' : (m.failed ? 'Gagal terkirim' : (seenIt ? 'Sudah dilihat · ketuk untuk pratinjau' : 'Terkirim, belum dibuka · ketuk untuk pratinjau'));
     const openAttr = canOpen ? ` data-open="${m.id}"` : '';
-    return `<div class="${cls}" data-id="${m.id}"${st}>${rico}<div class="b photo${m.failed ? ' failed' : ''}">${nm}${q}<div class="ph sent${seenIt ? ' seen' : ''}"${openAttr}><div class="lk">${m.pending ? I.clock : (seenIt ? I.eye : I.image)}</div><b>Foto</b><small>${label}</small></div>${meta}${rbtn}</div></div>`;
+    return `<div class="${cls}" data-id="${m.id}"${st}>${rico}<div class="b photo${m.failed ? ' failed' : ''}">${nm}${q}<div class="ph sent${seenIt ? ' seen' : ''}"${openAttr}><div class="lk">${m.pending ? I.clock : (seenIt ? I.eye : I.image)}</div><b>Foto</b><small>${label}</small></div>${meta}${rbtn}${reactChip(m)}</div></div>`;
   }
   let hint;
   if (me !== 'er') {
     const remain = Math.max(0, CONFIG.PARTNER_PHOTO_VIEWS - (m.view_count || 0));
     hint = m.viewed_at ? `Tersisa ${remain}x lagi` : `Bisa dilihat ${CONFIG.PARTNER_PHOTO_VIEWS}x`;
   } else hint = '';
-  return `<div class="${cls}" data-id="${m.id}"${st}>${rico}<div class="b photo">${nm}${q}<div class="ph lock" data-open="${m.id}"><div class="lk">${I.lock}</div><b>Ketuk untuk melihat foto</b>${hint ? `<small>${hint}</small>` : ''}</div>${meta}${rbtn}</div></div>`;
+  return `<div class="${cls}" data-id="${m.id}"${st}>${rico}<div class="b photo">${nm}${q}<div class="ph lock" data-open="${m.id}"><div class="lk">${I.lock}</div><b>Ketuk untuk melihat foto</b>${hint ? `<small>${hint}</small>` : ''}</div>${meta}${rbtn}${reactChip(m)}</div></div>`;
 }
 function render(opts) {
   try { renderInner(opts); }
@@ -1375,7 +1467,7 @@ async function sync() {
   const myRoom = room;
   try {
     const nowI = iso();
-    const cols = 'id,room,sender,kind,reply_to,created_at,expires_at,read_at,delivered_at,viewed_at,photo_gone,view_count,delete_req_at';
+    const cols = 'id,room,sender,kind,reply_to,created_at,expires_at,read_at,delivered_at,viewed_at,photo_gone,view_count,delete_req_at,reactions';
     const [t, i] = await Promise.all([
       sb.from('messages').select(cols + ',body').eq('room', myRoom).in('kind', ['text', 'audio']).gt('expires_at', nowI).order('created_at', { ascending: true }).limit(600),
       sb.from('messages').select(cols).eq('room', myRoom).eq('kind', 'image').gt('expires_at', nowI).order('created_at', { ascending: true }).limit(200)
@@ -1394,7 +1486,7 @@ async function sync() {
         body = textCache.get(r.id);
         if (body === undefined) { try { body = await dec(r.body); } catch (e) { body = r.kind === 'audio' ? '{}' : 'Pesan tidak bisa dibuka'; } textCache.set(r.id, body); }
       }
-      const old = byId.get(r.id), m = Object.assign({}, r, { body, pending: false, failed: false, localAt: old ? old.localAt : 0 });
+      const old = byId.get(r.id), m = Object.assign({}, r, { body, pending: false, failed: false, localAt: old ? old.localAt : 0, reactions: r.reactions || {} });
       if (old) { if (old.viewed_at && !m.viewed_at) m.viewed_at = old.viewed_at; if (old.delivered_at && !m.delivered_at) m.delivered_at = old.delivered_at; if (old.photo_gone) m.photo_gone = true; if ((old.view_count || 0) > (m.view_count || 0)) m.view_count = old.view_count; }
       out.push(m);
     }
@@ -1412,8 +1504,10 @@ async function sync() {
       sb.from('messages').update({ delivered_at: td }).in('id', delIds).is('delivered_at', null).then(r => { if (r.error) console.warn('[delivered_at] gagal update:', r.error.message || r.error); });
     }
     justDeliveredIds = new Set(delIds); // jangan langsung ditandai "dibaca" di siklus yang sama — beri jeda supaya status "diterima" sempat terlihat
-    if (!firstSync && fresh.length) { tone([880, 1175]); vib(12); if (!stick) { unread += fresh.length; updateFab(); } }
+    if (!firstSync && fresh.length) { if (!isQuietNow()) { tone([880, 1175]); vib(12); } if (!stick) { unread += fresh.length; updateFab(); } }
+    const wasFirstSync = firstSync;
     firstSync = false;
+    if (wasFirstSync) retryFailed(); // baru buka/pindah ruang: coba kirim ulang pesan yang sempat gagal saat terakhir ditutup
     render();
     maintain();
     if (me === 'er') checkOther();
@@ -1543,7 +1637,7 @@ async function sendText() {
   const b = $('btnSend'); b.classList.remove('fly'); void b.offsetWidth; b.classList.add('fly');
   vib(8); tone([660, 880]);
   const now = Date.now();
-  const m = { id: uid(), room, sender: me, kind: 'text', body: v, reply_to: rt, created_at: iso(now), expires_at: iso(now + TTL_MS), read_at: null, delivered_at: null, viewed_at: null, photo_gone: false, pending: true, localAt: now };
+  const m = { id: uid(), room, sender: me, kind: 'text', body: v, reply_to: rt, created_at: iso(now), expires_at: iso(now + TTL_MS), read_at: null, delivered_at: null, viewed_at: null, photo_gone: false, reactions: {}, pending: true, localAt: now };
   msgs.push(m); textCache.set(m.id, v); render({ scroll: true, smooth: true });
   await pushText(m);
 }
@@ -1592,7 +1686,7 @@ $('pvSend').addEventListener('click', async () => {
   pendingPhoto = null; $('pv').classList.remove('open');
   const rt = replyTo; cancelReply();
   const now = Date.now();
-  const m = { id: uid(), room, sender: me, kind: 'image', body: null, reply_to: rt, created_at: iso(now), expires_at: iso(now + TTL_MS), read_at: null, delivered_at: null, viewed_at: null, photo_gone: false, view_count: 0, pending: true, localAt: now, _data: data };
+  const m = { id: uid(), room, sender: me, kind: 'image', body: null, reply_to: rt, created_at: iso(now), expires_at: iso(now + TTL_MS), read_at: null, delivered_at: null, viewed_at: null, photo_gone: false, view_count: 0, reactions: {}, pending: true, localAt: now, _data: data };
   msgs.push(m); render({ scroll: true, smooth: true }); vib(10); tone([660, 880]);
   await pushPhoto(m);
 });
@@ -1666,7 +1760,7 @@ async function sendAudio(dataUrl, dur) {
   vib(8); tone([660, 880]);
   const now = Date.now();
   const payload = JSON.stringify({ data: dataUrl, dur });
-  const m = { id: uid(), room, sender: me, kind: 'audio', body: payload, reply_to: rt, created_at: iso(now), expires_at: iso(now + TTL_MS), read_at: null, delivered_at: null, viewed_at: null, photo_gone: false, pending: true, localAt: now };
+  const m = { id: uid(), room, sender: me, kind: 'audio', body: payload, reply_to: rt, created_at: iso(now), expires_at: iso(now + TTL_MS), read_at: null, delivered_at: null, viewed_at: null, photo_gone: false, reactions: {}, pending: true, localAt: now };
   msgs.push(m); textCache.set(m.id, payload); render({ scroll: true, smooth: true });
   await pushAudio(m);
 }
@@ -1682,6 +1776,17 @@ async function pushAudio(m) {
   } catch (e) { m.pending = false; m.failed = true; render({ force: true }); toast('Pesan suara gagal terkirim. Ketuk pesan untuk coba lagi.'); }
 }
 function audioEl(id) { return list.querySelector(`audio[data-a="${id}"]`); }
+// Kirim ulang otomatis pesan yang tadinya gagal terkirim (mis. karena koneksi putus),
+// dipanggil begitu koneksi pulih. Aman dipanggil berkali-kali: pesan yang sedang dalam
+// proses kirim (pending) dilewati supaya tidak terkirim dobel.
+function retryFailed() {
+  if (decoy || !me) return;
+  msgs.filter(m => m.failed && !m.pending && m.sender === me).forEach(m => {
+    if (m.kind === 'text') pushText(m);
+    else if (m.kind === 'audio') pushAudio(m);
+    else if (m.kind === 'image') pushPhoto(m);
+  });
+}
 function toggleAudio(id) {
   const el = audioEl(id); if (!el) return;
   if (curAudio && curAudio !== el) { try { curAudio.pause(); } catch (e) {} }
@@ -1819,7 +1924,13 @@ list.addEventListener('pointerup', endSwipe);
 list.addEventListener('pointercancel', endSwipe);
 function msgMenu(id) {
   const m = msgs.find(x => x.id === id); if (!m) return;
-  let html = `<button class="it" data-act="reply" data-id="${id}">${I.reply}<span>Balas pesan</span></button>`;
+  const REACT_EMOJI = ['❤️', '😂', '😮', '😢', '👍', '🔥'];
+  let html = '';
+  if (!m.pending && !m.failed) {
+    const mine = (m.reactions || {})[me] || '';
+    html += `<div class="react-bar">${REACT_EMOJI.map(em => `<button type="button" class="react-op${em === mine ? ' on' : ''}" data-act="react" data-id="${id}" data-emoji="${esc(em)}">${em}</button>`).join('')}</div>`;
+  }
+  html += `<button class="it" data-act="reply" data-id="${id}">${I.reply}<span>Balas pesan</span></button>`;
   if (m.kind === 'text' && m.body && !m.failed) html += `<button class="it" data-act="copymsg" data-id="${id}">${I.clip}<span>Salin teks</span></button>`;
   if (m.sender === me) html += `<button class="it dng" data-act="del" data-id="${id}">${I.trash}<span>Hapus pesan untuk semua</span></button>`;
   openSheet(html);
@@ -1829,6 +1940,14 @@ async function copyMsgText(id) {
   if (!m || m.kind !== 'text' || !m.body) return;
   const ok = await copyText(m.body);
   toast(ok ? 'Pesan disalin' : 'Gagal menyalin, coba lagi'); vib(ok ? 10 : [10, 30, 10]);
+}
+// Reaksi cepat (tapback) satu emoji per orang per pesan — tekan emoji yang sama lagi untuk membatalkan.
+async function setReaction(id, emoji) {
+  const m = msgs.find(x => x.id === id); if (!m || decoy) return;
+  const cur = Object.assign({}, m.reactions || {});
+  if (cur[me] === emoji) delete cur[me]; else cur[me] = emoji;
+  m.reactions = cur; render({ force: true });
+  try { await sb.from('messages').update({ reactions: cur }).eq('id', id); } catch (e) {}
 }
 // Hapus tuntas pesan teks/suara: hilang dari daftar, dari cache lokal, dan ditandai
 // terhapus di server (supaya perangkat lain — termasuk yang belum sync — ikut tahu).
@@ -2060,7 +2179,7 @@ async function checkOther() {
     const { data, error } = await sb.from('messages').select('id,kind,read_at,viewed_at,photo_gone').eq('room', other).eq('sender', other).gt('expires_at', iso());
     if (error || myRoom !== room) return;
     const n = data.filter(m => (m.kind === 'text' || m.kind === 'audio') ? !m.read_at : (!m.viewed_at && !m.photo_gone)).length;
-    if (n > badge[other]) { tone([880, 1175]); vib(12); toast('Ada pesan baru di obrolan lain'); }
+    if (n > badge[other]) { if (!isQuietNow()) { tone([880, 1175]); vib(12); } toast('Ada pesan baru di obrolan lain'); }
     badge[other] = n; updateTabs();
   } catch (e) {}
 }
@@ -2073,6 +2192,7 @@ function switchRoom(r) {
   chan = null; rtOk = false;
   msgs = []; seen = new Set(); lastSig = ''; firstRender = true; firstSync = true; stick = true; unread = 0;
   partnerOnline = false; partnerLastSeen = 0; lastSeenReady = false; typingUntil = 0; ta.value = ''; autosize(); updateSendBtn(); cancelReply();
+  applyTheme(themeKeyFor(r));
   updateHeader(); updateTabs(); render({ force: true });
   hydrateFromCache(r);
   list.classList.remove('swap'); void list.offsetWidth; list.classList.add('swap');
@@ -2171,6 +2291,8 @@ $('btnMenu').addEventListener('click', () => {
     <div class="who"><div class="av"><span>${esc(u.own[0])}</span></div><div><b>${esc(u.own)}</b><span>${decoy ? 'Terhubung' : 'Masuk dengan aman'}</span></div></div>
     <button class="it" data-act="lock">${I.lock}<span>Kunci sekarang</span></button>
     <button class="it" data-act="snd">${soundOn ? I.vol : I.mute}<span>Suara pesan</span><em>${soundOn ? 'Nyala' : 'Mati'}</em></button>
+    <button class="it" data-act="theme">${I.palette}<span>Tema warna</span></button>
+    ${decoy ? '' : `<button class="it" data-act="dnd">${I.bell}<span>Mode senyap terjadwal</span><em>${dndLabel()}</em></button>`}
     ${decoy ? '' : `<button class="it" data-act="push">${I.bell}<span>Notifikasi</span><em id="pushSt"></em></button>`}
     ${decoy ? '' : `<button class="it" data-act="pw">${I.key}<span>Ganti sandi</span></button>`}
     ${(!decoy && me === 'er') ? `<button class="it" data-act="names">${I.edit}<span>Ganti nama</span></button>` : ''}
@@ -2185,6 +2307,10 @@ $('shCard').addEventListener('click', async e => {
   else if (a === 'pick-camera') { closeSheet(); await wait(200); openCamera(); }
   else if (a === 'snd') { soundOn = !soundOn; localStorage.setItem('sk_snd', soundOn ? '1' : '0'); closeSheet(); toast(soundOn ? 'Suara dinyalakan' : 'Suara dimatikan'); if (soundOn) tone([880]); }
   else if (a === 'push') pushToggle();
+  else if (a === 'theme') themeForm();
+  else if (a === 'themeset') { setThemeFor(room, b.dataset.key); themeForm(); vib(8); }
+  else if (a === 'dnd') dndForm();
+  else if (a === 'dndsave') saveDnd();
   else if (a === 'pw') pwForm();
   else if (a === 'pwsave') savePw();
   else if (a === 'names') namesForm();
@@ -2193,6 +2319,7 @@ $('shCard').addEventListener('click', async e => {
   else if (a === 'copylock') copyAndLock(b.dataset.id);
   else if (a === 'discard') { closeSheet(); closeEditor(); }
   else if (a === 'del') deleteMsg(b.dataset.id);
+  else if (a === 'react') { closeSheet(); setReaction(b.dataset.id, b.dataset.emoji); }
   else if (a === 'reply') { closeSheet(); startReply(b.dataset.id); }
   else if (a === 'copymsg') copyMsgText(b.dataset.id);
   else if (a === 'wipeask') {
@@ -2555,6 +2682,7 @@ function enterChat() {
   if (decoy) { enterPoems(); tickT = setInterval(() => { if (me) touch(); }, 15000); return; }   // sandi palsu: tampilan puisi
   msgs = []; seen = new Set(); textCache = new Map(); lastSig = ''; firstRender = true; firstSync = true; stick = true; unread = 0; errShown = false;
   partnerOnline = false; partnerLastSeen = 0; lastSeenReady = false; typingUntil = 0; ta.value = ''; autosize(); updateSendBtn();
+  applyTheme(themeKeyFor(room));
   updateHeader(); updateTabs(); render({ force: true });
   hydrateFromCache(room);
   sync(); connectRealtime(); loadNames(); pollT = setInterval(() => { if (!document.hidden) sync(); }, 5000);
