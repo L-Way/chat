@@ -173,8 +173,8 @@ section{position:absolute;inset:0}
 .meta .ttl{color:#ffe08a}
 /* Status pesan: bulatan kecil — 1 abu (terkirim), 2 abu (diterima), 2 berwarna (dibaca) */
 .ticks{display:inline-flex;align-items:center;gap:2.5px;height:14px}
-.ticks i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.55);flex:none;transition:background .3s,box-shadow .3s,transform .25s var(--spring)}
-.ticks.read i{background:var(--ok);box-shadow:0 0 6px rgba(91,227,161,.75)}
+.ticks i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.55);box-shadow:0 0 0 1px rgba(0,0,0,.3);flex:none;transition:background .3s,box-shadow .3s,transform .25s var(--spring)}
+.ticks.read i{background:var(--ok);box-shadow:0 0 0 1px rgba(0,0,0,.32),0 0 6px rgba(91,227,161,.75)}
 .me .b:not(.failed) .ticks.read i{animation:tickPop .35s var(--spring)}
 @keyframes tickPop{0%{transform:scale(.4)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
 .ticks .ic{width:13px;height:13px;stroke-width:2.6}
@@ -302,7 +302,7 @@ section{position:absolute;inset:0}
 .dr-back{position:absolute;inset:0;background:rgba(6,4,10,0);-webkit-backdrop-filter:blur(0);backdrop-filter:blur(0);transition:background .4s var(--ease),backdrop-filter .4s,-webkit-backdrop-filter .4s}
 #drawer.open .dr-back{background:rgba(6,4,10,.66);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px)}
 .dr-panel{position:absolute;left:0;top:0;bottom:0;width:min(82vw,310px);display:flex;flex-direction:column;padding:calc(var(--sat) + 18px) 14px calc(var(--sab) + 18px);
-  background:linear-gradient(180deg,#1f1629 0%,#150f1e 100%);border-right:1px solid var(--line);border-radius:0 28px 28px 0;box-shadow:26px 0 70px rgba(0,0,0,.55);
+  background:linear-gradient(180deg,var(--surface2) 0%,var(--bg2) 100%);border-right:1px solid var(--line);border-radius:0 28px 28px 0;box-shadow:26px 0 70px rgba(0,0,0,.55);
   transform:translateX(-106%);transition:transform .5s var(--ease);touch-action:pan-y;overflow:hidden}
 .dr-panel::before{content:"";position:absolute;left:-40%;top:-20%;width:120%;height:60%;background:radial-gradient(closest-side,rgba(255,92,138,.16),transparent);pointer-events:none}
 #drawer.open .dr-panel{transform:none}
@@ -834,21 +834,27 @@ const ER_DELETE_MS = CONFIG.ER_DELETE_MIN * 60000;
 const PARTNER_PHOTO_MS = CONFIG.PARTNER_PHOTO_MAX_MIN * 60000;
 const TTL_MS = CONFIG.MSG_TTL_H * 3600000;
 
-/* ---------- Tema warna per ruang (tersimpan di perangkat, bukan di server) ---------- */
+/* ---------- Tema warna: kini menyeluruh (bubble, tombol, DAN latar/permukaan aplikasi) ----------
+   Catatan kontras: warna status kirim/terkirim/dibaca (--ok hijau, --danger merah) SENGAJA tidak
+   ikut diganti oleh tema apa pun, supaya laporan status pesan tetap jelas terlihat di tema manapun.
+   Warna aksen tiap tema juga dipilih agar tidak bentrok/nyaris sama dengan hijau --ok itu. */
 const THEMES = {
-  rose:    { name: 'Rose',    rose: '#ff5c8a', rose2: '#ff8fab', rosemid: '#e0459f', violet: '#b86bff' },
-  sunset:  { name: 'Sunset',  rose: '#ff7a45', rose2: '#ffb677', rosemid: '#ef5da8', violet: '#ffcf6b' },
-  ocean:   { name: 'Ocean',   rose: '#3ea6ff', rose2: '#7fd1ff', rosemid: '#3e7bff', violet: '#5be3a1' },
-  grape:   { name: 'Grape',   rose: '#a85cff', rose2: '#c79bff', rosemid: '#8a3fe0', violet: '#5c7bff' },
-  mint:    { name: 'Mint',    rose: '#1fbf82', rose2: '#7de8bd', rosemid: '#18b37c', violet: '#5be3a1' },
-  crimson: { name: 'Crimson', rose: '#ff3860', rose2: '#ff7a94', rosemid: '#c81f4d', violet: '#ff8a5c' },
+  rose:    { name: 'Rose',    rose: '#ff5c8a', rose2: '#ff8fab', rosemid: '#e0459f', violet: '#b86bff', bg: '#0c0911', bg2: '#140f1c', surface: '#1b1425', surface2: '#261c34', line: 'rgba(255,255,255,.07)' },
+  sunset:  { name: 'Sunset',  rose: '#ff7a45', rose2: '#ffb677', rosemid: '#ef5da8', violet: '#ffcf6b', bg: '#150d08', bg2: '#1f130c', surface: '#281a10', surface2: '#332214', line: 'rgba(255,180,120,.09)' },
+  ocean:   { name: 'Ocean',   rose: '#3ea6ff', rose2: '#8fd6ff', rosemid: '#4a8bff', violet: '#7c5cff', bg: '#070f16', bg2: '#0c1a24', surface: '#11212f', surface2: '#162c3d', line: 'rgba(130,200,255,.08)' },
+  grape:   { name: 'Grape',   rose: '#a85cff', rose2: '#c79bff', rosemid: '#8a3fe0', violet: '#5c7bff', bg: '#0e0a17', bg2: '#161022', surface: '#1e1730', surface2: '#281f3d', line: 'rgba(200,160,255,.09)' },
+  mint:    { name: 'Mint',    rose: '#14b8a6', rose2: '#7de8dd', rosemid: '#0f9c94', violet: '#38bdf8', bg: '#071313', bg2: '#0c1c1b', surface: '#112824', surface2: '#16332e', line: 'rgba(120,255,220,.08)' },
+  crimson: { name: 'Crimson', rose: '#ff3860', rose2: '#ff7a94', rosemid: '#c81f4d', violet: '#ff8a5c', bg: '#140609', bg2: '#1e0b0f', surface: '#271017', surface2: '#33151d', line: 'rgba(255,140,160,.09)' },
 };
+const THEME_VARS = ['rose', 'rose2', 'rosemid', 'violet', 'bg', 'bg2', 'surface', 'surface2', 'line'];
 function themeKeyFor(r) { try { return localStorage.getItem('sk_theme_' + r) || 'rose'; } catch (e) { return 'rose'; } }
 function applyTheme(key) {
   const t = THEMES[key] || THEMES.rose, s = document.documentElement.style;
-  s.setProperty('--rose', t.rose); s.setProperty('--rose2', t.rose2);
-  s.setProperty('--rosemid', t.rosemid); s.setProperty('--violet', t.violet);
+  THEME_VARS.forEach(k => s.setProperty('--' + k, t[k]));
 }
+// Kembalikan ke tampilan bawaan (dipakai saat masuk mode kamuflase/puisi & saat kunci layar),
+// supaya tema obrolan asli tidak pernah "bocor" ke tampilan lain.
+function resetTheme() { const s = document.documentElement.style; THEME_VARS.forEach(k => s.removeProperty('--' + k)); }
 function setThemeFor(r, key) {
   try { localStorage.setItem('sk_theme_' + r, key); } catch (e) {}
   if (r === room) applyTheme(key);
@@ -2679,7 +2685,7 @@ async function authLogin(pw) {
 }
 
 function enterChat() {
-  if (decoy) { enterPoems(); tickT = setInterval(() => { if (me) touch(); }, 15000); return; }   // sandi palsu: tampilan puisi
+  if (decoy) { resetTheme(); enterPoems(); tickT = setInterval(() => { if (me) touch(); }, 15000); return; }   // sandi palsu: tampilan puisi
   msgs = []; seen = new Set(); textCache = new Map(); lastSig = ''; firstRender = true; firstSync = true; stick = true; unread = 0; errShown = false;
   partnerOnline = false; partnerLastSeen = 0; lastSeenReady = false; typingUntil = 0; ta.value = ''; autosize(); updateSendBtn();
   applyTheme(themeKeyFor(room));
@@ -2724,6 +2730,7 @@ function lockApp() {
   killSession(burning ? 1500 : 0); // beri waktu foto sekali-lihat terhapus dulu
   me = null; partner = null; room = null; msgs = []; list.innerHTML = ''; updateTabs(); shieldOff = false;
   partnerOnline = false; partnerLastSeen = 0; lastSeenReady = false;
+  resetTheme();
   $('chat').classList.remove('show'); $('poems').classList.remove('show'); poemsReset();
   const lg = $('login'); lg.classList.remove('hide', 'unlocking'); $('pw').value = ''; $('pw').type = 'password'; $('eye').innerHTML = I.eye;
   const box = lg.querySelector('.lg'); box.style.animation = 'none'; void box.offsetWidth; box.style.animation = '';
