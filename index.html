@@ -537,6 +537,9 @@ section{position:absolute;inset:0}
   2) Jalankan setup.sql di SQL Editor.
   2b) Jalankan sekali di SQL Editor (untuk fitur batas 5x lihat foto kiriman Ganteng):
       alter table public.messages add column if not exists view_count integer not null default 0;
+  2b2) Jalankan juga sekali di SQL Editor (untuk fitur "pesan ke Er dihapus, tapi baru
+       benar-benar hilang di sisi Er beberapa menit setelah dia membaca"nya):
+      alter table public.messages add column if not exists delete_req_at timestamptz;
   2c) Jalankan juga fungsi view_photo.sql di SQL Editor (menghitung + mengecek batas lihat
       secara atomik di server, agar batas 5x tidak bisa terlewati saat foto dibuka nyaris
       bersamaan dari 2 perangkat/tab). Lihat file view_photo.sql yang disertakan.
@@ -758,7 +761,9 @@ const CONFIG = {
 
   MSG_TTL_H: 24,             // pesan hilang setelah (jam)
   ER_PHOTO_MIN: 60,          // foto untuk Er bertahan (menit) setelah dibuka
+  ER_DELETE_MIN: 2,          // pesan teks/suara yang dihapus pengirim ke Er: baru benar-benar hilang di sisi Er sekian menit SETELAH Er membacanya
   PARTNER_PHOTO_VIEWS: 5,    // foto kiriman Ganteng: maksimal berapa kali Saskia/Selpia boleh membukanya
+  PARTNER_PHOTO_MAX_MIN: 60, // foto kiriman Ganteng: kalau belum sampai dilihat 5x, otomatis terhapus juga setelah sekian menit sejak terkirim
   LOCK_AFTER_MS: 120000,     // otomatis terkunci jika ditinggal (ms)
 
   // Panggilan suara/video (WebRTC). STUN gratis Google cukup untuk kebanyakan jaringan;
@@ -807,6 +812,8 @@ const iso = t => new Date(t === undefined ? Date.now() : t).toISOString();
 const wait = ms => new Promise(r => setTimeout(r, ms));
 const vib = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (e) {} };
 const ER_MS = CONFIG.ER_PHOTO_MIN * 60000;
+const ER_DELETE_MS = CONFIG.ER_DELETE_MIN * 60000;
+const PARTNER_PHOTO_MS = CONFIG.PARTNER_PHOTO_MAX_MIN * 60000;
 const TTL_MS = CONFIG.MSG_TTL_H * 3600000;
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() :
   'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random()*16|0; return (c==='x'?r:(r&3|8)).toString(16); }));
@@ -939,6 +946,7 @@ function tone(freqs) {
    ===================================================================== */
 let me = null, partner = null, room = null, badge = { saskia: 0, selpia: 0 }, decoy = false, sb = null, chan = null, rtOk = false;
 let msgs = [], seen = new Set(), textCache = new Map();
+let justDeliveredIds = new Set(); // id pesan yang baru saja ditandai "diterima" pada siklus sync ini — ditunda dari "dibaca" 1 siklus
 let partnerOnline = false, typingUntil = 0, lastTypeSent = 0;
 let partnerLastSeen = 0, lastSeenReady = false, presenceBusy = false;
 let stick = true, unread = 0, lastSig = '', firstRender = true, firstSync = true;
@@ -1222,6 +1230,98 @@ function updateHeader() {
 }
 
 /* =====================================================================
+   Cache pesan lokal (IndexedDB)
+   Tujuan: saat obrolan dibuka/berpindah ruang, pesan langsung tampil dari
+   cache perangkat (tanpa menunggu jaringan), lalu sync() tetap jalan di
+   belakang layar untuk mengoreksi/menambah yang terbaru. Setiap kali sync()
+   berhasil, cache ruang itu ditulis ulang seluruhnya mengikuti daftar pesan
+   yang sah dari server — pesan yang sudah tidak ada di sana (dihapus,
+   kadaluarsa) otomatis ikut terbuang dari cache. Isi foto (data gambarnya)
+   sengaja TIDAK pernah disimpan di cache: sync() juga tidak pernah mengambil
+   isi foto, hanya metadatanya — jadi cache tetap kecil & cepat.
+   ===================================================================== */
+const CACHE_DB = 'sk_cache_v1', CACHE_STORE = 'msgs';
+let cacheDbP = null;
+function cacheDB() {
+  if (cacheDbP) return cacheDbP;
+  cacheDbP = new Promise((res, rej) => {
+    if (!window.indexedDB) { rej(new Error('no-idb')); return; }
+    try {
+      const req = indexedDB.open(CACHE_DB, 1);
+      req.onupgradeneeded = () => {
+        const db = req.result;
+        if (!db.objectStoreNames.contains(CACHE_STORE)) {
+          const os = db.createObjectStore(CACHE_STORE, { keyPath: 'id' });
+          os.createIndex('room', 'room', { unique: false });
+        }
+      };
+      req.onsuccess = () => res(req.result);
+      req.onerror = () => rej(req.error);
+    } catch (e) { rej(e); }
+  }).catch(e => { console.warn('[cache] IndexedDB tidak tersedia:', e); return null; });
+  return cacheDbP;
+}
+function cacheSanitize(m) {
+  // jangan simpan data sementara/berat: isi foto (_data belum terkirim) dan penanda animasi lokal
+  const c = Object.assign({}, m);
+  delete c._data; delete c._fresh;
+  if (c.kind === 'image') c.body = null;
+  return c;
+}
+async function cacheLoadRoom(r) {
+  try {
+    const db = await cacheDB(); if (!db) return [];
+    return await new Promise(res => {
+      const tx = db.transaction(CACHE_STORE, 'readonly'), idx = tx.objectStore(CACHE_STORE).index('room');
+      const out = [], req = idx.openCursor(IDBKeyRange.only(r));
+      req.onsuccess = e => { const c = e.target.result; if (c) { out.push(c.value); c.continue(); } else res(out); };
+      req.onerror = () => res([]);
+    });
+  } catch (e) { return []; }
+}
+async function cacheSaveRoom(r, list) {
+  try {
+    const db = await cacheDB(); if (!db) return;
+    const keep = new Set(list.map(m => m.id));
+    await new Promise(res => {
+      const tx = db.transaction(CACHE_STORE, 'readwrite'), os = tx.objectStore(CACHE_STORE), idx = os.index('room');
+      const req = idx.openCursor(IDBKeyRange.only(r));
+      req.onsuccess = e => {
+        const c = e.target.result;
+        if (c) { if (!keep.has(c.value.id)) c.delete(); c.continue(); }
+        else { list.forEach(m => os.put(cacheSanitize(m))); res(); }
+      };
+      req.onerror = () => res();
+      tx.onerror = () => res();
+    });
+  } catch (e) {}
+}
+async function cacheDeleteMsg(id) {
+  try { const db = await cacheDB(); if (!db) return; db.transaction(CACHE_STORE, 'readwrite').objectStore(CACHE_STORE).delete(id); } catch (e) {}
+}
+async function cacheClearRoom(r) {
+  try {
+    const db = await cacheDB(); if (!db) return;
+    const tx = db.transaction(CACHE_STORE, 'readwrite'), idx = tx.objectStore(CACHE_STORE).index('room');
+    const req = idx.openCursor(IDBKeyRange.only(r));
+    req.onsuccess = e => { const c = e.target.result; if (c) { c.delete(); c.continue(); } };
+  } catch (e) {}
+}
+// Tampilkan dulu pesan dari cache (kalau ada) sementara sync() ke server masih berjalan di
+// belakang layar — supaya obrolan langsung terisi seketika dibuka, bukan kosong menunggu jaringan.
+// Dibatalkan otomatis kalau ruang sudah berpindah lagi, atau kalau sync() sempat lebih dulu selesai.
+function hydrateFromCache(r) {
+  if (decoy) return;
+  cacheLoadRoom(r).then(cached => {
+    if (decoy || room !== r || !firstSync || !cached.length) return;
+    cached.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    cached.forEach(m => { if (m.kind === 'text' || m.kind === 'audio') textCache.set(m.id, m.body); });
+    msgs = cached;
+    render({ force: true });
+  });
+}
+
+/* =====================================================================
    Supabase: sinkronisasi
    ===================================================================== */
 function ensureClient(quiet) {
@@ -1275,7 +1375,7 @@ async function sync() {
   const myRoom = room;
   try {
     const nowI = iso();
-    const cols = 'id,room,sender,kind,reply_to,created_at,expires_at,read_at,delivered_at,viewed_at,photo_gone,view_count';
+    const cols = 'id,room,sender,kind,reply_to,created_at,expires_at,read_at,delivered_at,viewed_at,photo_gone,view_count,delete_req_at';
     const [t, i] = await Promise.all([
       sb.from('messages').select(cols + ',body').eq('room', myRoom).in('kind', ['text', 'audio']).gt('expires_at', nowI).order('created_at', { ascending: true }).limit(600),
       sb.from('messages').select(cols).eq('room', myRoom).eq('kind', 'image').gt('expires_at', nowI).order('created_at', { ascending: true }).limit(200)
@@ -1288,6 +1388,7 @@ async function sync() {
     const out = [];
     for (const r of rows) {
       if ((r.kind === 'text' || r.kind === 'audio') && r.photo_gone) { markDeleted(r.id); continue; } // pesan teks/suara yang sudah dihapus untuk semua — jangan ditampilkan sebagai bubble
+      if ((r.kind === 'text' || r.kind === 'audio') && r.delete_req_at && r.sender === me) { markDeleted(r.id); continue; } // sudah kuhapus sendiri; di sisi Er masih menunggu jeda baca sebelum benar-benar hilang
       let body = null;
       if (r.kind === 'text' || r.kind === 'audio') {
         body = textCache.get(r.id);
@@ -1301,14 +1402,16 @@ async function sync() {
     out.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
     const fresh = out.filter(m => !prevIds.has(m.id) && m.sender === partner);
     msgs = out;
+    cacheSaveRoom(myRoom, msgs); // tulis ulang cache ruang ini sesuai keadaan sah dari server (yang sudah tak ada ikut terbuang)
     // Pesan dari pasangan yang baru "tiba" di perangkat ini -> tandai sudah diterima
     // (terpisah dari "sudah dibaca", yang baru terjadi saat ruang benar-benar dibuka).
     const delIds = msgs.filter(m => m.sender === partner && !m.delivered_at && !m.pending && !m.failed).map(m => m.id);
     if (delIds.length) {
       const td = iso();
       msgs.forEach(m => { if (delIds.includes(m.id)) m.delivered_at = td; });
-      sb.from('messages').update({ delivered_at: td }).in('id', delIds).is('delivered_at', null).then(() => {});
+      sb.from('messages').update({ delivered_at: td }).in('id', delIds).is('delivered_at', null).then(r => { if (r.error) console.warn('[delivered_at] gagal update:', r.error.message || r.error); });
     }
+    justDeliveredIds = new Set(delIds); // jangan langsung ditandai "dibaca" di siklus yang sama — beri jeda supaya status "diterima" sempat terlihat
     if (!firstSync && fresh.length) { tone([880, 1175]); vib(12); if (!stick) { unread += fresh.length; updateFab(); } }
     firstSync = false;
     render();
@@ -1330,17 +1433,23 @@ async function maintain() {
   const now = Date.now();
   // hapus foto sesuai aturan
   for (const m of msgs) {
-    if (m.kind !== 'image' || m.photo_gone || m.pending || !m.viewed_at) continue;
-    const rcv = m.sender === 'er' ? m.room : 'er', va = +new Date(m.viewed_at);
-    const inViewer = V && V.id === m.id;
-    if (inViewer) continue;
-    if (rcv === 'er') { if (now > va + ER_MS) wipe(m.id); }
-    else { if ((m.view_count || 0) >= CONFIG.PARTNER_PHOTO_VIEWS) wipe(m.id); }
+    if (m.kind !== 'image' || m.photo_gone || m.pending) continue;
+    if (V && V.id === m.id) continue; // sedang dibuka
+    const rcv = m.sender === 'er' ? m.room : 'er';
+    if (rcv === 'er') { if (m.viewed_at && now > +new Date(m.viewed_at) + ER_MS) wipe(m.id); }
+    else if ((m.view_count || 0) >= CONFIG.PARTNER_PHOTO_VIEWS) wipe(m.id);
+    else if (now > +new Date(m.created_at) + PARTNER_PHOTO_MS) wipe(m.id); // belum sampai dilihat 5x, tapi sudah lewat PARTNER_PHOTO_MAX_MIN sejak terkirim
   }
   // tandai dibaca
   if (!document.hidden && !shieldOff) {
-    const ids = msgs.filter(m => m.sender === partner && (m.kind === 'text' || m.kind === 'audio') && !m.read_at).map(m => m.id);
-    if (ids.length) { const t = iso(); msgs.forEach(m => { if (ids.includes(m.id)) m.read_at = t; }); sb.from('messages').update({ read_at: t }).in('id', ids).then(() => {}); clearNotifs(room); }
+    const ids = msgs.filter(m => m.sender === partner && (m.kind === 'text' || m.kind === 'audio') && !m.read_at && !justDeliveredIds.has(m.id)).map(m => m.id);
+    if (ids.length) { const t = iso(); msgs.forEach(m => { if (ids.includes(m.id)) m.read_at = t; }); sb.from('messages').update({ read_at: t }).in('id', ids).then(r => { if (r.error) console.warn('[read_at] gagal update:', r.error.message || r.error); }); clearNotifs(room); }
+  }
+  // pesan teks/suara yang dihapus pengirim ke Er: jangan langsung hilang di sisi Er — baru benar-benar
+  // hilang (untuk semua, termasuk cache) ER_DELETE_MIN menit SETELAH Er membacanya
+  for (const m of msgs) {
+    if ((m.kind !== 'text' && m.kind !== 'audio') || m.photo_gone || !m.delete_req_at) continue;
+    if (m.read_at && now > +new Date(m.read_at) + ER_DELETE_MS) finalizeDelete(m.id);
   }
   // buang kadaluarsa
   if (now - lastClean > 120000) { lastClean = now; sb.from('messages').delete().lt('expires_at', iso()).then(() => {}); }
@@ -1409,7 +1518,7 @@ function autosize() { ta.style.height = 'auto'; ta.style.height = Math.min(ta.sc
 function updateSendBtn() {
   const hasText = !!ta.value.trim();
   $('btnSend').classList.toggle('on', hasText || recording);
-  if (!recording) $('btnSend').innerHTML = hasText ? I.send : I.mic;
+  $('btnSend').innerHTML = (hasText || recording) ? I.send : I.mic;
 }
 ta.addEventListener('input', () => {
   autosize(); updateSendBtn();
@@ -1469,7 +1578,7 @@ function openPreview(dataUrl) {
   pendingPhoto = dataUrl;
   $('pvImg').src = pendingPhoto;
   $('pvNote').textContent = partner !== 'er'
-    ? `Dia hanya bisa membuka foto ini maksimal ${CONFIG.PARTNER_PHOTO_VIEWS}x, lalu foto otomatis terhapus. Tidak bisa diunduh atau discreenshot.`
+    ? `Dia hanya bisa membuka foto ini maksimal ${CONFIG.PARTNER_PHOTO_VIEWS}x (atau ${Math.round(CONFIG.PARTNER_PHOTO_MAX_MIN / 60)} jam sejak terkirim kalau belum sampai ${CONFIG.PARTNER_PHOTO_VIEWS}x), lalu foto otomatis terhapus. Tidak bisa diunduh atau discreenshot.`
     : '';
   $('pv').classList.add('open');
 }
@@ -1721,15 +1830,34 @@ async function copyMsgText(id) {
   const ok = await copyText(m.body);
   toast(ok ? 'Pesan disalin' : 'Gagal menyalin, coba lagi'); vib(ok ? 10 : [10, 30, 10]);
 }
+// Hapus tuntas pesan teks/suara: hilang dari daftar, dari cache lokal, dan ditandai
+// terhapus di server (supaya perangkat lain — termasuk yang belum sync — ikut tahu).
+async function finalizeDelete(id) {
+  markDeleted(id);
+  msgs = msgs.filter(m => m.id !== id);
+  cacheDeleteMsg(id);
+  render({ force: true });
+  try { await sb.from('messages').update({ body: null, photo_gone: true }).eq('id', id); } catch (e) {}
+}
 async function deleteMsg(id) {
   closeSheet();
+  const m = msgs.find(x => x.id === id);
+  // Pesan teks/suara yang dikirim KE Er Ganteng: di akun pengirim, pesan ini sudah
+  // dianggap terhapus sejak sekarang. Tapi di sisi Er, pesan itu jangan langsung
+  // ikut hilang — biarkan dulu sampai benar-benar dibaca olehnya, baru benar-benar
+  // lenyap ER_DELETE_MIN menit setelah itu (dicek berkala di maintain()).
+  const delayed = !!m && m.sender !== 'er' && (m.kind === 'text' || m.kind === 'audio');
   const row = list.querySelector(`.row[data-id="${id}"] .b`);
   if (row) { const r = row.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2); row.classList.add('dissolve'); }
   vib(12); await wait(520);
   markDeleted(id);
-  msgs = msgs.filter(m => m.id !== id); render({ force: true });
-  // tandai dihapus (bukan hapus baris), supaya perangkat lain juga tahu ini "dihapus", bukan sekadar hilang/kadaluarsa
-  try { await sb.from('messages').update({ body: null, photo_gone: true }).eq('id', id); } catch (e) {}
+  msgs = msgs.filter(x => x.id !== id);
+  cacheDeleteMsg(id);
+  render({ force: true });
+  try {
+    if (delayed) await sb.from('messages').update({ delete_req_at: iso() }).eq('id', id);
+    else await sb.from('messages').update({ body: null, photo_gone: true }).eq('id', id); // tandai dihapus (bukan hapus baris), supaya perangkat lain juga tahu ini "dihapus", bukan sekadar hilang/kadaluarsa
+  } catch (e) {}
 }
 
 /* =====================================================================
@@ -1744,6 +1872,7 @@ async function openPhoto(id) {
   if (!mine) {
     if (isEr && m.viewed_at && Date.now() > +new Date(m.viewed_at) + ER_MS) { wipe(id); toast('Foto sudah hilang'); return; }
     if (!isEr && (m.view_count || 0) >= CONFIG.PARTNER_PHOTO_VIEWS) { wipe(id); toast('Foto sudah hilang'); return; }
+    if (!isEr && Date.now() > +new Date(m.created_at) + PARTNER_PHOTO_MS) { wipe(id); toast('Foto sudah hilang'); return; }
   }
   vib(10);
   V = { id, isEr, mine, loaded: false, url: null, timer: null };
@@ -1945,6 +2074,7 @@ function switchRoom(r) {
   msgs = []; seen = new Set(); lastSig = ''; firstRender = true; firstSync = true; stick = true; unread = 0;
   partnerOnline = false; partnerLastSeen = 0; lastSeenReady = false; typingUntil = 0; ta.value = ''; autosize(); updateSendBtn(); cancelReply();
   updateHeader(); updateTabs(); render({ force: true });
+  hydrateFromCache(r);
   list.classList.remove('swap'); void list.offsetWidth; list.classList.add('swap');
   connectRealtime(); sync();
 }
@@ -2071,7 +2201,7 @@ $('shCard').addEventListener('click', async e => {
   else if (a === 'close') closeSheet();
   else if (a === 'wipe') {
     closeSheet();
-    if (!decoy) { try { await sb.from('messages').delete().eq('room', room); } catch (er) {} }
+    if (!decoy) { try { await sb.from('messages').delete().eq('room', room); } catch (er) {} cacheClearRoom(room); }
     msgs = []; textCache.clear(); render({ force: true }); toast('Obrolan dihapus');
   }
 });
@@ -2426,6 +2556,7 @@ function enterChat() {
   msgs = []; seen = new Set(); textCache = new Map(); lastSig = ''; firstRender = true; firstSync = true; stick = true; unread = 0; errShown = false;
   partnerOnline = false; partnerLastSeen = 0; lastSeenReady = false; typingUntil = 0; ta.value = ''; autosize(); updateSendBtn();
   updateHeader(); updateTabs(); render({ force: true });
+  hydrateFromCache(room);
   sync(); connectRealtime(); loadNames(); pollT = setInterval(() => { if (!document.hidden) sync(); }, 5000);
   tickT = setInterval(() => {
     if (!me) return; touch();
@@ -2929,7 +3060,12 @@ $('btnInstall').addEventListener('click', async () => {
 });
 updateInstall();
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
-  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => {
+      // paksa cek versi terbaru tiap kali aplikasi dibuka — jangan andalkan cache CDN/hosting
+      reg.update().catch(() => {});
+    }).catch(() => {});
+  });
 }
 
 /* =====================================================================
