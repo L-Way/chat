@@ -174,7 +174,7 @@ section{position:absolute;inset:0}
 /* Status pesan: bulatan kecil — 1 abu (terkirim), 2 abu (diterima), 2 berwarna (dibaca) */
 .ticks{display:inline-flex;align-items:center;gap:2.5px;height:14px}
 .ticks i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.55);flex:none;transition:background .3s,box-shadow .3s,transform .25s var(--spring)}
-.ticks.read i{background:var(--rose2);box-shadow:0 0 5px rgba(255,143,171,.65)}
+.ticks.read i{background:var(--ok);box-shadow:0 0 6px rgba(91,227,161,.75)}
 .me .b:not(.failed) .ticks.read i{animation:tickPop .35s var(--spring)}
 @keyframes tickPop{0%{transform:scale(.4)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
 .ticks .ic{width:13px;height:13px;stroke-width:2.6}
@@ -540,6 +540,9 @@ section{position:absolute;inset:0}
   2c) Jalankan juga fungsi view_photo.sql di SQL Editor (menghitung + mengecek batas lihat
       secara atomik di server, agar batas 5x tidak bisa terlewati saat foto dibuka nyaris
       bersamaan dari 2 perangkat/tab). Lihat file view_photo.sql yang disertakan.
+  2d) Jalankan juga user_presence.sql di SQL Editor (dibutuhkan untuk fitur "terakhir online" —
+      tanpa tabel ini, upsertPresence()/loadLastSeen() diam-diam gagal karena try/catch, jadi
+      statusnya nggak akan pernah muncul di header chat). Lihat file user_presence.sql.
   3) Ganti kunci enkripsi (CHAT_SECRET) di objek CONFIG di bawah sebelum dipakai.
   4) Upload SEMUA file ke hosting HTTPS dalam satu folder: index.html, manifest.webmanifest,
      sw.js, dan folder icons/. Tanpa HTTPS, enkripsi & pemasangan di layar utama tidak jalan.
@@ -937,7 +940,7 @@ function tone(freqs) {
 let me = null, partner = null, room = null, badge = { saskia: 0, selpia: 0 }, decoy = false, sb = null, chan = null, rtOk = false;
 let msgs = [], seen = new Set(), textCache = new Map();
 let partnerOnline = false, typingUntil = 0, lastTypeSent = 0;
-let partnerLastSeen = 0, presenceBusy = false;
+let partnerLastSeen = 0, lastSeenReady = false, presenceBusy = false;
 let stick = true, unread = 0, lastSig = '', firstRender = true, firstSync = true;
 let shieldOff = false, hiddenAt = 0, V = null, syncing = false, syncQueued = false, syncTimer = null;
 let pollT = null, tickT = null, lastClean = 0, lgFails = 0, lgLock = 0, pendingPhoto = null;
@@ -1211,6 +1214,7 @@ function updateHeader() {
   if (typing) { hs.className = 'hs typing'; hs.textContent = 'sedang mengetik…'; }
   else if (v.sub && !(!decoy && !partnerOnline && partnerLastSeen)) { hs.className = 'hs love'; hs.textContent = v.sub; }
   else if (!decoy && !partnerOnline && partnerLastSeen) { hs.className = 'hs seen'; hs.textContent = 'terakhir online ' + fmtLastSeen(partnerLastSeen); }
+  else if (!decoy && !partnerOnline && !lastSeenReady) { /* belum sempat cek server — jangan buru-buru bilang "offline" */ }
   else { hs.className = 'hs'; hs.textContent = partnerOnline ? 'online' : 'offline'; }
   const showT = typing && !decoy ? true : typing;
   $('typing').classList.toggle('on', showT);
@@ -1244,16 +1248,22 @@ function scheduleSync(ms) { clearTimeout(syncTimer); syncTimer = setTimeout(sync
 async function upsertPresence() {
   if (decoy || !me || presenceBusy || !ensureClient(true)) return;
   presenceBusy = true;
-  try { await sb.from('user_presence').upsert({ id: me, last_seen: iso() }); } catch (e) {}
+  try {
+    const { error } = await sb.from('user_presence').upsert({ id: me, last_seen: iso() });
+    if (error) console.warn('[presence] upsert gagal:', error.message || error);
+  } catch (e) { console.warn('[presence] upsert gagal:', e); }
   finally { presenceBusy = false; }
 }
 async function loadLastSeen() {
   if (decoy || !me || !partner || !ensureClient(true)) return;
   try {
     const { data, error } = await sb.from('user_presence').select('last_seen').eq('id', partner).maybeSingle();
-    if (error || !data || !data.last_seen) return;
+    if (error) { console.warn('[presence] load gagal:', error.message || error); return; }
+    lastSeenReady = true;
+    if (!data || !data.last_seen) { updateHeader(); return; }
     const t = +new Date(data.last_seen);
-    if (t !== partnerLastSeen) { partnerLastSeen = t; updateHeader(); }
+    if (t !== partnerLastSeen) { partnerLastSeen = t; }
+    updateHeader();
   } catch (e) {}
 }
 let errShown = false;
@@ -1378,7 +1388,7 @@ function connectRealtime() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'names' }, () => loadNames())
       .on('presence', { event: 'sync' }, () => {
         const nowOnline = !!chan.presenceState()[partner];
-        if (partnerOnline && !nowOnline) { partnerLastSeen = Date.now(); setTimeout(loadLastSeen, 1200); } // pakai patokan kasar dulu, lalu selaraskan ke server
+        if (partnerOnline && !nowOnline) { partnerLastSeen = Date.now(); lastSeenReady = true; setTimeout(loadLastSeen, 1200); } // pakai patokan kasar dulu, lalu selaraskan ke server
         partnerOnline = nowOnline; updateHeader();
       })
       .on('broadcast', { event: 'typing' }, ({ payload }) => {
@@ -1701,8 +1711,15 @@ list.addEventListener('pointercancel', endSwipe);
 function msgMenu(id) {
   const m = msgs.find(x => x.id === id); if (!m) return;
   let html = `<button class="it" data-act="reply" data-id="${id}">${I.reply}<span>Balas pesan</span></button>`;
+  if (m.kind === 'text' && m.body && !m.failed) html += `<button class="it" data-act="copymsg" data-id="${id}">${I.clip}<span>Salin teks</span></button>`;
   if (m.sender === me) html += `<button class="it dng" data-act="del" data-id="${id}">${I.trash}<span>Hapus pesan untuk semua</span></button>`;
   openSheet(html);
+}
+async function copyMsgText(id) {
+  const m = msgs.find(x => x.id === id); closeSheet();
+  if (!m || m.kind !== 'text' || !m.body) return;
+  const ok = await copyText(m.body);
+  toast(ok ? 'Pesan disalin' : 'Gagal menyalin, coba lagi'); vib(ok ? 10 : [10, 30, 10]);
 }
 async function deleteMsg(id) {
   closeSheet();
@@ -1926,7 +1943,7 @@ function switchRoom(r) {
   if (chan && sb) { try { sb.removeChannel(chan); } catch (e) {} }
   chan = null; rtOk = false;
   msgs = []; seen = new Set(); lastSig = ''; firstRender = true; firstSync = true; stick = true; unread = 0;
-  partnerOnline = false; partnerLastSeen = 0; typingUntil = 0; ta.value = ''; autosize(); updateSendBtn(); cancelReply();
+  partnerOnline = false; partnerLastSeen = 0; lastSeenReady = false; typingUntil = 0; ta.value = ''; autosize(); updateSendBtn(); cancelReply();
   updateHeader(); updateTabs(); render({ force: true });
   list.classList.remove('swap'); void list.offsetWidth; list.classList.add('swap');
   connectRealtime(); sync();
@@ -2047,6 +2064,7 @@ $('shCard').addEventListener('click', async e => {
   else if (a === 'discard') { closeSheet(); closeEditor(); }
   else if (a === 'del') deleteMsg(b.dataset.id);
   else if (a === 'reply') { closeSheet(); startReply(b.dataset.id); }
+  else if (a === 'copymsg') copyMsgText(b.dataset.id);
   else if (a === 'wipeask') {
     $('shCard').innerHTML = `<div class="sh-t">Hapus semua obrolan?</div><p class="sh-p">Semua pesan dan foto di obrolan ini akan terhapus untuk kamu dan pasanganmu. Tindakan ini tidak bisa dibatalkan.</p><div class="acts"><button class="btn ghost" data-act="close">Batal</button><button class="btn danger" data-act="wipe">Hapus semua</button></div>`;
   }
@@ -2406,7 +2424,7 @@ async function authLogin(pw) {
 function enterChat() {
   if (decoy) { enterPoems(); tickT = setInterval(() => { if (me) touch(); }, 15000); return; }   // sandi palsu: tampilan puisi
   msgs = []; seen = new Set(); textCache = new Map(); lastSig = ''; firstRender = true; firstSync = true; stick = true; unread = 0; errShown = false;
-  partnerOnline = false; partnerLastSeen = 0; typingUntil = 0; ta.value = ''; autosize(); updateSendBtn();
+  partnerOnline = false; partnerLastSeen = 0; lastSeenReady = false; typingUntil = 0; ta.value = ''; autosize(); updateSendBtn();
   updateHeader(); updateTabs(); render({ force: true });
   sync(); connectRealtime(); loadNames(); pollT = setInterval(() => { if (!document.hidden) sync(); }, 5000);
   tickT = setInterval(() => {
@@ -2446,7 +2464,7 @@ function lockApp() {
   teardown(); localStorage.removeItem('sk_sess'); hidePushAsk();
   killSession(burning ? 1500 : 0); // beri waktu foto sekali-lihat terhapus dulu
   me = null; partner = null; room = null; msgs = []; list.innerHTML = ''; updateTabs(); shieldOff = false;
-  partnerOnline = false; partnerLastSeen = 0;
+  partnerOnline = false; partnerLastSeen = 0; lastSeenReady = false;
   $('chat').classList.remove('show'); $('poems').classList.remove('show'); poemsReset();
   const lg = $('login'); lg.classList.remove('hide', 'unlocking'); $('pw').value = ''; $('pw').type = 'password'; $('eye').innerHTML = I.eye;
   const box = lg.querySelector('.lg'); box.style.animation = 'none'; void box.offsetWidth; box.style.animation = '';
